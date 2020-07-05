@@ -1,0 +1,15 @@
+README.md
+setup.py
+clearCNV/__init__.py
+clearCNV/__main__.py
+clearCNV/cnv_arithmetics.py
+clearCNV/cnv_calling.py
+clearCNV/matchscores.py
+clearCNV/util.py
+clearCNV/visualize_scores.py
+clearCNV.egg-info/PKG-INFO
+clearCNV.egg-info/SOURCES.txt
+clearCNV.egg-info/dependency_links.txt
+clearCNV.egg-info/entry_points.txt
+clearCNV.egg-info/requires.txt
+clearCNV.egg-info/top_level.txt
