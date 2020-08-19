@@ -51,12 +51,8 @@ setuptools.setup(
     include_package_data=True,
     url="https://github.com/bihealth/clear-CNV",
     packages=setuptools.find_packages(),
-    entry_points={
-        'console_scripts': [
-            'clearCNV = clearCNV.__main__:main',
-        ],
-    },
+    entry_points={"console_scripts": ["clearCNV = clearCNV.__main__:main",],},
     install_requires=install_requirements,
-    python_requires='>=3.7',
+    python_requires=">=3.7",
     zip_safe=False,
 )
