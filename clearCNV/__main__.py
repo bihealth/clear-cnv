@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+from clearCNV import __version__
+
 # main parsing
 def get_parser():
     import argparse
@@ -10,6 +12,7 @@ def get_parser():
     from clearCNV import cnv_calling
     from clearCNV import visualize_scores
     parser = argparse.ArgumentParser(prog='clearCNV',  usage='%(prog)s [options]', description='clearCNV can compute matchscores, CNV-calls and visualizations.')
+    parser.add_argument('--version', action='version', version=__version__)
     subparsers = parser.add_subparsers()
 
     parser_matchscores = subparsers.add_parser('matchscores', description="Matchscore calculation script.")
