@@ -1,20 +1,23 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from clearCNV import __version__
+import argparse
+import sys
+from datetime import datetime
 
-# main parsing
+from logzero import logger
+
+from . import util
+from . import cnv_arithmetics as ca
+from . import matchscores
+from . import cnv_calling
+from . import visualize_scores
+from . import __version__
+
+
 def get_parser():
-    import argparse
-    from clearCNV import util
-    from clearCNV import cnv_arithmetics as ca
-    from clearCNV import matchscores
-    from clearCNV import cnv_calling
-    from clearCNV import visualize_scores
-
+    """Return argparse command line parser."""
     parser = argparse.ArgumentParser(
-        prog="clearCNV",
-        usage="%(prog)s [options]",
         description="clearCNV can compute matchscores, CNV-calls and visualizations.",
     )
     parser.add_argument("--version", action="version", version=__version__)
@@ -51,7 +54,11 @@ def get_parser():
 
     parser_cnv_calling = subparsers.add_parser(
         "cnv_calling",
-        description="CNV calling script. Output is a single file in tsv format containing a list of CNV calls sorted by score. Some quality control plots are added to the analysis directory in the process.",
+        description=(
+            "CNV calling script. Output is a single file in tsv format containing a list of CNV "
+            "calls sorted by score. Some quality control plots are added to the analysis "
+            "directory in the process."
+        ),
     )
     parser_cnv_calling.add_argument(
         "-p", "--panel", help="Name of the data set(or panel)", required=True, type=str
@@ -137,7 +144,11 @@ def get_parser():
 
     parser_visualize = subparsers.add_parser(
         "visualize",
-        description="The visualization script creates html files containing heatmap-like matrices containing the ratios aligned with mappability, GC-content and target size so that CNVs can be visually identified and evaluated easily.",
+        description=(
+            "The visualization script creates html files containing heatmap-like matrices "
+            "containing the ratios aligned with mappability, GC-content and target size so "
+            "that CNVs can be visually identified and evaluated easily."
+        ),
     )
     parser_visualize.add_argument(
         "-a",
@@ -181,17 +192,14 @@ def get_parser():
 
 
 def main():
-    import sys
-    from datetime import datetime
-    import argparse
-
-    print("Time at start:", datetime.now())
-    if len(sys.argv) <= 1:
-        args = get_parser().print_help()
+    parser = get_parser()
+    args = parser.parse_args()
+    if not hasattr(args, "func"):
+        parser.print_help()
     else:
-        args = get_parser().parse_args()
+        logger.info("Starting analysis...")
         args.func(args)
-    print("Terminated at:", datetime.now())
+        logger.info("All done. Have a nice day!")
 
 
 if __name__ == "__main__":
