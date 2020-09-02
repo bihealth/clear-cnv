@@ -1,0 +1,6 @@
+workdir: '/fast/users/vmay_m/work/workflow/FCC/CALLING/'
+panelname: 'TAADv2mini'
+bedfile: '/fast/users/vmay_m/work/workflow/FCC/beds/TAADv2.bed'
+bamsfile: '/fast/users/vmay_m/work/workflow/FCC/bams/TAADv2mini_bams.txt'
+reference: '/fast/work/projects/cubit/18.12/static_data/reference/GRCh37/hs37d5/hs37d5.fa'
+kmer_align: '/fast/work/projects/cubit/18.12/static_data/db/goldenpath/variable/GRCh37/wgEncodeCrgMapabilityAlign36mer.eq_1.bed'

@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[14]:
-
 
 import argparse
 
@@ -18,97 +16,20 @@ from clearCNV import util
 from clearCNV import cnv_arithmetics as ca
 
 
-# In[2]:
-
-
-r"""
-parser = argparse.ArgumentParser(description="CNV calling script. Output is a single cnv.calls file in tsv format. Some quality control plots are added to analysis directory in the process.")
-parser.add_argument("-p", "--panel",               help="Name of the data set(or panel)",                                                      required=True,  type=str)
-parser.add_argument("-c", "--coverages",           help="Coverages file in tsv format",                                                        required=True,  type=str)
-parser.add_argument("-a", "--analysis_directory",  help="Path to the directory, where analysis files are stored",                              required=True,  type=str)
-parser.add_argument("-m", "--matchscores",         help="matchscores.tsv file generated with matchscores.py",                                  required=True,  type=str)
-parser.add_argument("-C", "--cnv_calls",           help="Output cnv.calls file formatted in tsv format",                                       required=True,  type=str)
-parser.add_argument("-r", "--ratio_scores",        help="Output ratio scores file in tsv format. Best kept together with cnv.calls",           required=True,  type=str)
-parser.add_argument("-z", "--z_scores",            help="Output z-scores file in tsv format. Best kept together with cnv.calls",               required=True,  type=str)
-parser.add_argument("-x", "--expected_artifacts",  help="Expected ratio of CNVs or artifacs in target fragment counts",                        required=False, type=float, default=0.02)
-parser.add_argument("-u", "--minimum_sample_score",help="A lower threshold results in better fitting, but smaller calling groups",             required=False, type=float, default=0.15)
-parser.add_argument("-g", "--minimum_group_sizes", help="Minimum group size per CNV calling group per match scores",                           required=False, type=int,   default=33)
-parser.add_argument("-s", "--sensitivity",         help="A higher sensitivity results in more CNV calls. Can only be 0.0 <= sens <= 1.0",      required=False, type=float, default=0.7)
-parser.add_argument("--cores",                     help="Number of cpu cores used in parallel processing. Default: determined automatically.", required=False, type=int,   default=0)
-
-args = parser.parse_args()
-
-panel                = args.panel
-intsv_path           = args.coverages
-analysis_dir         = args.analysis_directory
-matchscores_path     = args.matchscores
-calls_path           = args.cnv_calls
-ratio_scores_path    = args.ratio_scores
-z_scores_path        = args.z_scores
-EXPECTED_CNV_RATE    = args.expected_artifacts
-MINIMUM_SAMPLE_SCORE = args.minimum_sample_score
-MINIMUM_SAMPLE_GROUP = args.minimum_group_sizes
-SENSITIVITY          = args.sensitivity if args.sensitivity >= 0 and args.sensitivity <= 1 else 0.0
-CORES                = min([args.cores, mp.cpu_count()]) if args.cores else mp.cpu_count()
-"""
-
-
-# In[15]:
-
-
-r"""
-panel = "TAADv2"
-
-intsv_path       = "/vol/sshfs/vmay/bih_cluster/fast/work/users/vmay_m/workflow/FCC/CALLING/%s/cov/coverages.tsv"%panel
-
-# the resulting matchscore matrix is saved here
-calls_path       = "/vol/sshfs/vmay/bih_cluster/fast/work/users/vmay_m/workflow/FCC/CALLING/%s/results/cnv.calls"%panel
-
-# all analysis results are saved here
-analysis_dir     = "/vol/sshfs/vmay/bih_cluster/fast/work/users/vmay_m/workflow/FCC/CALLING/%s/analysis/"%panel
-
-matchscores_path = "/vol/sshfs/vmay/bih_cluster/fast/work/users/vmay_m/workflow/FCC/CALLING/%s/analysis/matchscores.tsv"%panel
-
-ratio_scores_path = analysis_dir+'ratio_scores.tsv'
-z_scores_path = analysis_dir+'z_scores.tsv'
-
-EXPECTED_CNV_RATE    = 0.02
-MINIMUM_SAMPLE_GROUP = 33
-SENSITIVITY = 0.7
-MINIMUM_SAMPLE_SCORE = 0.15
-CORES = 4
-"""
-
-
-# In[20]:
-
-
-# D,Z,R = cnv_calling(panel, intsv_path, analysis_dir, matchscores_path,
-#        calls_path, ratio_scores_path, z_scores_path, EXPECTED_CNV_RATE,
-#        MINIMUM_SAMPLE_GROUP, MINIMUM_SAMPLE_SCORE, SENSITIVITY, CORES)
-
-
-# In[21]:
-
-
-# def cnv_calling(panel, intsv_path, analysis_dir, matchscores_path,
-#        calls_path, ratio_scores_path, z_scores_path, EXPECTED_CNV_RATE,
-#        MINIMUM_SAMPLE_GROUP, MINIMUM_SAMPLE_SCORE, SENSITIVITY, CORES):
-#
 def cnv_calling(args):
     # argparsing
-    panel = args.panel
-    intsv_path = args.coverages
-    analysis_dir = args.analysis_directory
-    matchscores_path = args.matchscores
-    calls_path = args.cnv_calls
-    ratio_scores_path = args.ratio_scores
-    z_scores_path = args.z_scores
-    EXPECTED_CNV_RATE = args.expected_artifacts
+    panel                = args.panel
+    intsv_path           = args.coverages
+    analysis_dir         = args.analysis_directory
+    matchscores_path     = args.matchscores
+    calls_path           = args.cnv_calls
+    ratio_scores_path    = args.ratio_scores
+    z_scores_path        = args.z_scores
+    EXPECTED_CNV_RATE    = args.expected_artefacts
     MINIMUM_SAMPLE_SCORE = args.minimum_sample_score
     MINIMUM_SAMPLE_GROUP = args.minimum_group_sizes
-    SENSITIVITY = args.sensitivity if args.sensitivity >= 0 and args.sensitivity <= 1 else 0.0
-    CORES = min([args.cores, mp.cpu_count()]) if args.cores else mp.cpu_count()
+    SENSITIVITY          = args.sensitivity if args.sensitivity >= 0 and args.sensitivity <= 1 else 0.0
+    CORES                = min([args.cores, mp.cpu_count()]) if args.cores else mp.cpu_count()
 
     # load data
     D0 = util.load_dataframe(intsv_path)
@@ -205,7 +126,14 @@ def cnv_calling(args):
     for i in range(len(Matchscores_bools.columns)):
         pool.apply_async(
             util.calling_cnv,
-            args=(i, DA[0], Matchscores_bools, DA[1], EXPECTED_CNV_RATE, SENSITIVITY,),
+            args=(
+                i,
+                DA[0],
+                Matchscores_bools,
+                DA[1],
+                EXPECTED_CNV_RATE,
+                SENSITIVITY,
+            ),
             callback=collect_result,
         )
     pool.close()
@@ -229,7 +157,14 @@ def cnv_calling(args):
         for i in range(len(Matchscores_bools.columns)):
             pool.apply_async(
                 util.calling_cnv,
-                args=(i, DX[0], Matchscores_bools, DX[1], EXPECTED_CNV_RATE, SENSITIVITY,),
+                args=(
+                    i,
+                    DX[0],
+                    Matchscores_bools,
+                    DX[1],
+                    EXPECTED_CNV_RATE,
+                    SENSITIVITY,
+                ),
                 callback=collect_result,
             )
         pool.close()
@@ -251,7 +186,14 @@ def cnv_calling(args):
         for i in range(len(Matchscores_bools.columns)):
             pool.apply_async(
                 util.calling_cnv,
-                args=(i, DY[0], My, DY[1], EXPECTED_CNV_RATE, SENSITIVITY,),
+                args=(
+                    i,
+                    DY[0],
+                    My,
+                    DY[1],
+                    EXPECTED_CNV_RATE,
+                    SENSITIVITY,
+                ),
                 callback=collect_result,
             )
         pool.close()
@@ -284,7 +226,16 @@ def cnv_calling(args):
             [
                 pool.apply(
                     util.merge_score_cnvs,
-                    args=([HMM[i, :], z_scores_scaled[i, :], ratio_scores[i:,], INDEX]),
+                    args=(
+                        [
+                            HMM[i, :],
+                            z_scores_scaled[i, :],
+                            ratio_scores[
+                                i:,
+                            ],
+                            INDEX,
+                        ]
+                    ),
                 )
                 for i in cnv_carrying_indexes
             ],

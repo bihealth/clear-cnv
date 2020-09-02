@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
 
 import argparse
 
@@ -17,50 +15,14 @@ import plotly.graph_objects as go
 import plotly
 from plotly.subplots import make_subplots
 
-
-# In[3]:
-
-
-r"""panel = "TAADv2"
-analysis_dir      = "/vol/sshfs/vmay/bih_cluster/fast/users/vmay_m/work/workflow/FCC/CALLING/%s/analysis/"%panel
-z_scores_path     = "/vol/sshfs/vmay/bih_cluster/fast/users/vmay_m/work/workflow/FCC/CALLING/%s/analysis/z_scores.tsv"%panel
-ratio_scores_path = "/vol/sshfs/vmay/bih_cluster/fast/users/vmay_m/work/workflow/FCC/CALLING/%s/analysis/ratio_scores.tsv"%panel
-annotated_path    = "/vol/sshfs/vmay/bih_cluster/fast/users/vmay_m/work/workflow/FCC/CALLING/%s/results/annotations.bed"%panel
-htmp_size         = 1000"""
-
-
-# In[4]:
-
-
-r"""
-parser = argparse.ArgumentParser(description="CNV calling script. Output is a single cnv.calls file in tsv format. Some quality control plots are added to analysis directory in the process.")
-parser.add_argument("-a", "--analysis_directory", help="Path to the directory, where analysis files are stored", required=True, type=str)
-parser.add_argument("-r", "--ratio_scores", help="Ratio scores file in tsv format, generated in cnv_calling.py", required=True, type=str)
-parser.add_argument("-z", "--z_scores", help="Z-scores file in tsv format, generated in cnv_calling.py", required=True, type=str)
-parser.add_argument("-n", "--annotated", help="CALL_GROUPS.py analysis_directory z_scores.tsv ratio_scores.tsv annotations.bed", required=True, type=str)
-parser.add_argument("-s", "--size", help="Rough number of targets in each visualization.", required=False, type=int, default=1000)
-
-args = parser.parse_args()
-
-analysis_dir      = args.analysis_directory
-ratio_scores_path = args.ratio_scores
-z_scores_path     = args.z_scores
-annotated_path    = args.annotated
-htmp_size         = args.size
-"""
-
-
-# In[21]:
-
-
 # def visualize(analysis_dir, ratio_scores_path, z_scores_path, annotated_path, htmp_size):
 def visualize(args):
     # argparsing
-    analysis_dir = args.analysis_directory
+    analysis_dir      = args.analysis_directory
     ratio_scores_path = args.ratio_scores
-    z_scores_path = args.z_scores
-    annotated_path = args.annotated
-    htmp_size = args.size
+    z_scores_path     = args.z_scores
+    annotated_path    = args.annotated
+    htmp_size         = args.size
 
     # load data
     annotated = pd.read_csv(annotated_path, sep="\t", low_memory=False, header=None)
@@ -130,7 +92,8 @@ def visualize(args):
         sp.add_trace(msize, row=1, col=4)
 
         sp.update_layout(
-            width=len(df.columns) * 3 + 300, height=len(df.index) * 3 + 300,
+            width=len(df.columns) * 3 + 300,
+            height=len(df.index) * 3 + 300,
         )
         return sp
 
@@ -173,9 +136,3 @@ def visualize(args):
     plt.title("GC content vs sd of ratio scores after grouping")
     plt.legend()
     plt.savefig(analysis_dir + "ANALYSIS_ratio_vs_gc.pdf", format="pdf")
-
-
-# In[20]:
-
-
-# visualize(analysis_dir, ratio_scores_path, z_scores_path, annotated_path, htmp_size)

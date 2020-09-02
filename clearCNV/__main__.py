@@ -7,11 +7,13 @@ from datetime import datetime
 
 from logzero import logger
 
-from . import util
+#from . import util
+from . import misc
 from . import cnv_arithmetics as ca
 from . import matchscores
 from . import cnv_calling
 from . import visualize_scores
+from . import workflow
 from . import __version__
 
 
@@ -23,6 +25,9 @@ def get_parser():
     parser.add_argument("--version", action="version", version=__version__)
     subparsers = parser.add_subparsers()
 
+    # =========================================================================
+    #  matchscores
+    # =========================================================================
     parser_matchscores = subparsers.add_parser(
         "matchscores", description="Matchscore calculation script."
     )
@@ -37,8 +42,8 @@ def get_parser():
     )
     parser_matchscores.add_argument(
         "-x",
-        "--expected_artifacts",
-        help="Expected ratio of CNVs or artifacs in target fragment counts",
+        "--expected_artefacts",
+        help="Expected ratio of CNVs or artefacs in target fragment counts",
         required=False,
         type=float,
         default=0.02,
@@ -52,6 +57,9 @@ def get_parser():
     )
     parser_matchscores.set_defaults(func=matchscores.matchscores)
 
+    # =========================================================================
+    #  cnv calling
+    # =========================================================================
     parser_cnv_calling = subparsers.add_parser(
         "cnv_calling",
         description=(
@@ -103,8 +111,8 @@ def get_parser():
     )
     parser_cnv_calling.add_argument(
         "-x",
-        "--expected_artifacts",
-        help="Expected ratio of CNVs or artifacs in target fragment counts",
+        "--expected_artefacts",
+        help="Expected ratio of CNVs or artefacs in target fragment counts",
         required=False,
         type=float,
         default=0.02,
@@ -142,6 +150,9 @@ def get_parser():
     )
     parser_cnv_calling.set_defaults(func=cnv_calling.cnv_calling)
 
+    # =========================================================================
+    #  visualize
+    # =========================================================================
     parser_visualize = subparsers.add_parser(
         "visualize",
         description=(
@@ -187,6 +198,181 @@ def get_parser():
         default=1000,
     )
     parser_visualize.set_defaults(func=visualize_scores.visualize)
+
+    # =========================================================================
+    #  merge bed
+    # =========================================================================
+    parser_merge_bed = subparsers.add_parser(
+        "merge_bed",
+        description=("Merges bed files to non-overlapping intervals."),
+    )
+    parser_merge_bed.add_argument(
+        "-i",
+        "--infile",
+        help="Path to the original .bed file.",
+        required=True,
+        type=str,
+    )
+    parser_merge_bed.add_argument(
+        "-o",
+        "--outfile",
+        help="Output path to the merged .bed file.",
+        required=True,
+        type=str,
+    )
+    parser_merge_bed.set_defaults(func=misc.merge_bedfile)
+
+    # =========================================================================
+    #  coverage
+    # =========================================================================
+    parser_rtbeds = subparsers.add_parser(
+        "coverage",
+        description=(
+            "wrapper for bedtools multicov. Creates an .rtbed file which contains the read depth coverage per target."
+        ),
+    )
+    parser_rtbeds.add_argument(
+        "-i",
+        "--inbam",
+        help="Path to the .bam file of the sample.",
+        required=True,
+        type=str,
+    )
+    parser_rtbeds.add_argument(
+        "-b",
+        "--bedfile",
+        help="Path to the merged .bed file.",
+        required=True,
+        type=str,
+    )
+    parser_rtbeds.add_argument(
+        "-r",
+        "--rtbed",
+        help="Output file in .rtbed format.",
+        required=True,
+        type=str,
+    )
+    parser_rtbeds.set_defaults(func=misc.count_pair)
+
+    # -------------------------------------------------------------------------
+    # merge rtbeds
+
+    parser_merge_rtbeds = subparsers.add_parser(
+        "merge_coverages",
+        description=("Merges all .rtbed files into one table in .tsv format."),
+    )
+    parser_merge_rtbeds.add_argument(
+        "-b",
+        "--bedfile",
+        help="Path to the merged .bed file.",
+        required=True,
+        type=str,
+    )
+    parser_merge_rtbeds.add_argument(
+        "-r",
+        "--rtbeds",
+        help="Input .rtbed file paths.",
+        required=True,
+        nargs="+",
+        type=str,
+    )
+    parser_merge_rtbeds.add_argument(
+        "-c",
+        "--coverages",
+        help="Output table in .tsv format.",
+        required=True,
+        type=str,
+    )
+    parser_merge_rtbeds.set_defaults(func=misc.merge_rtbeds)
+
+    # =========================================================================
+    #  annotations
+    # =========================================================================
+    parser_annotations = subparsers.add_parser(
+        "annotations",
+        description=("Creates annotations file."),
+    )
+    parser_annotations.add_argument(
+        "-r",
+        "--reference",
+        help="Path to the genomic reference.",
+        required=True,
+        type=str,
+    )
+    parser_annotations.add_argument(
+        "-b",
+        "--bedfile",
+        help="Path to the merged .bed file.",
+        required=True,
+        type=str,
+    )
+    parser_annotations.add_argument(
+        "-k",
+        "--kmer_align",
+        help="Path to aligned k-mers (mappability) file in .bed format.",
+        required=True,
+        type=str,
+    )
+    parser_annotations.add_argument(
+        "-a",
+        "--annotations",
+        help="Output file in .bed format.",
+        required=True,
+        type=str,
+    )
+    parser_annotations.set_defaults(func=misc.create_annotations_file)
+
+    # =========================================================================
+    #  workflow
+    # =========================================================================
+    parser_workflow = subparsers.add_parser(
+        "workflow",
+        description=("Complete workflow that runs snakemake internally."),
+    )
+    parser_workflow.add_argument(
+        "-w",
+        "--workdir",
+        help="Path to the snakemake workdir.",
+        required=True,
+        type=str,
+    )
+    parser_workflow.add_argument(
+        "-p",
+        "--panelname",
+        help="name of the panel or dataset.",
+        required=True,
+        type=str,
+    )
+    parser_workflow.add_argument(
+        "-r",
+        "--reference",
+        help="Path to the genomic reference.",
+        required=True,
+        type=str,
+    )
+    parser_workflow.add_argument(
+        "-b",
+        "--bamsfile",
+        help="Path to a .txt file that contains all paths to all used .bam files.",
+        required=True,
+        type=str,
+    )
+    parser_workflow.add_argument(
+        "-d",
+        "--bedfile",
+        help="Path to the .bed file.",
+        required=True,
+        type=str,
+    )
+    parser_workflow.add_argument(
+        "-k",
+        "--kmer_align",
+        help="Path to aligned k-mers (mappability) file in .bed format.",
+        required=True,
+        type=str,
+    )
+    parser_workflow.set_defaults(func=workflow.workflow)
+
 
     return parser
 
