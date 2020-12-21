@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-
 import argparse
+import pathlib
 
 import pandas as pd
 import numpy as np
@@ -18,63 +18,35 @@ from clearCNV import cnv_arithmetics as ca
 
 def cnv_calling(args):
     # argparsing
-    panel                = args.panel
-    intsv_path           = args.coverages
-    analysis_dir         = args.analysis_directory
-    matchscores_path     = args.matchscores
-    calls_path           = args.cnv_calls
-    ratio_scores_path    = args.ratio_scores
-    z_scores_path        = args.z_scores
-    EXPECTED_CNV_RATE    = args.expected_artefacts
+    panel = args.panel
+    intsv_path = args.coverages
+    analysis_dir = args.analysis_directory
+    matchscores_path = args.matchscores
+    calls_path = args.cnv_calls
+    ratio_scores_path = args.ratio_scores
+    z_scores_path = args.z_scores
+    EXPECTED_CNV_RATE = args.expected_artefacts
     MINIMUM_SAMPLE_SCORE = args.minimum_sample_score
     MINIMUM_SAMPLE_GROUP = args.minimum_group_sizes
-    SENSITIVITY          = args.sensitivity if args.sensitivity >= 0 and args.sensitivity <= 1 else 0.0
-    CORES                = min([args.cores, mp.cpu_count()]) if args.cores else mp.cpu_count()
+    SENSITIVITY = args.sensitivity if args.sensitivity >= 0 and args.sensitivity <= 1 else 0.7
+    CORES = min([args.cores, mp.cpu_count()]) if args.cores else mp.cpu_count()
 
     # load data
     D0 = util.load_dataframe(intsv_path)
     Matchscores = pd.read_csv(matchscores_path, sep="\t", low_memory=False, header=0, index_col=0)
 
     # adaptive threshold for group sizes
-    MINIMUM_SAMPLE_SCORE_O = MINIMUM_SAMPLE_SCORE
-    suggested_MINIMUM_SAMPLE_SCORE = np.mean(
-        Matchscores.sum(axis=0) / (len(Matchscores.columns) - 1)
-    )
-    if suggested_MINIMUM_SAMPLE_SCORE < MINIMUM_SAMPLE_SCORE:
-        MINIMUM_SAMPLE_SCORE = (suggested_MINIMUM_SAMPLE_SCORE + MINIMUM_SAMPLE_SCORE * 2) / 3
-    print("chose %.04f as MINIMUM_SAMPLE_SCORE" % MINIMUM_SAMPLE_SCORE)
+    matchmatrix = pd.DataFrame()
+    for sample in Matchscores.columns:
+        matchmatrix[sample] = Matchscores[sample] <= np.quantile(Matchscores[sample],MINIMUM_SAMPLE_GROUP/len(Matchscores.columns))
 
-    # define calling groups
-    matchmatrix = Matchscores < MINIMUM_SAMPLE_SCORE
-
-    # select all underfitting samples
-    sample_group_sizes = matchmatrix.sum(axis=0) - 1
-    selected_samples_matrix = matchmatrix[sample_group_sizes >= MINIMUM_SAMPLE_GROUP]
-    failed_samples = matchmatrix.index.difference(selected_samples_matrix.index)
-    Matchscores_selected = Matchscores[selected_samples_matrix.index]
-    Matchscores = Matchscores_selected.T[selected_samples_matrix.index].T
-    Matchscores_bools = Matchscores <= MINIMUM_SAMPLE_SCORE
-    Matchscores_bools = Matchscores_bools  # * (1-np.identity(len(Matchscores_bools)))).astype(bool)
+    v = util.turntransform((Matchscores * matchmatrix).mean(axis=0).sort_values())
+    minmatchscore    = min([(Matchscores * matchmatrix).mean(axis=0)[v[v <= min(v)].index[0]],MINIMUM_SAMPLE_SCORE])
+    failed_samples   = matchmatrix[((Matchscores * matchmatrix).mean(axis=0) >= minmatchscore)].index
+    selected_samples = matchmatrix.columns.difference(failed_samples)
+    Matchscores_bools = matchmatrix[selected_samples].drop(index=failed_samples)
 
     # evaluation
-    plt.figure(figsize=(8, 4), dpi=200)
-    n, bins, patches = plt.hist(
-        sample_group_sizes,
-        int(len(sample_group_sizes) / 2),
-        label=str(len(failed_samples)) + " failed samples",
-    )
-    plt.vlines(
-        MINIMUM_SAMPLE_GROUP,
-        0,
-        max(n) * 0.75,
-        label="cutoff at %.d" % MINIMUM_SAMPLE_GROUP,
-        color="darkred",
-    )
-    plt.xlabel("sample group size")
-    plt.ylabel("samples")
-    plt.legend()
-    plt.savefig(analysis_dir + "ANALYSIS_group_sizes_cutoff.pdf", format="pdf")
-
     print(
         "%.d samples failed to have a sufficient group size. They are ignored in cnv calling."
         % len(failed_samples)
@@ -82,9 +54,27 @@ def cnv_calling(args):
     for f in failed_samples:
         print(f)
 
+    plt.figure(figsize=(8, 4), dpi=200)
+    n, bins, patches = plt.hist(
+        (Matchscores * matchmatrix).mean(),
+        int(len(matchmatrix.columns) / 2),
+        label=str(len(failed_samples)) + " failed samples",
+    )
+    plt.vlines(
+        minmatchscore,
+        0,
+        max(n) * 0.75,
+        label="cutoff at %1.4f"% minmatchscore,
+        color="darkred",
+    )
+    plt.xlabel("mean sample group score")
+    plt.ylabel("samples")
+    plt.legend()
+    plt.savefig(pathlib.Path(analysis_dir) / "ANALYSIS_group_sizes_cutoff.pdf", format="pdf")
+
     util.print_clustermap(
         Matchscores,
-        path=(analysis_dir + "ANALYSIS_clustermap_filtered.pdf"),
+        path=pathlib.Path(analysis_dir) / "ANALYSIS_clustermap_filtered.pdf",
         title="clustered heat map of selected sample distances",
     )
 
@@ -200,13 +190,70 @@ def cnv_calling(args):
         pool.join()
         sample_scores += sample_scores_buffer
 
+    # extract single exon CNVs
+    S = pd.DataFrame(sample_scores, index=SAMPLES).T
+    DFZ = pd.DataFrame(z_scores_scaled, columns=INDEX, index=SAMPLES).T
+    DFR = pd.DataFrame(ratio_scores, columns=INDEX, index=SAMPLES).T
+    SINGLE_EXONS = pd.concat(
+        [
+            pd.DataFrame(
+                [
+                    [
+                        DFZ.columns[c],
+                        *DFZ.index[i].split("_"),
+                        "DEL",
+                        1,
+                        DFZ.iloc[i, c],
+                        float(S[DFZ.columns[c]]),
+                    ]
+                    for i, c in zip(*np.where((DFZ < -5) & (DFR < 0.65)))
+                ],
+                columns=[
+                    "sample",
+                    "chr",
+                    "start",
+                    "end",
+                    "gene",
+                    "aberration",
+                    "size",
+                    "score",
+                    "sample_score",
+                ],
+            ),
+            pd.DataFrame(
+                [
+                    [
+                        DFZ.columns[c],
+                        *DFZ.index[i].split("_"),
+                        "DUP",
+                        1,
+                        DFZ.iloc[i, c],
+                        float(S[DFZ.columns[c]]),
+                    ]
+                    for i, c in zip(*np.where((DFZ > 6) & (DFR > 1.35)))
+                ],
+                columns=[
+                    "sample",
+                    "chr",
+                    "start",
+                    "end",
+                    "gene",
+                    "aberration",
+                    "size",
+                    "score",
+                    "sample_score",
+                ],
+            ),
+        ]
+    )
+
     print("compute HMM on z-scores")
     # HMM guided CNV candidates
     # =========================================================================
     # --- fix lockdown bug --- #
     # pool = mp.Pool(CORES)
-    probs = np.array([[-3.0], [0.0], [5.0]])
-    transitionprobs = np.array([[0.99, 0.01, 0.0], [0.001, 0.998, 0.001], [0.0, 0.001, 0.999]])
+    probs = np.array([[-2.5], [0.0], [3.5]])
+    transitionprobs = np.array([[0.9999, 0.0001, 0.0], [0.0001, 0.9998, 0.0001], [0.0, 0.0001, 0.9999]])
     # HMM = np.array([pool.apply(util.hmm_scores, args=([sample,probs,transitionprobs]))
     #                for sample in z_scores_scaled])
     # pool.close()
@@ -231,7 +278,7 @@ def cnv_calling(args):
                             HMM[i, :],
                             z_scores_scaled[i, :],
                             ratio_scores[
-                                i:,
+                                i,:
                             ],
                             INDEX,
                         ]
@@ -264,8 +311,89 @@ def cnv_calling(args):
     ).sort_values(by="score", ascending=False)
     RZ = pd.DataFrame(z_scores_scaled, columns=INDEX, index=SAMPLES).T
     RR = pd.DataFrame(ratio_scores, columns=INDEX, index=SAMPLES).T
+
+    S = pd.DataFrame(sample_scores, index=SAMPLES).T
+    SINGLE_EXONS = pd.concat(
+        [
+            pd.DataFrame(
+                [
+                    [
+                        RZ.columns[c],
+                        *RZ.index[i].split("_"),
+                        "DEL",
+                        1,
+                        RZ.iloc[i, c],
+                        float(S[RZ.columns[c]]),
+                    ]
+                    for i, c in zip(*np.where((RZ < -5) & (RR < 0.65)))
+                ],
+                columns=[
+                    "sample",
+                    "chr",
+                    "start",
+                    "end",
+                    "gene",
+                    "aberration",
+                    "size",
+                    "score",
+                    "sample_score",
+                ],
+            ),
+            pd.DataFrame(
+                [
+                    [
+                        RZ.columns[c],
+                        *RZ.index[i].split("_"),
+                        "DUP",
+                        1,
+                        RZ.iloc[i, c],
+                        float(S[RZ.columns[c]]),
+                    ]
+                    for i, c in zip(*np.where((RZ > 6) & (RR > 1.35)))
+                ],
+                columns=[
+                    "sample",
+                    "chr",
+                    "start",
+                    "end",
+                    "gene",
+                    "aberration",
+                    "size",
+                    "score",
+                    "sample_score",
+                ],
+            ),
+        ]
+    )
+    print("extract single exon CNVs.")
+    BIG_HITS = ca.flatten_list(
+        [
+            l.get_hits()
+            for l in ca.load_cnvs_from_df(
+                RD[["sample", "chr", "start", "end", "gene", "aberration", "score", "size"]]
+            )
+        ]
+    )
+    SINGLE_HITS = ca.flatten_list(
+        [
+            l.get_hits()
+            for l in ca.load_cnvs_from_df(
+                SINGLE_EXONS[
+                    ["sample", "chr", "start", "end", "gene", "aberration", "score", "size"]
+                ]
+            )
+        ]
+    )
+    X = [
+        [*h.to_list()[:6], h.to_list()[7], h.to_list()[6], *S[h.to_list()[0]]]
+        for h in ca.hitsA_not_in_hitsB(SINGLE_HITS, BIG_HITS)
+    ]
+    FINAL = pd.concat([RD, pd.DataFrame(X, columns=RD.columns)])
+    FINAL["score"] = FINAL["score"].astype(float).apply(lambda x: abs(x))
+    FINAL = FINAL.sort_values(by="score", ascending=False)
+
     print("saving results...")
-    RD.to_csv(calls_path, sep="\t", index=False)
+    FINAL.to_csv(calls_path, sep="\t", index=False)
     RZ.to_csv(z_scores_path, sep="\t")
     RR.to_csv(ratio_scores_path, sep="\t")
     print("done!")

@@ -3,7 +3,7 @@
 
 
 import argparse
-
+import pathlib
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,11 +18,11 @@ from plotly.subplots import make_subplots
 # def visualize(analysis_dir, ratio_scores_path, z_scores_path, annotated_path, htmp_size):
 def visualize(args):
     # argparsing
-    analysis_dir      = args.analysis_directory
+    analysis_dir = args.analysis_directory
     ratio_scores_path = args.ratio_scores
-    z_scores_path     = args.z_scores
-    annotated_path    = args.annotated
-    htmp_size         = args.size
+    z_scores_path = args.z_scores
+    annotated_path = args.annotated
+    htmp_size = args.size
 
     # load data
     annotated = pd.read_csv(annotated_path, sep="\t", low_memory=False, header=None)
@@ -102,7 +102,7 @@ def visualize(args):
     for i, split in enumerate(splits(RS.index, htmp_size)):
         plotly.offline.plot(
             get_plots(RS.loc[split, :], annotated),
-            filename=analysis_dir + f"ratio_scores_extended_{i}.html",
+            filename=str(pathlib.Path(analysis_dir) / f"ratio_scores_extended_{i}.html"),
         )
         print(f"ratio_scores_extended_{i}.html finished")
 
@@ -125,7 +125,7 @@ def visualize(args):
     plt.xlabel("sd of z-scores")
     plt.title("GC content vs z-scores after grouping")
     plt.legend()
-    plt.savefig(analysis_dir + "ANALYSIS_GC_vs_SD.pdf", format="pdf")
+    plt.savefig(pathlib.Path(analysis_dir) / "ANALYSIS_GC_vs_SD.pdf", format="pdf")
 
     plt.figure(figsize=(8, 5))
     plt.scatter(
@@ -135,4 +135,4 @@ def visualize(args):
     plt.xlabel("sd of ratios")
     plt.title("GC content vs sd of ratio scores after grouping")
     plt.legend()
-    plt.savefig(analysis_dir + "ANALYSIS_ratio_vs_gc.pdf", format="pdf")
+    plt.savefig(str(pathlib.Path(analysis_dir) / "ANALYSIS_ratio_vs_gc.pdf"), format="pdf")

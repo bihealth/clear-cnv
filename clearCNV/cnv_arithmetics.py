@@ -4,7 +4,7 @@
 # In[1]:
 
 
-import os
+import os, numpy as np
 
 
 # In[2]:
@@ -61,7 +61,7 @@ class Target:
                 < other.start + (other.end - other.start) / 2
             )
         elif self.chr.isdigit() and other.chr.isdigit():
-            return self.chr < other.chr
+            return int(self.chr) < int(other.chr)
         elif not self.chr.isdigit() and not other.chr.isdigit():
             return self.chr < other.chr
         elif self.chr.isdigit() and not other.chr.isdigit():
@@ -77,6 +77,15 @@ class Target:
 
     def __ge__(self, other):
         return self > other or self == other
+
+    def __add__(self, other):
+        if self.chr != other.chr:
+            raise ValueError('Chromosomes have to be the same of both targets.')
+        newgene = ""
+        if self.gene in other.gene:   newgene = other.gene
+        elif other.gene in self.gene: newgene = self.gene
+        else: ','.join(set([self.gene,other.gene]))
+        return Target(self.chr, min([self.start, other.start]),max(self.end,other.end),newgene)
 
     def to_list(self):
         return list(map(str, [self.chr, self.start, self.end, self.gene]))
@@ -134,6 +143,8 @@ class CNV:
             )
         return list(map(str, [self.chr, self.start, self.end, self.gene, self.abb, self.score]))
 
+    def get_size(self):
+        return self.end - self.start
 
 # In[6]:
 
@@ -158,6 +169,8 @@ class Hit:
     def to_list(self):
         return [str(self.sample), *self.cnv.to_list()]
 
+    def get_size(self):
+        return self.cnv.get_size()
 
 # In[7]:
 
@@ -185,31 +198,38 @@ class Sample:
 
 # In[8]:
 
-
-def intersect_hits(hits1, hits2):
-    R = []
-    for h1 in hits1:
-        if h1 in hits2:
-            R.append(h1)
-    return list(set(R))
+def load_cnvs_from_df(df):
+    samples = []
+    header = ["sample","chr","start","end","gene","aberration","score","size"]
+    df.columns = header
+    for sample in set(df["sample"]):
+        sub_df = df[df["sample"] == sample]
+        cnvs = []
+        for target in sub_df.index:
+            cnvs.append(CNV(*sub_df.loc[target,header[1:]]))
+        samples.append(Sample(sample,cnvs))
+    return samples
 
 
 # In[9]:
 
+def union_hits(hits):
+    if len(hits) <= 1:
+        return hits[0]
+    return set(hits[0]).union(union_hits(hits[1:]))
 
-def dissect_hits(hits1, hits2):
-    R = []
-    for h1 in hits1:
-        if not h1 in hits2:
-            R.append(h1)
-    return list(set(R))
+def difference_left(hits, hits_other):
+    return set(hits).difference(set(difference_left(hits_other)))
 
+def difference_hits(hits):
+    if len(hits) <= 1:
+        return hits[0]
+    return set(hits[0]).difference(difference_hits(hits[1:]))
 
-# In[10]:
-
-
-def union_hits(hits1, hits2):
-    return set(hits1).union(set(hits2))
+def intersect_hits(hits):
+    if len(hits) <= 1:
+        return hits[0]
+    return set(hits[0]).intersection(intersect_hits(hits[1:]))
 
 
 # In[11]:
@@ -235,6 +255,14 @@ def read_sample(file, sep="\t"):
             cnvs.append(CNV(*(line.split(sep))))
     return Sample(os.path.basename(file).split(".")[0], cnvs)
 
+def read_bedfile(file, sep="\t"):
+    targets = []
+    with open(file) as f:
+        for line in f:
+            if sum([s.isdigit() for s in line.split(sep)]) == 0:
+                continue
+            targets.append(Target(*(line.split(sep))))
+    return targets
 
 # In[13]:
 
@@ -243,4 +271,38 @@ def overlapping(c1, c2):
     return c1.chr == c2.chr and (min([c1.end, c2.end]) - (max([c2.start, c1.start])) > 0)
 
 
-# In[ ]:
+def is_hit_unique(hit, hits):
+    for h in hits:
+        if overlapping(hit.cnv, h.cnv) and hit.sample.name == h.sample.name:
+            return False
+    return True
+
+
+def hitsA_not_in_hitsB(hitsA, hitsB):
+    R = []
+    for h in hitsA:
+        if is_hit_unique(h, hitsB):
+            R.append(h)
+    return R
+
+
+# bed needs to be formatted: chr, start, end, gene
+def num_targets(bed, target, tolerance=10):
+    return bed[
+        (bed["chr"].astype(str) == str(target.chr))
+        & (bed["start"] + tolerance >= int(target.start))
+        & (bed["end"] - tolerance <= int(target.end))
+    ].shape[0]
+
+
+def distance(t0, t1):
+    if t0.chr == t1.chr:
+        return abs((t0.end + t1.start) - (t1.end - t1.start))
+    else:
+        return 0
+
+
+# In[10]:
+
+def flatten_list(L):
+    return [val for l in L for val in l]

@@ -12,12 +12,12 @@ from clearCNV import util
 # def matchscores(panel, intsv_path, matchscores_path, expected_cnv_rate, fast=True):
 def matchscores(args):
     # parse args
-    panel             = args.panel
-    intsv_path        = args.coverages
-    matchscores_path  = args.matchscores
+    panel = args.panel
+    intsv_path = args.coverages
+    matchscores_path = args.matchscores
     expected_cnv_rate = args.expected_artefacts
-    CORES             = min([args.cores, mp.cpu_count()]) if args.cores else mp.cpu_count()
-    fast              = True
+    CORES = min([args.cores, mp.cpu_count()]) if args.cores else mp.cpu_count()
+    fast = True
 
     D0 = util.load_dataframe(intsv_path)
     D3a = util.normalize_within_exon(
@@ -32,7 +32,7 @@ def matchscores(args):
 
     # only take every i-th target into account to speed up
     if fast:
-        X = D3a.T[D3a.index[:: min([len(D3a.index), math.floor(len(D3a.index) / 1000)])]].T
+        X = D3a.T[D3a.index[:: min([len(D3a.index), math.ceil(len(D3a.index) / 1000)])]].T
     else:
         X = D3a
 

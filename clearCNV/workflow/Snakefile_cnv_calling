@@ -1,0 +1,228 @@
+import os.path
+import pathlib
+
+workdir: config["workdir"]
+
+# -----------------------------------------------------------------------------
+#  USER INPUT FILES
+
+PANEL       = config["panelname"]
+BED         = config["bedfile"]
+BAMSTXT     = config["bamsfile"]
+REF         = config["reference"]
+KMER_ALIGN  = config["kmer_align"]
+
+# -----------------------------------------------------------------------------
+# =============================================================================
+# -----------------------------------------------------------------------------
+#  DO NOT TOUCH
+
+
+folder          = pathlib.Path(PANEL)
+BED_MERGED      = folder / "merged.bed"
+COV_DIR         = folder / "cov"
+RESULTS_DIR     = folder / "results"
+ANALYSIS_DIR    = folder / "analysis"
+COVERAGES       = COV_DIR / "coverages.tsv"
+MATCHSCORES     = RESULTS_DIR / "matchscores.tsv"
+RESULTS_DIR     = folder / "results"
+CNV_CALLS       = RESULTS_DIR / "cnv.calls"
+RATIO_SCORES    = RESULTS_DIR / "rscores.tsv"
+Z_SCORES        = RESULTS_DIR / "zscores.tsv"
+ANNOT           = RESULTS_DIR / "annotations.bed"
+
+# options
+
+EXPECTED_ARTEFACTS   = float(config["expected_artefacts"])
+MINIMUM_SAMPLE_SCORE = float(config["minimum_sample_score"])
+MINIMUM_GROUP_SIZES  = int(config["minimum_group_sizes"])
+SENSITIVITY          = float(config["sensitivity"])
+SIZE                 = int(config["size"])
+
+# =============================================================================
+#  UTIL
+# =============================================================================
+
+with open(BAMSTXT, "rt") as inputf:
+  paths = [p.strip() for p in inputf.readlines()]
+  BAMS = {
+    pathlib.Path(p).stem: p
+    for p in paths
+  }
+
+# -----------------------------------------------------------------------------
+
+rule all:
+    input:
+        CNV_CALLS,
+        ANALYSIS_DIR / 'ratio_scores_extended_0.html'
+
+        # COVERAGES,
+        # MATCHSCORES,
+        # BED_MERGED,
+        # ANNOT
+
+# =============================================================================
+#  MERGE BED
+# =============================================================================
+
+rule merge_bed:
+    params:
+        BED
+    output:
+        BED_MERGED
+    log: folder / "logs" / "merge_bed.log"
+    shell:
+        "clearCNV merge_bed\
+            -i {params} \
+            -o {output}"
+
+# =============================================================================
+#  ANNOTATIONS (GC content & mappability)
+# =============================================================================
+
+rule annotations:
+    input:
+        BED_MERGED
+    output:
+        ANNOT
+    params:
+        REF,
+        KMER_ALIGN
+    log: folder / "logs" / "annotations.log"
+    shell:
+        "clearCNV annotations \
+            -r {params[0]} \
+            -b {input} \
+            -k {params[1]} \
+            -a {output}"
+
+
+# =============================================================================
+#  COVERAGES
+# =============================================================================
+
+rule count_pairs:
+    input:
+        lambda wildcards: BAMS[wildcards.bam],
+        BED_MERGED
+    output:
+        COV_DIR / "{bam}.rtbed"
+    log: folder / "logs" / "coverages/{bam}.log"
+    shell:
+        "clearCNV coverage \
+            -i {input[0]} \
+            -b {input[1]} \
+            -r {output}"
+
+# -----------------------------------------------------------------------------
+
+rule merge_rtbeds:
+    input:
+        rtbeds=expand(str(COV_DIR / "{bam}.rtbed"),bam=BAMS.keys())
+    output:
+        COVERAGES
+    params:
+        exome=BED_MERGED
+    log: folder / "logs" / "merge_coverages.log"
+    shell:
+        "clearCNV merge_coverages \
+            -b {params} \
+            -r {input} \
+            -c {output}"
+
+# =============================================================================
+#  MATCH SCORES
+# =============================================================================
+
+rule matchscores:
+    input:
+        COVERAGES
+    output:
+        MATCHSCORES
+    params:
+        PANEL,
+        EXPECTED_ARTEFACTS
+    threads: 64
+    log: folder / "logs" / "matchscores.log"
+    shell:
+        "clearCNV matchscores \
+            -p {params[0]} \
+            -c {input} \
+            -m {output} \
+            -x {params[1]} \
+            --cores {threads}"
+
+# =============================================================================
+#  CNV CALLING
+# =============================================================================
+
+rule cnv_calling:
+    input:
+        COVERAGES,
+        MATCHSCORES
+    output:
+        calls=CNV_CALLS,
+        rscores=RATIO_SCORES,
+        zscores=Z_SCORES,
+        _=ANALYSIS_DIR / "ANALYSIS_group_sizes_cutoff.pdf"
+    params:
+        panel=PANEL,
+        anadir=ANALYSIS_DIR,
+        cnvs=CNV_CALLS,
+        artefacts=EXPECTED_ARTEFACTS,
+        min_group_size=MINIMUM_GROUP_SIZES,
+        sens=SENSITIVITY,
+        sscore=MINIMUM_SAMPLE_SCORE
+    threads: 64
+    log: folder / "logs" / "cnvcalls.log"
+    shell:
+        "clearCNV cnv_calling \
+            -p {params.panel} \
+            -c {input[0]} \
+            -a {params.anadir} \
+            -m {input[1]} \
+            -C {output.calls} \
+            -r {output.rscores} \
+            -z {output.zscores} \
+            -x {params.artefacts} \
+            -g {params.min_group_size} \
+            -s {params.sens} \
+            -u {params.sscore} \
+            --cores {threads}"
+
+# =============================================================================
+#  VISUALIZE RESULTS
+# =============================================================================
+
+rule visualize_results:
+    input:
+        zscores=Z_SCORES,
+        rscores=RATIO_SCORES,
+        annot=ANNOT
+    output:
+        ANALYSIS_DIR / 'ratio_scores_extended_0.html'
+    params:
+        ANALYSIS_DIR,
+        SIZE
+    shell:
+         "clearCNV visualize \
+            -a {params[0]} \
+            -r {input.rscores} \
+            -z {input.zscores} \
+            -n {input.annot} \
+            -s {params[1]}"
+
+# =============================================================================
+#  FIND COMMON CNV CALLS
+# =============================================================================
+
+# rule common_cnv_calls:
+#     input:
+#         RESULTS_DIR+"cnv.calls"
+#     output:
+#         COMMON_CNV_CALLS
+#     params:
+#         COMMON_CNVS
+#     shell:
+#         "bash scripts/common_cnv_calls.sh {input} {params} {output}"

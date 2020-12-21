@@ -7,13 +7,14 @@ from datetime import datetime
 
 from logzero import logger
 
-#from . import util
+# from . import util
 from . import misc
 from . import cnv_arithmetics as ca
 from . import matchscores
 from . import cnv_calling
 from . import visualize_scores
-from . import workflow
+from . import workflow_cnv_calling
+from . import workflow_untangle
 from . import __version__
 
 
@@ -128,10 +129,10 @@ def get_parser():
     parser_cnv_calling.add_argument(
         "-g",
         "--minimum_group_sizes",
-        help="Minimum group size per CNV calling group per match scores",
+        help="Group size per CNV calling group per match scores. Default is 30.",
         required=False,
         type=int,
-        default=33,
+        default=30,
     )
     parser_cnv_calling.add_argument(
         "-s",
@@ -139,7 +140,7 @@ def get_parser():
         help="A higher sensitivity results in more CNV calls. Can only be 0.0 <= sens <= 1.0",
         required=False,
         type=float,
-        default=0.7,
+        default=0.75,
     )
     parser_cnv_calling.add_argument(
         "--cores",
@@ -221,6 +222,39 @@ def get_parser():
         type=str,
     )
     parser_merge_bed.set_defaults(func=misc.merge_bedfile)
+
+    # =========================================================================
+    #  UNTANGLE
+    # =========================================================================
+
+    # prepare - maybe exclude in future
+    parser_prepare_untangle = subparsers.add_parser(
+        "prepare_untangling",
+        description=("Prepares the necessary files to perform panel untangling on a set of .bed files and corresponding .bam file data sets."),
+    )
+    parser_prepare_untangle.add_argument(
+        "-m",
+        "--metafile",
+        help="Path to the file containing the meta information. It is a .tsv of the scheme -panel bams.txt bed.bed. \
+            It aligns each desired panel name with the corresponding .bam files and the .bed file.",
+        required=True,
+        type=str,
+    )
+    parser_prepare_untangle.add_argument(
+        "-b",
+        "--bamsfile",
+        help="Output .txt file. It will contain the distinct set of all given .bam file paths.",
+        required=True,
+        type=str,
+    )
+    parser_prepare_untangle.add_argument(
+        "-d",
+        "--bedfile",
+        help="Output .bed file. It will contain the merged union of all given .bed files.",
+        required=True,
+        type=str,
+    )
+    parser_prepare_untangle.set_defaults(func=misc.prepare_untangling)
 
     # =========================================================================
     #  coverage
@@ -323,56 +357,170 @@ def get_parser():
     parser_annotations.set_defaults(func=misc.create_annotations_file)
 
     # =========================================================================
-    #  workflow
+    #  workflow CNV calling
     # =========================================================================
-    parser_workflow = subparsers.add_parser(
-        "workflow",
-        description=("Complete workflow that runs snakemake internally."),
+    parser_workflow_cnv_calling = subparsers.add_parser(
+        "workflow_cnv_calling",
+        description=("Complete CNV-calling snakemake-workflow to run on data from a single sequencing panel (bed-file)."),
     )
-    parser_workflow.add_argument(
+    parser_workflow_cnv_calling.add_argument(
         "-w",
         "--workdir",
         help="Path to the snakemake workdir.",
         required=True,
         type=str,
     )
-    parser_workflow.add_argument(
+    parser_workflow_cnv_calling.add_argument(
         "-p",
         "--panelname",
         help="name of the panel or dataset.",
         required=True,
         type=str,
     )
-    parser_workflow.add_argument(
+    parser_workflow_cnv_calling.add_argument(
         "-r",
         "--reference",
         help="Path to the genomic reference.",
         required=True,
         type=str,
     )
-    parser_workflow.add_argument(
+    parser_workflow_cnv_calling.add_argument(
         "-b",
         "--bamsfile",
         help="Path to a .txt file that contains all paths to all used .bam files.",
         required=True,
         type=str,
     )
-    parser_workflow.add_argument(
+    parser_workflow_cnv_calling.add_argument(
         "-d",
         "--bedfile",
         help="Path to the .bed file.",
         required=True,
         type=str,
     )
-    parser_workflow.add_argument(
+    parser_workflow_cnv_calling.add_argument(
         "-k",
         "--kmer_align",
         help="Path to aligned k-mers (mappability) file in .bed format.",
         required=True,
         type=str,
     )
-    parser_workflow.set_defaults(func=workflow.workflow)
+    parser_workflow_cnv_calling.add_argument(
+        "-c",
+        "--cores",
+        help="Number of used cores in snakemake workflow. Default is 32.",
+        required=False,
+        type=int,
+        default=32,
+    )
+    # options
+    parser_workflow_cnv_calling.add_argument(
+        "--expected_artefacts",
+        help="Expected ratio of CNVs or artefacs in target fragment counts. Default is 0.02",
+        required=False,
+        type=float,
+        default=0.02,
+    )
+    parser_workflow_cnv_calling.add_argument(
+        "--minimum_sample_score",
+        help="A lower threshold results in better fitting, but smaller calling groups. Default is 0.15.",
+        required=False,
+        type=float,
+        default=0.15,
+    )
+    parser_workflow_cnv_calling.add_argument(
+        "--minimum_group_sizes",
+        help="Minimum group size per CNV calling group per match scores. Default is 30.",
+        required=False,
+        type=int,
+        default=30,
+    )
+    parser_workflow_cnv_calling.add_argument(
+        "--sensitivity",
+        help="A higher sensitivity results in more CNV calls. Can only be 0.0 <= sens <= 1.0. Default is 0.75.",
+        required=False,
+        type=float,
+        default=0.75,
+    )
+    parser_workflow_cnv_calling.add_argument(
+        "--size",
+        help="Rough number of targets in each visualization. Default is 2000.",
+        required=False,
+        type=int,
+        default=2000,
+    )
+    parser_workflow_cnv_calling.set_defaults(func=workflow_cnv_calling.workflow_cnv_calling)
 
+    # =========================================================================
+    #  workflow untangling
+    # =========================================================================
+    parser_workflow_untangle = subparsers.add_parser(
+        "workflow_untangle",
+        description=("Complete CNV-calling snakemake-workflow to run on data from a single sequencing panel (bed-file)."),
+    )
+    parser_workflow_untangle.add_argument(
+        "-w",
+        "--workdir",
+        help="Path to the snakemake workdir.",
+        required=True,
+        type=str,
+    )
+    parser_workflow_untangle.add_argument(
+        "-r",
+        "--reference",
+        help="Path to the genomic reference.",
+        required=True,
+        type=str,
+    )
+    parser_workflow_untangle.add_argument(
+        "-m",
+        "--metafile",
+        help="Path to the file containing the meta information. It is a .tsv of the scheme -panel bams.txt bed.bed. \
+            It aligns each desired panel name with the corresponding .bam files and the .bed file.",
+        required=True,
+        type=str,
+    )
+
+    parser_workflow_untangle.add_argument(
+        "-c",
+        "--cores",
+        help="Number of used cores in snakemake workflow. Default is 32.",
+        required=False,
+        type=int,
+        default=32,
+    )
+
+    parser_workflow_untangle.add_argument(
+        "--cluster_configfile",
+        help="Path to the cluster config file.",
+        required=False,
+        type=str,
+        default="",
+    )
+
+#    parser_workflow_untangle.add_argument(
+#        '--drmaa',
+#        dest='drmaa',
+#        action='store_true'
+#    )
+
+    parser_workflow_untangle.add_argument(
+        "--drmaa_mem",
+        help="Number of megabytes used with drmaa. Default is 16000",
+        required=False,
+        type=int,
+        default=16000,
+    )
+
+    parser_workflow_untangle.add_argument(
+        "--drmaa_time",
+        help="Maximum number of hours:minutes per job. Default is 4:00",
+        required=False,
+        type=str,
+        default="4:00",
+    )
+
+    parser_workflow_untangle.set_defaults(func=workflow_untangle.workflow_untangle)
 
     return parser
 

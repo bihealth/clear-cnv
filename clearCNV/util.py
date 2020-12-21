@@ -164,7 +164,7 @@ def hmm_predict(D):
     df = D.copy()
     model = hmm.GaussianHMM(n_components=3, covariance_type="full")
     model.startprob_ = np.array([0.0001, 0.9998, 0.0001])
-    model.transmat_ = np.array([[0.999, 0.001, 0.0], [0.0001, 0.9998, 0.0001], [0.0, 0.001, 0.999]])
+    model.transmat_ = np.array([[0.9999, 0.0001, 0.0], [0.0001, 0.9998, 0.0001], [0.0, 0.0001, 0.9999]])
     model.means_ = np.array([[-2], [0.0], [2]])
     model.covars_ = np.tile(np.identity(1), (3, 1, 1))
     for col in D.columns:
@@ -214,7 +214,7 @@ def npcolor(D, factor=0.08):
 def hmm_scores(
     X,
     means=np.array([[-3.0], [0.0], [5.0]]),
-    transitionprobs=np.array([[0.999, 0.001, 0.0], [0.0001, 0.9998, 0.0001], [0.0, 0.001, 0.999]]),
+    transitionprobs=np.array([[0.9999, 0.0001, 0.0], [0.0001, 0.99989, 0.00001], [0.0, 0.00001, 0.99999]]),
 ):
     model = hmm.GaussianHMM(n_components=3, covariance_type="full")
     model.startprob_ = np.array([0.0001, 0.9998, 0.0001])
@@ -227,6 +227,11 @@ def hmm_scores(
 def score_cnv(start, end, z_scores):
     x = np.abs(z_scores[start:end])
     return np.mean(x)  # sum(np.log(x)/np.log(sum(x)))
+
+
+def rscore_cnv(start, end, r_scores):
+    x = r_scores[start:end]
+    return np.mean(x)
 
 
 # hmm_preds,z_scores,r_scores,index = HMM[9],z_scores_scaled[9],ratio_scores[9],INDEX
@@ -242,15 +247,18 @@ def merge_score_cnvs(hmm_preds, z_scores, r_scores, index):
                 start = i
             # cnv -> w or cnv
             if hmm_preds[i - 1] != 1:
-                CNVs.append(
-                    ca.CNV(
-                        *index[start].split("_")[:2],
-                        *index[i - 1].split("_")[2:4],
-                        "DUP" if hmm_preds[i - 1] == 2 else "DEL",
-                        length - 1,
-                        score_cnv(start, i, z_scores)
+                rs = rscore_cnv(start, i, r_scores)
+                # ensure that the ratio score is sufficiently high
+                if rs <= 0.65 or rs >= 1.35:
+                    CNVs.append(
+                        ca.CNV(
+                            *index[start].split("_")[:2],
+                            *index[i - 1].split("_")[2:4],
+                            "DUP" if hmm_preds[i - 1] == 2 else "DEL",
+                            length - 1,
+                            score_cnv(start, i, z_scores)
+                        )
                     )
-                )
                 # cnv -> cnv
                 if abs(hmm_preds[i] - hmm_preds[i - 1]) > 1:
                     length = 1
@@ -305,3 +313,9 @@ def calling_cnv(index_sample, D, MS, index, EXPECTED_CNV_RATE, SENSITIVITY=0.7):
     # new metric instead of z-scores
     # E_scores = pd.Series(util.escore_sample(D6.to_numpy(),ratio_values.to_numpy()),index=D6.index)
     return (index_sample, index, sample_score, ratio_values, z_scores_scaled)
+
+def turntransform(v):
+    v -= min(v)
+    v /= max(v)
+    v += np.arange(1,0,-1/len(v))
+    return v
