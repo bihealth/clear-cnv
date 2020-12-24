@@ -164,7 +164,9 @@ def hmm_predict(D):
     df = D.copy()
     model = hmm.GaussianHMM(n_components=3, covariance_type="full")
     model.startprob_ = np.array([0.0001, 0.9998, 0.0001])
-    model.transmat_ = np.array([[0.9999, 0.0001, 0.0], [0.0001, 0.9998, 0.0001], [0.0, 0.0001, 0.9999]])
+    model.transmat_ = np.array(
+        [[0.9999, 0.0001, 0.0], [0.0001, 0.9998, 0.0001], [0.0, 0.0001, 0.9999]]
+    )
     model.means_ = np.array([[-2], [0.0], [2]])
     model.covars_ = np.tile(np.identity(1), (3, 1, 1))
     for col in D.columns:
@@ -214,7 +216,9 @@ def npcolor(D, factor=0.08):
 def hmm_scores(
     X,
     means=np.array([[-3.0], [0.0], [5.0]]),
-    transitionprobs=np.array([[0.9999, 0.0001, 0.0], [0.0001, 0.99989, 0.00001], [0.0, 0.00001, 0.99999]]),
+    transitionprobs=np.array(
+        [[0.9999, 0.0001, 0.0], [0.0001, 0.99989, 0.00001], [0.0, 0.00001, 0.99999]]
+    ),
 ):
     model = hmm.GaussianHMM(n_components=3, covariance_type="full")
     model.startprob_ = np.array([0.0001, 0.9998, 0.0001])
@@ -314,8 +318,9 @@ def calling_cnv(index_sample, D, MS, index, EXPECTED_CNV_RATE, SENSITIVITY=0.7):
     # E_scores = pd.Series(util.escore_sample(D6.to_numpy(),ratio_values.to_numpy()),index=D6.index)
     return (index_sample, index, sample_score, ratio_values, z_scores_scaled)
 
+
 def turntransform(v):
     v -= min(v)
     v /= max(v)
-    v += np.arange(1,0,-1/len(v))
+    v += np.arange(1, 0, -1 / len(v))
     return v

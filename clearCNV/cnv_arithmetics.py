@@ -80,12 +80,15 @@ class Target:
 
     def __add__(self, other):
         if self.chr != other.chr:
-            raise ValueError('Chromosomes have to be the same of both targets.')
+            raise ValueError("Chromosomes have to be the same of both targets.")
         newgene = ""
-        if self.gene in other.gene:   newgene = other.gene
-        elif other.gene in self.gene: newgene = self.gene
-        else: ','.join(set([self.gene,other.gene]))
-        return Target(self.chr, min([self.start, other.start]),max(self.end,other.end),newgene)
+        if self.gene in other.gene:
+            newgene = other.gene
+        elif other.gene in self.gene:
+            newgene = self.gene
+        else:
+            ",".join(set([self.gene, other.gene]))
+        return Target(self.chr, min([self.start, other.start]), max(self.end, other.end), newgene)
 
     def to_list(self):
         return list(map(str, [self.chr, self.start, self.end, self.gene]))
@@ -146,6 +149,7 @@ class CNV:
     def get_size(self):
         return self.end - self.start
 
+
 # In[6]:
 
 
@@ -171,6 +175,7 @@ class Hit:
 
     def get_size(self):
         return self.cnv.get_size()
+
 
 # In[7]:
 
@@ -198,33 +203,38 @@ class Sample:
 
 # In[8]:
 
+
 def load_cnvs_from_df(df):
     samples = []
-    header = ["sample","chr","start","end","gene","aberration","score","size"]
+    header = ["sample", "chr", "start", "end", "gene", "aberration", "score", "size"]
     df.columns = header
     for sample in set(df["sample"]):
         sub_df = df[df["sample"] == sample]
         cnvs = []
         for target in sub_df.index:
-            cnvs.append(CNV(*sub_df.loc[target,header[1:]]))
-        samples.append(Sample(sample,cnvs))
+            cnvs.append(CNV(*sub_df.loc[target, header[1:]]))
+        samples.append(Sample(sample, cnvs))
     return samples
 
 
 # In[9]:
+
 
 def union_hits(hits):
     if len(hits) <= 1:
         return hits[0]
     return set(hits[0]).union(union_hits(hits[1:]))
 
+
 def difference_left(hits, hits_other):
     return set(hits).difference(set(difference_left(hits_other)))
+
 
 def difference_hits(hits):
     if len(hits) <= 1:
         return hits[0]
     return set(hits[0]).difference(difference_hits(hits[1:]))
+
 
 def intersect_hits(hits):
     if len(hits) <= 1:
@@ -255,6 +265,7 @@ def read_sample(file, sep="\t"):
             cnvs.append(CNV(*(line.split(sep))))
     return Sample(os.path.basename(file).split(".")[0], cnvs)
 
+
 def read_bedfile(file, sep="\t"):
     targets = []
     with open(file) as f:
@@ -263,6 +274,7 @@ def read_bedfile(file, sep="\t"):
                 continue
             targets.append(Target(*(line.split(sep))))
     return targets
+
 
 # In[13]:
 
@@ -303,6 +315,7 @@ def distance(t0, t1):
 
 
 # In[10]:
+
 
 def flatten_list(L):
     return [val for l in L for val in l]

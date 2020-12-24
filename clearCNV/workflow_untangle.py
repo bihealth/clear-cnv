@@ -3,21 +3,23 @@ import pathlib
 
 from . import misc
 
+
 def create_config(configpath, args):
     with open(configpath, "wt") as f:
-        print("workdir: '"   + str(args.workdir) + "'", file=f)
-        print("metafile: '"  + str(args.metafile) + "'", file=f)
+        print("workdir: '" + str(args.workdir) + "'", file=f)
+        print("metafile: '" + str(args.metafile) + "'", file=f)
         print("coverages: '" + str(args.coverages) + "'", file=f)
-        print("cov_dir: '"   + str(args.cov_dir) + "'", file=f)
-        print("bedfile: '"   + str(args.bedfile) + "'", file=f)
-        print("bamsfile: '"  + str(args.bamsfile) + "'", file=f)
+        print("cov_dir: '" + str(args.cov_dir) + "'", file=f)
+        print("bedfile: '" + str(args.bedfile) + "'", file=f)
+        print("bamsfile: '" + str(args.bamsfile) + "'", file=f)
         print("reference: '" + str(args.reference) + "'", file=f)
 
+
 def workflow_untangle(args):
-    args.bamsfile  = pathlib.Path(args.workdir) / "allbams.txt"
-    args.bedfile   = pathlib.Path(args.workdir) / "union.bed"
+    args.bamsfile = pathlib.Path(args.workdir) / "allbams.txt"
+    args.bedfile = pathlib.Path(args.workdir) / "union.bed"
     args.coverages = pathlib.Path(args.workdir) / "coverages.tsv"
-    args.cov_dir   = pathlib.Path(args.workdir) / "covs"
+    args.cov_dir = pathlib.Path(args.workdir) / "covs"
     misc.prepare_untangling(args)
 
     configpath = (
@@ -41,14 +43,18 @@ def workflow_untangle(args):
         str(args.cores),
     ]
     if args.cluster_configfile:
-        arguments.append('--cluster-config')
+        arguments.append("--cluster-config")
         arguments.append(args.cluster_configfile)
     if args.drmaa_mem and args.drmaa_time:
-        arguments.append('-p')
-        arguments.append('--drmaa')
-        arguments.append(str(f' --mem={args.drmaa_mem} --time={args.drmaa_time} --output={args.workdir}/sge_log/%x-%j.log'))
+        arguments.append("-p")
+        arguments.append("--drmaa")
+        arguments.append(
+            str(
+                f" --mem={args.drmaa_mem} --time={args.drmaa_time} --output={args.workdir}/sge_log/%x-%j.log"
+            )
+        )
 
     # How to create the dir the best way?
-    subprocess.check_call(["mkdir","-p",f"{args.workdir}/sge_log"])
+    subprocess.check_call(["mkdir", "-p", f"{args.workdir}/sge_log"])
 
     subprocess.check_call(arguments)

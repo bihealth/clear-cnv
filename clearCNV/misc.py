@@ -10,6 +10,7 @@ import tempfile
 # =============================================================================
 #  BED file merging
 
+
 def merge_bedfile(args):
     f = open(args.outfile, "wt")
     p1 = subprocess.Popen(
@@ -21,35 +22,40 @@ def merge_bedfile(args):
     p2.communicate()[0]
     f.close()
 
+
 # =============================================================================
 #  UNTANGLING - preparations
 
-def merge_bedfiles(beds,bedfile):
+
+def merge_bedfiles(beds, bedfile):
     pathlib.Path(bedfile).absolute().parent.mkdir(parents=True, exist_ok=True)
     with open(bedfile, "wt") as f:
         p1 = subprocess.Popen(
-            ["bedops", "--merge", *[line.rstrip('\n') for line in beds]],
-            stdout=subprocess.PIPE,
+            ["bedops", "--merge", *[line.rstrip("\n") for line in beds]], stdout=subprocess.PIPE,
         )
-        p2 = subprocess.Popen(["sort", "-V", "-k1,1", "-k2,2"], stdin=p1.stdout, stdout=subprocess.PIPE)
+        p2 = subprocess.Popen(
+            ["sort", "-V", "-k1,1", "-k2,2"], stdin=p1.stdout, stdout=subprocess.PIPE
+        )
         p3 = subprocess.Popen(["bedtools", "merge"], stdin=p2.stdout, stdout=f)
         p3.communicate()[0]
         p1.stdout.close()
         p2.stdout.close()
-    B = [l.rstrip('\n') for l in open(bedfile)]
+    B = [l.rstrip("\n") for l in open(bedfile)]
     with open(bedfile, "wt") as g:
-        for line in B: #[::1+(int(len(B) / 1000))]:
-            print(line,file=g)
+        for line in B:  # [::1+(int(len(B) / 1000))]:
+            print(line, file=g)
+
 
 def prepare_untangling(args):
-    META = pd.read_csv(args.metafile,sep='\t')
+    META = pd.read_csv(args.metafile, sep="\t")
     # prepare bamsfile
     pathlib.Path(args.bamsfile).absolute().parent.mkdir(parents=True, exist_ok=True)
-    with open(args.bamsfile,"wt") as f:
-        L=[[l.rstrip('\n') for l in open(bam)] for bam in META.iloc[:,1]]
+    with open(args.bamsfile, "wt") as f:
+        L = [[l.rstrip("\n") for l in open(bam)] for bam in META.iloc[:, 1]]
         for b in set([val for l in L for val in l]):
-            print(b,file=f)
-    merge_bedfiles(META.iloc[:,2],args.bedfile)
+            print(b, file=f)
+    merge_bedfiles(META.iloc[:, 2], args.bedfile)
+
 
 # =============================================================================
 #  ANNOTATIONS
@@ -93,11 +99,13 @@ def count_pair(args):
             stdout=f,
         )
 
+
 def merge_rtbeds(args):
     D = pd.read_csv(args.bedfile, sep="\t", header=None)
     dcols = D.shape[1]
     for i in range(len(args.rtbeds)):
         D[dcols + i] = pd.read_csv(args.rtbeds[i], sep="\t", header=None)[dcols]
     D.columns = ["chr", "start", "end", "gene"][:dcols] + [
-        pathlib.Path(s).stem for s in args.rtbeds]
+        pathlib.Path(s).stem for s in args.rtbeds
+    ]
     D.to_csv(args.coverages, sep="\t", index=False)
