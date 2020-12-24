@@ -1,4 +1,5 @@
-"""Tests for the misc module.
+"""
+Tests for the misc module.
 
 If external programs are called then there are two variants of the test.  One has the suffix
 "_integration" and the actual external program is called (must have been installed, of course).

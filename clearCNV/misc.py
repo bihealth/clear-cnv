@@ -16,6 +16,7 @@ def merge_bedfile(args):
         p1 = subprocess.Popen(
             ["bedtools", "merge", "-i", args.infile, "-c", "4", "-o", "collapse"],
             stdout=subprocess.PIPE,
+            shell=False,
         )
         p2 = subprocess.Popen(["sort", "-V", "-k1,1", "-k2,2"], stdin=p1.stdout, stdout=f)
         p1.stdout.close()
@@ -30,12 +31,14 @@ def merge_bedfiles(beds, bedfile):
     pathlib.Path(bedfile).absolute().parent.mkdir(parents=True, exist_ok=True)
     with open(bedfile, "wt") as f:
         p1 = subprocess.Popen(
-            ["bedops", "--merge", *[line.rstrip("\n") for line in beds]], stdout=subprocess.PIPE,
+            ["bedops", "--merge", *[line.rstrip("\n") for line in beds]],
+            stdout=subprocess.PIPE,
+            shell=False,
         )
         p2 = subprocess.Popen(
-            ["sort", "-V", "-k1,1", "-k2,2"], stdin=p1.stdout, stdout=subprocess.PIPE
+            ["sort", "-V", "-k1,1", "-k2,2"], stdin=p1.stdout, stdout=subprocess.PIPE, shell=False,
         )
-        p3 = subprocess.Popen(["bedtools", "merge"], stdin=p2.stdout, stdout=f)
+        p3 = subprocess.Popen(["bedtools", "merge"], stdin=p2.stdout, stdout=f, shell=False)
         p3.communicate()[0]
         p1.stdout.close()
         p2.stdout.close()
