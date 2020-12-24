@@ -12,15 +12,14 @@ import tempfile
 
 
 def merge_bedfile(args):
-    f = open(args.outfile, "wt")
-    p1 = subprocess.Popen(
-        ["bedtools", "merge", "-i", args.infile, "-c", "4", "-o", "collapse"],
-        stdout=subprocess.PIPE,
-    )
-    p2 = subprocess.Popen(["sort", "-V", "-k1,1", "-k2,2"], stdin=p1.stdout, stdout=f)
-    p1.stdout.close()
-    p2.communicate()[0]
-    f.close()
+    with open(args.outfile, "wt") as f:
+        p1 = subprocess.Popen(
+            ["bedtools", "merge", "-i", args.infile, "-c", "4", "-o", "collapse"],
+            stdout=subprocess.PIPE,
+        )
+        p2 = subprocess.Popen(["sort", "-V", "-k1,1", "-k2,2"], stdin=p1.stdout, stdout=f)
+        p1.stdout.close()
+        p2.communicate()[0]
 
 
 # =============================================================================

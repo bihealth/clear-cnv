@@ -8,7 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version:
+          - "3.6"
+          - "3.7"
+          - "3.8"
 
     steps:
       - name: Install Python via conda.
@@ -20,9 +23,19 @@ jobs:
         uses: actions/checkout@v2
         with:
           lfs: true
+      - name: Install mamba.
+        run: conda install -y mamba
       - name: Install external program dependencies.
-        run: conda install -y bedtools
+        run: mamba install -y bedtools
       - name: Install test dependencies via pip
         run: pip install -r requirements/test.txt
+      - name: Run tests
+        run: pytest .
+      - name: Run codacy-coverage-reporter
+        uses: codacy/codacy-coverage-reporter-action@master
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: coverage.xml
+        if: ${{ matrix.python-version == '3.8' }}
       - name: Check style with black
         run: black --line-length 100 --check .
