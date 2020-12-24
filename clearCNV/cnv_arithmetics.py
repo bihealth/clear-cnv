@@ -4,7 +4,7 @@
 # In[1]:
 
 
-import os, numpy as np
+import os
 
 
 # In[2]:

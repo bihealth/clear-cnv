@@ -2,7 +2,6 @@
 # coding: utf-8
 
 
-import argparse
 import pathlib
 import pandas as pd
 import numpy as np

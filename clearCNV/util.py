@@ -6,14 +6,12 @@
 
 import pandas as pd
 import numpy as np
-import scipy.stats as st
 import matplotlib.pyplot as plt
 import math
 from sklearn.neighbors import KernelDensity
 from sklearn.linear_model import LinearRegression
-from sklearn.cluster import KMeans
 import seaborn as sns
-import scipy.spatial as sp, scipy.cluster.hierarchy as hc
+import scipy.cluster.hierarchy as hc
 from hmmlearn import hmm
 from clearCNV import cnv_arithmetics as ca
 

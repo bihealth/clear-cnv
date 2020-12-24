@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import argparse
 import pathlib
 
 import pandas as pd
@@ -10,7 +9,6 @@ import numpy as np
 import multiprocessing as mp
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
-import math
 
 from clearCNV import util
 from clearCNV import cnv_arithmetics as ca
@@ -18,7 +16,6 @@ from clearCNV import cnv_arithmetics as ca
 
 def cnv_calling(args):
     # argparsing
-    panel = args.panel
     intsv_path = args.coverages
     analysis_dir = args.analysis_directory
     matchscores_path = args.matchscores

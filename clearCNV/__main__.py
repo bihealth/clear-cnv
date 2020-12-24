@@ -2,14 +2,11 @@
 # coding: utf-8
 
 import argparse
-import sys
-from datetime import datetime
 
 from logzero import logger
 
 # from . import util
 from . import misc
-from . import cnv_arithmetics as ca
 from . import matchscores
 from . import cnv_calling
 from . import visualize_scores

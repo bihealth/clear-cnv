@@ -3,7 +3,6 @@
 
 import subprocess
 import pandas as pd
-import os
 import pathlib
 import tempfile
 

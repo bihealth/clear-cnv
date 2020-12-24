@@ -12,3 +12,7 @@ test:
 .PHONY: bandit
 bandit:
 	bandit -c bandit.yml -r clearCNV
+
+.PHONY: pyflakes
+pyflakes:
+	pyflakes clearCNV tests

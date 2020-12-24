@@ -4,3 +4,7 @@ pytest
 pytest-mock
 pytest-coverage
 pytest-pep8
+
+bandit
+
+pyflakes

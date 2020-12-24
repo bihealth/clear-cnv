@@ -1,11 +1,6 @@
 import subprocess
 import pathlib
 
-from . import cnv_arithmetics as ca
-from . import matchscores
-from . import cnv_calling
-from . import visualize_scores
-
 
 def create_config(configpath, args):
     with open(configpath, "wt") as f:

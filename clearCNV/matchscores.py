@@ -1,18 +1,15 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import argparse
 import pandas as pd
 import numpy as np
 import multiprocessing as mp
-import os.path
 import math
 from clearCNV import util
 
 # def matchscores(panel, intsv_path, matchscores_path, expected_cnv_rate, fast=True):
 def matchscores(args):
     # parse args
-    panel = args.panel
     intsv_path = args.coverages
     matchscores_path = args.matchscores
     expected_cnv_rate = args.expected_artefacts
