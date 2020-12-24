@@ -1,3 +1,8 @@
 -r base.txt
 
 black ==19.10b0
+
+pytest
+pytest-mock
+pytest-coverage
+pytest-pep8
