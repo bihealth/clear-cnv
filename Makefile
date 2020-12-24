@@ -8,3 +8,7 @@ black:
 .PHONY: test
 test:
 	black -l 100 --check .
+
+.PHONY: bandit
+bandit:
+	bandit -c bandit.yml -r clearCNV
