@@ -27,8 +27,13 @@ jobs:
         run: conda install -y mamba
       - name: Install external program dependencies.
         run: mamba install -y bedtools
+      - name: Install large dependencies with mamba to speedup vs. pip
+        run: mamba install -y pandas matplotlib scikit-learn snakemake
       - name: Install test dependencies via pip
         run: pip install -r requirements/test.txt
+      - name: Install test dependencies via pip (black only on Python 3.8)
+        run: pip install -r requirements/test_black.txt
+        if: ${{ matrix.python-version == '3.8' }}
       - name: Run tests
         run: pytest .
       - name: Run codacy-coverage-reporter
@@ -37,5 +42,6 @@ jobs:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           coverage-reports: coverage.xml
         if: ${{ matrix.python-version == '3.8' }}
-      - name: Check style with black
+      - name: Check style with black (only on Python 3.8)
         run: black --line-length 100 --check .
+        if: ${{ matrix.python-version == '3.8' }}
