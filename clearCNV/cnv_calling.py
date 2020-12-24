@@ -38,11 +38,15 @@ def cnv_calling(args):
     # adaptive threshold for group sizes
     matchmatrix = pd.DataFrame()
     for sample in Matchscores.columns:
-        matchmatrix[sample] = Matchscores[sample] <= np.quantile(Matchscores[sample],MINIMUM_SAMPLE_GROUP/len(Matchscores.columns))
+        matchmatrix[sample] = Matchscores[sample] <= np.quantile(
+            Matchscores[sample], MINIMUM_SAMPLE_GROUP / len(Matchscores.columns)
+        )
 
     v = util.turntransform((Matchscores * matchmatrix).mean(axis=0).sort_values())
-    minmatchscore    = min([(Matchscores * matchmatrix).mean(axis=0)[v[v <= min(v)].index[0]],MINIMUM_SAMPLE_SCORE])
-    failed_samples   = matchmatrix[((Matchscores * matchmatrix).mean(axis=0) >= minmatchscore)].index
+    minmatchscore = min(
+        [(Matchscores * matchmatrix).mean(axis=0)[v[v <= min(v)].index[0]], MINIMUM_SAMPLE_SCORE]
+    )
+    failed_samples = matchmatrix[((Matchscores * matchmatrix).mean(axis=0) >= minmatchscore)].index
     selected_samples = matchmatrix.columns.difference(failed_samples)
     Matchscores_bools = matchmatrix[selected_samples].drop(index=failed_samples)
 
@@ -61,11 +65,7 @@ def cnv_calling(args):
         label=str(len(failed_samples)) + " failed samples",
     )
     plt.vlines(
-        minmatchscore,
-        0,
-        max(n) * 0.75,
-        label="cutoff at %1.4f"% minmatchscore,
-        color="darkred",
+        minmatchscore, 0, max(n) * 0.75, label="cutoff at %1.4f" % minmatchscore, color="darkred",
     )
     plt.xlabel("mean sample group score")
     plt.ylabel("samples")
@@ -116,14 +116,7 @@ def cnv_calling(args):
     for i in range(len(Matchscores_bools.columns)):
         pool.apply_async(
             util.calling_cnv,
-            args=(
-                i,
-                DA[0],
-                Matchscores_bools,
-                DA[1],
-                EXPECTED_CNV_RATE,
-                SENSITIVITY,
-            ),
+            args=(i, DA[0], Matchscores_bools, DA[1], EXPECTED_CNV_RATE, SENSITIVITY,),
             callback=collect_result,
         )
     pool.close()
@@ -147,14 +140,7 @@ def cnv_calling(args):
         for i in range(len(Matchscores_bools.columns)):
             pool.apply_async(
                 util.calling_cnv,
-                args=(
-                    i,
-                    DX[0],
-                    Matchscores_bools,
-                    DX[1],
-                    EXPECTED_CNV_RATE,
-                    SENSITIVITY,
-                ),
+                args=(i, DX[0], Matchscores_bools, DX[1], EXPECTED_CNV_RATE, SENSITIVITY,),
                 callback=collect_result,
             )
         pool.close()
@@ -176,14 +162,7 @@ def cnv_calling(args):
         for i in range(len(Matchscores_bools.columns)):
             pool.apply_async(
                 util.calling_cnv,
-                args=(
-                    i,
-                    DY[0],
-                    My,
-                    DY[1],
-                    EXPECTED_CNV_RATE,
-                    SENSITIVITY,
-                ),
+                args=(i, DY[0], My, DY[1], EXPECTED_CNV_RATE, SENSITIVITY,),
                 callback=collect_result,
             )
         pool.close()
@@ -253,7 +232,9 @@ def cnv_calling(args):
     # --- fix lockdown bug --- #
     # pool = mp.Pool(CORES)
     probs = np.array([[-2.5], [0.0], [3.5]])
-    transitionprobs = np.array([[0.9999, 0.0001, 0.0], [0.0001, 0.9998, 0.0001], [0.0, 0.0001, 0.9999]])
+    transitionprobs = np.array(
+        [[0.9999, 0.0001, 0.0], [0.0001, 0.9998, 0.0001], [0.0, 0.0001, 0.9999]]
+    )
     # HMM = np.array([pool.apply(util.hmm_scores, args=([sample,probs,transitionprobs]))
     #                for sample in z_scores_scaled])
     # pool.close()
@@ -273,16 +254,7 @@ def cnv_calling(args):
             [
                 pool.apply(
                     util.merge_score_cnvs,
-                    args=(
-                        [
-                            HMM[i, :],
-                            z_scores_scaled[i, :],
-                            ratio_scores[
-                                i,:
-                            ],
-                            INDEX,
-                        ]
-                    ),
+                    args=([HMM[i, :], z_scores_scaled[i, :], ratio_scores[i, :], INDEX,]),
                 )
                 for i in cnv_carrying_indexes
             ],
