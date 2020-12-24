@@ -45,8 +45,8 @@ def visualize(args):
         chrs = list(OrderedDict.fromkeys(indexchrs))
         chrstarts = [indexchrs.index(s) for s in chrs]
         chrstarts.append(len(indexchrs))
-        l = np.abs(np.array(chrstarts) - (len(index) / 2))
-        split_pos = list(l).index(min(l)) + 1
+        arr = np.abs(np.array(chrstarts) - (len(index) / 2))
+        split_pos = list(arr).index(min(arr)) + 1
 
         if len(chrs) <= 1 or len(index) <= htmp_size:
             return [index]

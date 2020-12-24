@@ -19,7 +19,7 @@ def merge_bedfile(args):
         )
         p2 = subprocess.Popen(["sort", "-V", "-k1,1", "-k2,2"], stdin=p1.stdout, stdout=f)
         p1.stdout.close()
-        p2.communicate()[0]
+        # p2.communicate()[0]
 
 
 # =============================================================================
@@ -38,7 +38,7 @@ def merge_bedfiles(beds, bedfile):
             ["sort", "-V", "-k1,1", "-k2,2"], stdin=p1.stdout, stdout=subprocess.PIPE, shell=False,
         )
         p3 = subprocess.Popen(["bedtools", "merge"], stdin=p2.stdout, stdout=f, shell=False)
-        p3.communicate()[0]
+        # p3.communicate()[0]
         p1.stdout.close()
         p2.stdout.close()
     B = [l.rstrip("\n") for l in open(bedfile)]

@@ -56,7 +56,7 @@ def cnv_calling(args):
         print(f)
 
     plt.figure(figsize=(8, 4), dpi=200)
-    n, bins, patches = plt.hist(
+    n, _bins, _patches = plt.hist(
         (Matchscores * matchmatrix).mean(),
         int(len(matchmatrix.columns) / 2),
         label=str(len(failed_samples)) + " failed samples",
@@ -358,7 +358,7 @@ def cnv_calling(args):
         for h in ca.hitsA_not_in_hitsB(SINGLE_HITS, BIG_HITS)
     ]
     FINAL = pd.concat([RD, pd.DataFrame(X, columns=RD.columns)])
-    FINAL["score"] = FINAL["score"].astype(float).apply(lambda x: abs(x))
+    FINAL["score"] = FINAL["score"].astype(float).apply(x)
     FINAL = FINAL.sort_values(by="score", ascending=False)
 
     print("saving results...")

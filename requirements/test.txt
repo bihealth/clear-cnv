@@ -8,3 +8,5 @@ pytest-pep8
 bandit
 
 pyflakes
+
+prospector

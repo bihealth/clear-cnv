@@ -9,6 +9,9 @@ black:
 test:
 	black -l 100 --check .
 
+.PHONY: lint-all
+lint-all: bandit pyflakes pep257 prospector
+
 .PHONY: bandit
 bandit:
 	bandit -c bandit.yml -r clearCNV
@@ -20,3 +23,7 @@ pyflakes:
 .PHONY: pep257
 pep257:
 	pep257
+
+.PHONY: prospector
+prospector:
+	prospector

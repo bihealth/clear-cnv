@@ -99,7 +99,10 @@ class Target:
 
 class CNV:
     def __init__(self, chr, start, end, gene, abb, score=1.0, size=None):
-        Target.__init__(self, chr, start, end, gene)
+        self.chr = chr
+        self.start = start
+        self.end = end
+        self.gene = gene
         self.abb = abb
         self.size = size
         self.score = float(score)
