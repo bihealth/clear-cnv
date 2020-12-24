@@ -16,3 +16,7 @@ bandit:
 .PHONY: pyflakes
 pyflakes:
 	pyflakes clearCNV tests
+
+.PHONY: pep257
+pep257:
+	pep257
