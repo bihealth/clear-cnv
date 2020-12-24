@@ -14,7 +14,7 @@ import pandas as pd
 def execs_available(execs: typing.List[str]) -> None:
     ok = True
     for exec in execs:
-        res = subprocess.run(["which", exec], capture_output=True)
+        res = subprocess.run(["which", exec], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if res.returncode != 0:
             logger.warn("Could not find executable %s via `which %s`", exec, exec)
             ok = False
