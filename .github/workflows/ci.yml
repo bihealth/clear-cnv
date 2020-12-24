@@ -27,7 +27,7 @@ jobs:
       - name: Install mamba.
         run: conda install -y mamba
       - name: Install external program dependencies.
-        run: mamba install -y bedtools
+        run: mamba install -y bedtools bedops
       - name: Install large dependencies with mamba to speedup vs. pip
         run: mamba install -y pandas matplotlib scikit-learn snakemake
       - name: Install test dependencies via pip

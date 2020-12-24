@@ -1,25 +1,43 @@
 #!/usr/bin/env python
-# coding: utf-8
 
-import subprocess
-import pandas as pd
+import contextlib
+import os
 import pathlib
+import subprocess
 import tempfile
+import typing
 
-# =============================================================================
-#  BED file merging
+from logzero import logger
+import pandas as pd
+
+
+def execs_available(execs: typing.List[str]) -> None:
+    ok = True
+    for exec in execs:
+        res = subprocess.run(["which", exec], capture_output=True)
+        if res.returncode != 0:
+            logger.warn("Could not find executable %s via `which %s`", exec, exec)
+            ok = False
+    return ok
 
 
 def merge_bedfile(args):
+    # TODO: used anywhere besides tests?
+    cmd_merge = ["bedtools", "merge", "-i", args.infile, "-c", "4", "-o", "collapse"]
+    cmd_sort = ["sort", "-V", "-k1,1", "-k2,2"]
     with open(args.outfile, "wt") as f:
-        p1 = subprocess.Popen(
-            ["bedtools", "merge", "-i", args.infile, "-c", "4", "-o", "collapse"],
-            stdout=subprocess.PIPE,
-            shell=False,
-        )
-        p2 = subprocess.Popen(["sort", "-V", "-k1,1", "-k2,2"], stdin=p1.stdout, stdout=f)
-        p1.stdout.close()
-        # p2.communicate()[0]
+        with subprocess.Popen(cmd_merge, stdout=subprocess.PIPE, shell=False) as proc_merge:
+            with subprocess.Popen(
+                cmd_sort, stdin=proc_merge.stdout, stdout=f, shell=False
+            ) as proc_sort:
+                proc_merge.wait()
+                proc_sort.wait()
+
+
+def _popen(cmd, stdin=None, stdout=None):
+    """Simple wrapper for Popen to shorten things and in particular disables using the shell."""
+    stdout = stdout or subprocess.PIPE
+    return subprocess.Popen(cmd, stdin=stdin, stdout=stdout, shell=False)
 
 
 # =============================================================================
@@ -27,24 +45,22 @@ def merge_bedfile(args):
 
 
 def merge_bedfiles(beds, bedfile):
-    pathlib.Path(bedfile).absolute().parent.mkdir(parents=True, exist_ok=True)
-    with open(bedfile, "wt") as f:
-        p1 = subprocess.Popen(
-            ["bedops", "--merge", *[line.rstrip("\n") for line in beds]],
-            stdout=subprocess.PIPE,
-            shell=False,
-        )
-        p2 = subprocess.Popen(
-            ["sort", "-V", "-k1,1", "-k2,2"], stdin=p1.stdout, stdout=subprocess.PIPE, shell=False,
-        )
-        p3 = subprocess.Popen(["bedtools", "merge"], stdin=p2.stdout, stdout=f, shell=False)
-        # p3.communicate()[0]
-        p1.stdout.close()
-        p2.stdout.close()
-    B = [l.rstrip("\n") for l in open(bedfile)]
-    with open(bedfile, "wt") as g:
-        for line in B:  # [::1+(int(len(B) / 1000))]:
-            print(line, file=g)
+    os.makedirs(os.path.dirname(bedfile), exist_ok=True)
+
+    cmd_merge = ["bedops", "--merge", *map(str.rstrip, beds)]
+    cmd_sort = ["sort", "-V", "-k1,1", "-k2,2"]
+    cmd_merge2 = ["bedtools", "merge"]
+
+    with contextlib.ExitStack() as stack:
+        # Open output file and start process pipeline.
+        f = stack.enter_context(open(bedfile, "wt"))
+        p_merge = _popen(cmd_merge)
+        p_sort = _popen(cmd_sort, p_merge.stdout)
+        p_merge2 = _popen(cmd_merge2, p_sort.stdout, f)
+        # Wait for completion.
+        p_merge.wait()
+        p_sort.wait()
+        p_merge2.wait()
 
 
 def prepare_untangling(args):

@@ -9,6 +9,10 @@ black:
 test:
 	black -l 100 --check .
 
+.PHONY: pytest
+pytest:
+	pytest .
+
 .PHONY: lint-all
 lint-all: bandit pyflakes pep257 prospector
 

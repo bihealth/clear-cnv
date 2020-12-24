@@ -14,6 +14,9 @@ from . import workflow_cnv_calling
 from . import workflow_untangle
 from . import __version__
 
+#: The executables required for running clear-CNV.
+REQUIRED_EXECUTABLES = ("bedops", "bedtools", "sort")
+
 
 def get_parser():
     """Return argparse command line parser."""
@@ -457,6 +460,10 @@ def get_parser():
 
 
 def main():
+    if not misc.execs_available(REQUIRED_EXECUTABLES):
+        logger.error("Missing some executables. The program will eventually fail.")
+    else:
+        logger.debug("External executables present: %s", ", ".join(REQUIRED_EXECUTABLES))
     parser = get_parser()
     args = parser.parse_args()
     if not hasattr(args, "func"):
