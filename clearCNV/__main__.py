@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-# coding: utf-8
 
 import argparse
+import os
+import tempfile
 
 from logzero import logger
 
-# from . import util
 from . import misc
 from . import matchscores
 from . import cnv_calling
@@ -455,6 +455,52 @@ def get_parser():
     )
 
     parser_workflow_untangle.set_defaults(func=workflow_untangle.workflow_untangle)
+
+    # =========================================================================
+    #  visualize untangling
+    # =========================================================================
+    parser_visualize_untangle = subparsers.add_parser(
+        "visualize_untangle", description=("Interactive untangling visualization"),
+    )
+
+    parser_visualize_untangle.add_argument(
+        "--host", default="0.0.0.0", help="Host to run server on, defaults to 0.0.0.0"
+    )
+
+    parser_visualize_untangle.add_argument(
+        "--port", type=int, default=8080, help="Port to run server on"
+    )
+
+    parser_visualize_untangle.add_argument(
+        "--debug", default=False, action="store_true", help="Whether or not to enable debugging"
+    )
+
+    parser_visualize_untangle.add_argument(
+        "--cache-dir", help="Optional path to cache directory, avoids repeating startup computation"
+    )
+
+    parser_visualize_untangle.add_argument("path", help="Path to untangling directory")
+
+    def viz_untangle(args):
+        """Helper function that launches the Dash webserver for untangling visualization."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            from .viz_untangle import settings
+
+            if args.cache_dir:
+                settings.CACHE_DIR = args.cache_dir
+            else:
+                settings.CACHE_DIR = os.path.join(tmpdir, "cache")
+            os.makedirs(settings.CACHE_DIR, exist_ok=True)
+            settings.setup_paths(args.path)
+
+            from .viz_untangle.app import app  # noqa
+            from .viz_untangle import store
+
+            if settings.CACHE_PRELOAD_DATA:
+                store.load_all_data(settings.UNTANGLE_SETTINGS)
+            app.run_server(host=args.host, port=args.port, debug=args.debug)
+
+    parser_visualize_untangle.set_defaults(func=viz_untangle)
 
     return parser
 

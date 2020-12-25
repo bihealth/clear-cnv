@@ -12,7 +12,7 @@ jobs:
           - "3.6"
           - "3.7"
           - "3.8"
-          - "3.9"
+#         - "3.9"  # disable for now
 
     steps:
       - name: Install Python via conda.
@@ -29,7 +29,7 @@ jobs:
       - name: Install external program dependencies.
         run: mamba install -y bedtools bedops
       - name: Install large dependencies with mamba to speedup vs. pip
-        run: mamba install -y pandas matplotlib scikit-learn snakemake
+        run: mamba install -y pandas matplotlib scikit-learn snakemake fastcluster
       - name: Install test dependencies via pip
         run: pip install -r requirements/test.txt
       - name: Install test dependencies via pip (black only on Python 3.8)
