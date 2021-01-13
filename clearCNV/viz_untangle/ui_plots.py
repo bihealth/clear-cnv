@@ -2,6 +2,7 @@ import base64
 import io
 import tempfile
 
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
@@ -14,6 +15,8 @@ sns.set_theme(color_codes=True)
 
 
 from .cache import cache
+
+# matplotlib.use('Agg')
 
 
 @cache.memoize()
