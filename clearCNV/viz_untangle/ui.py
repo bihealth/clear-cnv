@@ -135,9 +135,7 @@ def render_main_content():
             )
         else:
             return dbc.Card(
-                dbc.CardBody(
-                    dbc.Spinner(color="primary", id=id_), className="mt-3 text-center",
-                ),
+                dbc.CardBody(dbc.Spinner(color="primary", id=id_), className="mt-3 text-center",),
                 className="border-top-0 rounded-0",
             )
 
