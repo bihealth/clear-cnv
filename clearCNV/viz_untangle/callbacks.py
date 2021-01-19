@@ -47,6 +47,7 @@ def register_buffer_to_graphs(app):
             Output("graph-pca", "figure"),
             Output("graph-tsne", "figure"),
             Output("graph-agg-clust", "figure"),
+            Output("container-image-cluster-panels", "children"),
         ],
         [Input("buffer-cluster-params", "children")],
     )
@@ -56,4 +57,5 @@ def register_buffer_to_graphs(app):
             ui.render_pca(us),
             ui.render_tsne(us),
             ui.render_agg_clust(us),
+            ui.render_image_cluster_panels(us),
         ]

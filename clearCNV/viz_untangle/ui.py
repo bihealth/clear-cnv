@@ -49,7 +49,7 @@ def render_agg_clust(us: UntangleSettings):
 
 
 @cache.memoize()
-def render_clustermap_panels(us: UntangleSettings):
+def render_image_cluster_panels(us: UntangleSettings):
     data = store.load_all_data(us)
     img_b64 = ui_plots.plot_clustermap_panels_as_base64(data, store.compute_panelcoldict(us))
     return html.Img(src="data:image/png;base64,%s" % img_b64, className="img-responsive")
@@ -125,18 +125,27 @@ def render_main_content():
         body=True,
     )
 
-    def make_card(id_):
-        return dbc.Card(
-            dbc.CardBody(
-                dbc.Spinner([dcc.Graph(id=id_)], color="primary"), className="mt-3 text-center",
-            ),
-            className="border-top-0 rounded-0",
-        )
+    def make_card(id_, type_="graph"):
+        if type_ == "graph":
+            return dbc.Card(
+                dbc.CardBody(
+                    dbc.Spinner([dcc.Graph(id=id_)], color="primary"), className="mt-3 text-center",
+                ),
+                className="border-top-0 rounded-0",
+            )
+        else:
+            return dbc.Card(
+                dbc.CardBody(
+                    dbc.Spinner(color="primary", id=id_), className="mt-3 text-center",
+                ),
+                className="border-top-0 rounded-0",
+            )
 
     tabs_content = [
         dbc.Tab(make_card("graph-pca"), label="PCA"),
         dbc.Tab(make_card("graph-tsne"), label="tSNE"),
         dbc.Tab(make_card("graph-agg-clust"), label="Agg. Clust."),
+        dbc.Tab(make_card("container-image-cluster-panels", type_="image"), label="Panels"),
         # TODO: :-{ somehow the following crashes with
         # RecursionError: maximum recursion depth exceeded while getting the str of an object
         # dbc.Tab(make_card(render_clustermap_panels()), label="Clustermap Panels"),

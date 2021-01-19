@@ -498,6 +498,14 @@ def get_parser():
 
             if settings.CACHE_PRELOAD_DATA:
                 store.load_all_data(settings.UNTANGLE_SETTINGS)
+            from .viz_untangle import ui_plots
+            ## XXX
+            us = settings.UNTANGLE_SETTINGS
+            data = store.load_all_data(us)
+            ui_plots.plot_clustermap_clustering_as_base64(
+                data, store.compute_acluster(us), store.compute_clustercoldict(us)
+            )
+            ## XXX
             app.run_server(host=args.host, port=args.port, debug=args.debug)
 
     parser_visualize_untangle.set_defaults(func=viz_untangle)
