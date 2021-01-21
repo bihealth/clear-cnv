@@ -1,0 +1,13 @@
+tests/testdata/sample01.bam
+tests/testdata/sample02.bam
+tests/testdata/sample03.bam
+tests/testdata/sample04.bam
+tests/testdata/sample05.bam
+tests/testdata/sample06.bam
+tests/testdata/sample07.bam
+tests/testdata/sample08.bam
+tests/testdata/sample09.bam
+tests/testdata/sample10.bam
+tests/testdata/sample11.bam
+tests/testdata/sample12.bam
+tests/testdata/sample13.bam

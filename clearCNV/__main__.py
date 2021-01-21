@@ -432,12 +432,6 @@ def get_parser():
         default="",
     )
 
-    #    parser_workflow_untangle.add_argument(
-    #        '--drmaa',
-    #        dest='drmaa',
-    #        action='store_true'
-    #    )
-
     parser_workflow_untangle.add_argument(
         "--drmaa_mem",
         help="Number of megabytes used with drmaa. Default is 16000",
@@ -479,7 +473,40 @@ def get_parser():
         "--cache-dir", help="Optional path to cache directory, avoids repeating startup computation"
     )
 
-    parser_visualize_untangle.add_argument("path", help="Path to untangling directory")
+    parser_visualize_untangle.add_argument(
+        "-m",
+        "--metafile",
+        help="Path to the file containing the meta information. It is a .tsv of the scheme [panel name] [path of bams.txt] [path of targets.bed]. \
+            It aligns each desired panel name with the corresponding .bam files and the .bed file.",
+        required=True, type=str)
+
+    parser_visualize_untangle.add_argument(
+        "-c",
+        "--coverages",
+        required=True,
+        type=str,
+        help="Matrix in tsv format containing coverage values. Is output of 'workflow_untangle' step")
+
+    parser_visualize_untangle.add_argument(
+        "-u",
+        "--union",
+        required=True,
+        type=str,
+        help="Path to BED file that will contain the union of all given BED files")
+
+    #parser_visualize_untangle.add_argument(
+    #    "-p",
+    #    "--panels",
+    #    required=True,
+    #    type=str,
+    #    help="Path to the directory that will contain the final lists of bam-files grouped by panels")
+
+    parser_visualize_untangle.add_argument(
+        "-b",
+        "--batches",
+        required=True,
+        type=str,
+        help="Path to the directory that will contain the final lists of bam-files grouped by batches")
 
     def viz_untangle(args):
         """Helper function that launches the Dash webserver for untangling visualization."""
@@ -491,7 +518,7 @@ def get_parser():
             else:
                 settings.CACHE_DIR = os.path.join(tmpdir, "cache")
             os.makedirs(settings.CACHE_DIR, exist_ok=True)
-            settings.setup_paths(args.path)
+            settings.setup_paths(args)
 
             from .viz_untangle.app import app  # noqa
             from .viz_untangle import store

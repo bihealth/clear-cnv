@@ -56,7 +56,7 @@ def render_image_cluster_panels(us: UntangleSettings):
 
 
 @cache.memoize()
-def render_clustermap_clustering(us: UntangleSettings):
+def render_image_cluster_clustering(us: UntangleSettings):
     data = store.load_all_data(us)
     img_b64 = ui_plots.plot_clustermap_clustering_as_base64(
         data, store.compute_acluster(us), store.compute_clustercoldict(us)
@@ -143,7 +143,8 @@ def render_main_content():
         dbc.Tab(make_card("graph-pca"), label="PCA"),
         dbc.Tab(make_card("graph-tsne"), label="tSNE"),
         dbc.Tab(make_card("graph-agg-clust"), label="Agg. Clust."),
-        dbc.Tab(make_card("container-image-cluster-panels", type_="image"), label="Panels"),
+        dbc.Tab(make_card("container-image-cluster-panels", type_="image"), label="Original assignment"),
+        dbc.Tab(make_card("container-image-cluster-clustering", type_="image"), label="New assignment"),
         # TODO: :-{ somehow the following crashes with
         # RecursionError: maximum recursion depth exceeded while getting the str of an object
         # dbc.Tab(make_card(render_clustermap_panels()), label="Clustermap Panels"),

@@ -34,7 +34,7 @@ from . import ui_plots
 
 
 #: Whether or not to pickle data (for development only).
-PICKLE_DATA = True
+PICKLE_DATA = False
 
 
 @attr.s(auto_attribs=True, frozen=True)
@@ -74,10 +74,13 @@ def _find_batches(xd, savepath, factor=0.99, _n=1, _bic=None, _df=None):
     BIC = GM.bic(xds)
 
     if _bic and factor * _bic <= BIC:
+        # render figures
         plt.figure(figsize=(10, 6))
         sns.scatterplot(data=_df, x="X", y="Y", hue="clustering")
         plt.savefig(savepath)
+
         _df.to_csv(str(savepath) + ".tsv", sep="\t", header=True, index=True)
+
         return (_n - 1, _bic, _df)
     else:
         return _find_batches(xd, savepath, factor, _n + 1, BIC, xds_df)
