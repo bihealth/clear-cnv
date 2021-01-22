@@ -478,23 +478,27 @@ def get_parser():
         "--metafile",
         help="Path to the file containing the meta information. It is a .tsv of the scheme [panel name] [path of bams.txt] [path of targets.bed]. \
             It aligns each desired panel name with the corresponding .bam files and the .bed file.",
-        required=True, type=str)
+        required=True,
+        type=str,
+    )
 
     parser_visualize_untangle.add_argument(
         "-c",
         "--coverages",
         required=True,
         type=str,
-        help="Matrix in tsv format containing coverage values. Is output of 'workflow_untangle' step")
+        help="Matrix in tsv format containing coverage values. Is output of 'workflow_untangle' step",
+    )
 
     parser_visualize_untangle.add_argument(
         "-u",
         "--union",
         required=True,
         type=str,
-        help="Path to BED file that will contain the union of all given BED files")
+        help="Path to BED file that will contain the union of all given BED files",
+    )
 
-    #parser_visualize_untangle.add_argument(
+    # parser_visualize_untangle.add_argument(
     #    "-p",
     #    "--panels",
     #    required=True,
@@ -506,7 +510,8 @@ def get_parser():
         "--batches",
         required=True,
         type=str,
-        help="Path to the directory that will contain the final lists of bam-files grouped by batches")
+        help="Path to the directory that will contain the final lists of bam-files grouped by batches",
+    )
 
     def viz_untangle(args):
         """Helper function that launches the Dash webserver for untangling visualization."""

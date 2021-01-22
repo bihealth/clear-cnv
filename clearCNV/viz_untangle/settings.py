@@ -13,7 +13,7 @@ import cattr
 HOME_BRAND = "clear-CNV"
 
 #: Base input path.
-#PATH_BASE = None
+# PATH_BASE = None
 
 #: Path to metafile.
 PATH_METAFILE = None
@@ -30,7 +30,7 @@ PATH_BATCHES = None
 #: Helper function to setup the paths based on an input path.
 def setup_paths(args):
     global PATH_METAFILE, PATH_COVERAGES, PATH_BEDFILE, PATH_BATCHES
-    #PATH_BASE = pathlib.Path(path)
+    # PATH_BASE = pathlib.Path(path)
     PATH_METAFILE = args.metafile
     PATH_COVERAGES = args.coverages
     PATH_BEDFILE = args.union

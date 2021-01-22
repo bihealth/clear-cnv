@@ -26,8 +26,10 @@ def plot_clustermap_panels_as_base64(data, panelcoldict):
     n = min([data.X.shape[0], 1000])
     m = min([data.X.shape[1], 1000])
     plt.figure(figsize=(8, 5))
-    sns.clustermap(data.X.iloc[::math.ceil(data.X.shape[0]/n),::math.ceil(data.X.shape[1]/m)],
-        col_colors=list(map(lambda x: panelcoldict[x], data.samples["panel"])))
+    sns.clustermap(
+        data.X.iloc[:: math.ceil(data.X.shape[0] / n), :: math.ceil(data.X.shape[1] / m)],
+        col_colors=list(map(lambda x: panelcoldict[x], data.samples["panel"])),
+    )
     logger.info("... done creating panels clustermap.")
     with tempfile.NamedTemporaryFile(suffix=".png") as f:
         plt.savefig(f, format="png")
@@ -42,8 +44,10 @@ def plot_clustermap_clustering_as_base64(data, XD, clustercoldict):
     n = min([data.X.shape[0], 1000])
     m = min([data.X.shape[1], 1000])
     plt.figure(figsize=(8, 5))
-    sns.clustermap(data.X.iloc[::math.ceil(data.X.shape[0]/n),::math.ceil(data.X.shape[1]/m)],
-        col_colors=list(map(lambda x: clustercoldict[x], XD["clustering"])))
+    sns.clustermap(
+        data.X.iloc[:: math.ceil(data.X.shape[0] / n), :: math.ceil(data.X.shape[1] / m)],
+        col_colors=list(map(lambda x: clustercoldict[x], XD["clustering"])),
+    )
 
     logger.info("... done creating clustering clustermap.")
     with tempfile.NamedTemporaryFile(suffix=".png") as f:
