@@ -417,6 +417,21 @@ def get_parser():
 
     parser_workflow_untangle.add_argument(
         "-c",
+        "--coverages",
+        help="Output file path to coverages matrix (e.g. coverages.tsv).",
+        required=True,
+        type=str,
+    )
+
+    parser_workflow_untangle.add_argument(
+        "-b",
+        "--bedfile",
+        required=True,
+        type=str,
+        help="Output file path to BED file that will contain the union of all given BED files",
+    )
+
+    parser_workflow_untangle.add_argument(
         "--cores",
         help="Number of used cores in snakemake workflow. Default is 32.",
         required=False,
@@ -491,8 +506,8 @@ def get_parser():
     )
 
     parser_visualize_untangle.add_argument(
-        "-u",
-        "--union",
+        "-b",
+        "--bedfile",
         required=True,
         type=str,
         help="Path to BED file that will contain the union of all given BED files",
@@ -505,13 +520,13 @@ def get_parser():
     #    type=str,
     #    help="Path to the directory that will contain the final lists of bam-files grouped by panels")
 
-    parser_visualize_untangle.add_argument(
-        "-b",
-        "--batches",
-        required=True,
-        type=str,
-        help="Path to the directory that will contain the final lists of bam-files grouped by batches",
-    )
+    #parser_visualize_untangle.add_argument(
+    #    "-a",
+    #    "--batches",
+    #    required=True,
+    #    type=str,
+    #    help="Path to the directory that will contain the final lists of bam-files grouped by batches",
+    #)
 
     def viz_untangle(args):
         """Helper function that launches the Dash webserver for untangling visualization."""

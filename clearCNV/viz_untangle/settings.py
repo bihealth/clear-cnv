@@ -33,7 +33,7 @@ def setup_paths(args):
     # PATH_BASE = pathlib.Path(path)
     PATH_METAFILE = args.metafile
     PATH_COVERAGES = args.coverages
-    PATH_BEDFILE = args.union
+    PATH_BEDFILE = args.bedfile
     PATH_BATCHES = args.batches
 
 
