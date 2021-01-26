@@ -515,8 +515,8 @@ def get_parser():
 
     parser_visualize_untangle.add_argument(
         "-o",
-        "--output-batch-file",
-        help="Path to output file for batch separation results (you can modify in UI)",
+        "--new_panel_assignments_directory",
+        help="Path to directory that will contain the output lists of paths to .bam-files, which were re-assigned to the given panels according to clustering.",
     )
 
     # parser_visualize_untangle.add_argument(
