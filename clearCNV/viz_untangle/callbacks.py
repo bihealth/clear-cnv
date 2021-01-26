@@ -13,7 +13,7 @@ from logzero import logger
 from werkzeug.utils import secure_filename
 
 from . import ui, settings, store
-from .settings import UntangleSettings
+from .settings import UntangleSettings, BATCH_OUTPUT_PATH
 
 
 def register_control_to_buffer(app):
@@ -61,3 +61,14 @@ def register_buffer_to_graphs(app):
             ui.render_image_cluster_panels(us),
             ui.render_image_cluster_clustering(us),
         ]
+
+
+def register_save_button(app):
+    """Register button for the save button."""
+
+    @app.callback(
+        Output("buffer-save-batches-text", "children"),
+        Input("input-save-batches-button", "n_clicks"),
+    )
+    def on_click_button(n_clicks):
+        return "%d: saving to %s" % (n_clicks, BATCH_OUTPUT_PATH)

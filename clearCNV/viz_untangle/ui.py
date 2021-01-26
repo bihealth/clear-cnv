@@ -121,6 +121,8 @@ def render_main_content():
                 ],
             ),
             html.Div(id="buffer-cluster-params", style={"display": "none"}),
+            dbc.Button("Save", id="input-save-batches-button"),
+            html.P(id="buffer-save-batches-text"),
         ],
         body=True,
     )

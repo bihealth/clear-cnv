@@ -513,6 +513,12 @@ def get_parser():
         help="Path to BED file that will contain the union of all given BED files",
     )
 
+    parser_visualize_untangle.add_argument(
+        "-o",
+        "--output-batch-file",
+        help="Path to output file for batch separation results (you can modify in UI)",
+    )
+
     # parser_visualize_untangle.add_argument(
     #    "-p",
     #    "--panels",
@@ -539,6 +545,8 @@ def get_parser():
                 settings.CACHE_DIR = os.path.join(tmpdir, "cache")
             os.makedirs(settings.CACHE_DIR, exist_ok=True)
             settings.setup_paths(args)
+
+            settings.BATCH_OUTPUT_PATH = args.output_batch_file
 
             from .viz_untangle.app import app  # noqa
             from .viz_untangle import store

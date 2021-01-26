@@ -66,3 +66,6 @@ CACHE_DIR = None
 CACHE_REDIS_URL = None
 #: whether or not to preload data on startup
 CACHE_PRELOAD_DATA = True
+
+#: Output path for batch separation.
+BATCH_OUTPUT_PATH = None
