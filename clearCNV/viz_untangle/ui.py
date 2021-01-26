@@ -64,6 +64,15 @@ def render_image_cluster_clustering(us: UntangleSettings):
     return html.Img(src="data:image/png;base64,%s" % img_b64, className="img-responsive")
 
 
+@cache.memoize()
+def render_images_batch_separation(us: UntangleSettings):
+    return [
+        html.H1("Hello"),
+        html.H2("World"),
+        html.H3("!"),
+    ]
+
+
 def render_main_content():
     """Render page main content"""
 
@@ -151,6 +160,7 @@ def render_main_content():
         dbc.Tab(
             make_card("container-image-cluster-clustering", type_="image"), label="New assignment"
         ),
+        dbc.Tab(make_card("container-image-batch-separation", type_="image"), label="Batches"),
         # TODO: :-{ somehow the following crashes with
         # RecursionError: maximum recursion depth exceeded while getting the str of an object
         # dbc.Tab(make_card(render_clustermap_panels()), label="Clustermap Panels"),

@@ -49,6 +49,7 @@ def register_buffer_to_graphs(app):
             Output("graph-agg-clust", "figure"),
             Output("container-image-cluster-panels", "children"),
             Output("container-image-cluster-clustering", "children"),
+            Output("container-image-batch-separation", "children"),
         ],
         [Input("buffer-cluster-params", "children")],
     )
@@ -60,6 +61,7 @@ def register_buffer_to_graphs(app):
             ui.render_agg_clust(us),
             ui.render_image_cluster_panels(us),
             ui.render_image_cluster_clustering(us),
+            ui.render_images_batch_separation(us),
         ]
 
 
@@ -71,4 +73,4 @@ def register_save_button(app):
         Input("input-save-batches-button", "n_clicks"),
     )
     def on_click_button(n_clicks):
-        return "%d: saving to %s" % (n_clicks, BATCH_OUTPUT_PATH)
+        return "%d: saving to %s" % (n_clicks or 0, BATCH_OUTPUT_PATH)
