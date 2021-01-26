@@ -45,7 +45,7 @@ def render_tsne(us: UntangleSettings):
 
 @cache.memoize()
 def render_agg_clust(us: UntangleSettings):
-    return px.scatter(store.compute_acluster(us), x="X", y="Y", color="clustering")
+    return px.scatter(store.compute_acluster(us), x="X", y="Y", color="new_assignments")
 
 
 @cache.memoize()

@@ -46,7 +46,7 @@ def plot_clustermap_clustering_as_base64(data, XD, clustercoldict):
     plt.figure(figsize=(8, 5))
     sns.clustermap(
         data.X.iloc[:: math.ceil(data.X.shape[0] / n), :: math.ceil(data.X.shape[1] / m)],
-        col_colors=list(map(lambda x: clustercoldict[x], XD["new_panels"])),
+        col_colors=list(map(lambda x: clustercoldict[x], XD["clustering"])),
     )
 
     logger.info("... done creating clustering clustermap.")

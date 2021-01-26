@@ -29,7 +29,7 @@ PATH_BEDFILE = None
 
 #: Helper function to setup the paths based on an input path.
 def setup_paths(args):
-    global PATH_METAFILE, PATH_COVERAGES, PATH_BEDFILE, #PATH_BATCHES
+    global PATH_METAFILE, PATH_COVERAGES, PATH_BEDFILE #PATH_BATCHES
     # PATH_BASE = pathlib.Path(path)
     PATH_METAFILE = args.metafile
     PATH_COVERAGES = args.coverages
