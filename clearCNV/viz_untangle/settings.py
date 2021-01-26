@@ -25,16 +25,16 @@ PATH_COVERAGES = None
 PATH_BEDFILE = None
 
 #: Path to batch definition.
-#PATH_BATCHES = None
+# PATH_BATCHES = None
 
 #: Helper function to setup the paths based on an input path.
 def setup_paths(args):
-    global PATH_METAFILE, PATH_COVERAGES, PATH_BEDFILE #PATH_BATCHES
+    global PATH_METAFILE, PATH_COVERAGES, PATH_BEDFILE  # PATH_BATCHES
     # PATH_BASE = pathlib.Path(path)
     PATH_METAFILE = args.metafile
     PATH_COVERAGES = args.coverages
     PATH_BEDFILE = args.bedfile
-    #PATH_BATCHES = args.batches
+    # PATH_BATCHES = args.batches
 
 
 #: Whether or not to preload data.

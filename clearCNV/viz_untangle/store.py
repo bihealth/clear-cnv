@@ -214,6 +214,7 @@ def compute_tsne(us: settings.UntangleSettings):
     logger.info("... done computing tSNE.")
     return XD
 
+
 @cache.memoize()
 def compute_acluster(us: settings.UntangleSettings):
     logger.info("Computing Agglomerative Clustering ...")
@@ -223,8 +224,11 @@ def compute_acluster(us: settings.UntangleSettings):
     # TODO: yikes, inplace update with cached data...
     XD["clustering"] = clustering.labels_
     # majority vote for panel assignments
-    cluster_panel_dict = {i:Counter(data.samples[clustering.labels_ == i]["panel"]).most_common()[0][0] for i in range(len(data.panels))}
-    XD["new_assignments"] = list(map(lambda x: cluster_panel_dict[x],clustering.labels_))
+    cluster_panel_dict = {
+        i: Counter(data.samples[clustering.labels_ == i]["panel"]).most_common()[0][0]
+        for i in range(len(data.panels))
+    }
+    XD["new_assignments"] = list(map(lambda x: cluster_panel_dict[x], clustering.labels_))
     logger.info("... done computing Agglomerative Clustering.")
     return XD
 

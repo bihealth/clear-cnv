@@ -520,13 +520,13 @@ def get_parser():
     #    type=str,
     #    help="Path to the directory that will contain the final lists of bam-files grouped by panels")
 
-    #parser_visualize_untangle.add_argument(
+    # parser_visualize_untangle.add_argument(
     #    "-a",
     #    "--batches",
     #    required=True,
     #    type=str,
     #    help="Path to the directory that will contain the final lists of bam-files grouped by batches",
-    #)
+    # )
 
     def viz_untangle(args):
         """Helper function that launches the Dash webserver for untangling visualization."""
