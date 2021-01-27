@@ -546,7 +546,7 @@ def get_parser():
             os.makedirs(settings.CACHE_DIR, exist_ok=True)
             settings.setup_paths(args)
 
-            settings.BATCH_OUTPUT_PATH = args.output_batch_file
+            settings.BATCH_OUTPUT_PATH = args.new_panel_assignments_directory
 
             from .viz_untangle.app import app  # noqa
             from .viz_untangle import store
