@@ -19,7 +19,8 @@ BAMSTXT     = pathlib.Path(config["bamsfile"])
 COVERAGES   = pathlib.Path(config["coverages"])
 COV_DIR     = pathlib.Path(config["cov_dir"])
 
-logspath = pathlib.Path(config["workdir"]) / "logs"
+#logspath = pathlib.Path(config["workdir"]) / "logs"
+logspath = pathlib.Path("logs")
 # options
 
 # =============================================================================
@@ -29,10 +30,9 @@ logspath = pathlib.Path(config["workdir"]) / "logs"
 with open(BAMSTXT, "rt") as inputf:
   paths = [p.strip() for p in inputf.readlines()]
   BAMS = {
-    pathlib.Path(p).stem: p
+    pathlib.Path(p).stem: str(pathlib.Path(p).absolute())
     for p in paths
   }
-
 # -----------------------------------------------------------------------------
 
 rule all:

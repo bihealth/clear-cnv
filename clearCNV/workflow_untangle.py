@@ -6,21 +6,22 @@ from . import misc
 
 def create_config(configpath, args):
     with open(configpath, "wt") as f:
-        print("workdir: '" + str(args.workdir) + "'", file=f)
-        print("metafile: '" + str(args.metafile) + "'", file=f)
+        print("workdir: '"   + str(args.workdir) + "'",   file=f)
+        print("metafile: '"  + str(args.metafile) + "'",  file=f)
         print("coverages: '" + str(args.coverages) + "'", file=f)
-        print("cov_dir: '" + str(args.cov_dir) + "'", file=f)
-        print("bedfile: '" + str(args.bedfile) + "'", file=f)
-        print("bamsfile: '" + str(args.bamsfile) + "'", file=f)
+        print("cov_dir: '"   + str(args.cov_dir) + "'",   file=f)
+        print("bedfile: '"   + str(args.bedfile) + "'",   file=f)
+        print("bamsfile: '"  + str(args.bamsfile) + "'",  file=f)
         print("reference: '" + str(args.reference) + "'", file=f)
 
 
 def workflow_untangle(args):
-    args.bamsfile = (pathlib.Path(args.workdir) / "allbams.txt").absolute()
-    args.cov_dir = (pathlib.Path(args.workdir) / "covs").absolute()
-    args.bedfile = pathlib.Path(args.bedfile).absolute()
+    args.bamsfile  = (pathlib.Path(args.workdir) / "allbams.txt").absolute()
+    args.cov_dir   = (pathlib.Path(args.workdir) / "covs").absolute()
+    args.bedfile   = pathlib.Path(args.bedfile).absolute()
     args.coverages = pathlib.Path(args.coverages).absolute()
-    args.metafile = pathlib.Path(args.metafile).absolute()
+    args.metafile  = pathlib.Path(args.metafile).absolute()
+    args.reference = pathlib.Path(args.reference).absolute()
 
     misc.prepare_untangling(args)
 
@@ -58,5 +59,6 @@ def workflow_untangle(args):
 
     # How to create the dir the best way?
     subprocess.check_call(["mkdir", "-p", f"{args.workdir}sge_log"])
+    subprocess.check_call(["mkdir", "-p", f"{args.workdir}covs"])
 
     subprocess.check_call(arguments)
