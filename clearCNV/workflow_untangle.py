@@ -52,11 +52,11 @@ def workflow_untangle(args):
         arguments.append("--drmaa")
         arguments.append(
             str(
-                f" --mem={args.drmaa_mem} --time={args.drmaa_time} --output={args.workdir}/sge_log/%x-%j.log"
+                f" --mem={args.drmaa_mem} --time={args.drmaa_time} --output={args.workdir}sge_log/%x-%j.log"
             )
         )
 
     # How to create the dir the best way?
-    subprocess.check_call(["mkdir", "-p", f"{args.workdir}/sge_log"])
+    subprocess.check_call(["mkdir", "-p", f"{args.workdir}sge_log"])
 
     subprocess.check_call(arguments)
