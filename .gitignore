@@ -327,3 +327,15 @@ tags
 [._]*.un~
 
 # End of https://www.toptal.com/developers/gitignore/api/python,vim,linux,emacs,pycharm
+
+t.sh
+workflow_untangle.sh
+run_baches.sh
+run_FCC.sh
+run_rtbedmerge.sh
+log.log
+
+tests/testdata/covs
+tests/testdata/logs
+tests/testdata/.snakemake
+
