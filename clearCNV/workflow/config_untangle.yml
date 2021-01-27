@@ -1,6 +1,6 @@
 workdir: 'tests/testdata/'
 metafile: '/home/memsonmi/clear-cnv/tests/testdata/test_untangle_meta.tsv'
-coverages: '/home/memsonmi/clear-cnv/tests/testdata/test_untangling_coverages_out.tsv'
+coverages: '/home/memsonmi/clear-cnv/tests/testdata/test_untangling_coverages.tsv'
 cov_dir: '/home/memsonmi/clear-cnv/tests/testdata/covs'
 bedfile: '/home/memsonmi/clear-cnv/tests/testdata/test_untangling_union.bed'
 bamsfile: '/home/memsonmi/clear-cnv/tests/testdata/allbams.txt'

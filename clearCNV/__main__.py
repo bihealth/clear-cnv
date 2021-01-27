@@ -409,7 +409,7 @@ def get_parser():
     parser_workflow_untangle.add_argument(
         "-m",
         "--metafile",
-        help="Path to the file containing the meta information. It is a .tsv of the scheme -panel bams.txt bed.bed. \
+        help="Path to the file containing the meta information. It is a .tsv of the scheme [panel] [bams.txt] [bed.bed]. \
             It aligns each desired panel name with the corresponding .bam files and the .bed file.",
         required=True,
         type=str,
@@ -449,18 +449,18 @@ def get_parser():
 
     parser_workflow_untangle.add_argument(
         "--drmaa_mem",
-        help="Number of megabytes used with drmaa. Default is 16000",
+        help="Number of megabytes used with drmaa. Suggested is 16000. If --drmaa_mem and --drmaa_time are given, this workflow will automatically use --drmaa in its snakemake call.",
         required=False,
         type=int,
-        default=16000,
+        default=None,
     )
 
     parser_workflow_untangle.add_argument(
         "--drmaa_time",
-        help="Maximum number of hours:minutes per job. Default is 4:00",
+        help="Maximum number of hh:mm per job. Suggested is 4:00.",
         required=False,
         type=str,
-        default="4:00",
+        default=None,
     )
 
     parser_workflow_untangle.set_defaults(func=workflow_untangle.workflow_untangle)
@@ -514,7 +514,7 @@ def get_parser():
     )
 
     parser_visualize_untangle.add_argument(
-        "-o",
+        "-d",
         "--new_panel_assignments_directory",
         help="Path to directory that will contain the output lists of paths to .bam-files, which were re-assigned to the given panels according to clustering.",
     )
