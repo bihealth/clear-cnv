@@ -18,7 +18,7 @@ Go to the directory `clear-cnv/` and execute the shell commad:
 INPUT: working directory given by `--workdir`, the files given by `--reference` and `--metafile`.
 OUTPUT: files created at `--coverages` and `--bedfile`. They are used in the next step.
 
-If you want to create the necessary files for your own data just edit the meta.tsv file analogously to the example at `clearCNV/tests/testdata/meta.tsv`, where you can add more rows for each targets file (BED-file).
+If you want to create the necessary files for your own data just edit the meta.tsv file analogously to the example at `clearCNV/tests/testdata/meta.tsv`, where you can add more rows for each targets file (BED-file). It is recommended to use absolute paths in the meta file.
 
 Optionally, **drmaa** can be used, if the two flags are present:
 `--drmaa_mem 1600 --drmaa_time 4:00`,

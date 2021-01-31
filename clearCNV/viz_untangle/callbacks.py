@@ -73,4 +73,5 @@ def register_save_button(app):
         Input("input-save-batches-button", "n_clicks"),
     )
     def on_click_button(n_clicks):
+        print("clicked save")
         return "%d: saving to %s" % (n_clicks or 0, BATCH_OUTPUT_PATH)
