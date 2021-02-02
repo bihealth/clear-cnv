@@ -49,7 +49,6 @@ class Data:
     panels: typing.Any
     bedsmatrix: typing.Any
 
-
 def _load_coverage(path, sep="\t"):
     D0 = pd.read_csv(path, sep="\t", low_memory=False)
     if not (
@@ -64,7 +63,7 @@ def _load_coverage(path, sep="\t"):
     return D0
 
 
-def _find_batches(xd, savepath, factor=0.99, _n=1, _bic=None, _df=None):
+def _find_batches(xd, factor=0.99, _n=1, _bic=None, _df=None):
     xds = xd[["X", "Y"]].to_numpy()
     xindex = xd.index
     GM = GaussianMixture(n_components=_n, n_init=10).fit(xds)
@@ -74,16 +73,10 @@ def _find_batches(xd, savepath, factor=0.99, _n=1, _bic=None, _df=None):
     BIC = GM.bic(xds)
 
     if _bic and factor * _bic <= BIC:
-        # render figures
-        plt.figure(figsize=(10, 6))
-        sns.scatterplot(data=_df, x="X", y="Y", hue="clustering")
-        plt.savefig(savepath)
-
-        _df.to_csv(str(savepath) + ".tsv", sep="\t", header=True, index=True)
-
+        #_df.to_csv(str(savepath) + ".tsv", sep="\t", header=True, index=True)
         return (_n - 1, _bic, _df)
     else:
-        return _find_batches(xd, savepath, factor, _n + 1, BIC, xds_df)
+        return _find_batches(xd, factor, _n + 1, BIC, xds_df)
 
 
 @cache.memoize()
@@ -251,3 +244,50 @@ def compute_clustercoldict(us: settings.UntangleSettings):
         i: c for i, c in enumerate(clustercolors(np.linspace(0, 1, len(data.panels))))
     }
     return clustercoldict
+
+
+@cache.memoize()
+def compute_batches(us: settings.UntangleSettings):
+    data = store.load_all_data(us)
+    XD = store.compute_acluster(us)
+    XD.index = data.D.columns
+    batches = []
+    for cluster in set(XD["new_assignments"])
+        D1 = data.D.drop(columns=dropoutsamples.index)
+        x = D1.T[XD["new_assignments"] == cluster]
+        x = x.fillna(0).T[x.median(axis=0) > us.threshold].T
+        d = x[x.median(axis=1) <= us.threshold]
+        x = x.T[x.index.difference(d.index)].T
+        p = x.index
+        x = pd.DataFrame(util.normalize(util.normalize(x,axis=1),axis=0)).T.fillna(1).T
+        x.index = p
+
+        # perform clustering
+        pca = PCA(n_components=us.pca_components)
+        xt = pca.fit_transform(x)
+
+        x_embedded = TSNE(n_components=2).fit_transform(xt)
+
+        xd = pd.DataFrame(x_embedded)
+        xd.index = x.index
+        xd.columns = ["X","Y"]
+        xd["panel"] = data.samples.loc[x.index,"panel"]
+
+        n_batches, score, df = _find_batches(xd,BATCH_FACTOR)
+        batches.append(df)
+
+    return batches
+
+
+@cache.memoize()
+def save_results(us: settings.UntangleSettings):
+    data = load_all_data(us)
+    print("store: save results")
+    XD = compute_acluster(us)
+    # save new panel assignments
+    XD.index = data.allsamples.index
+    XD["paths"] = data.allsamples["path"]
+    for p in data.panels:
+        bamspath = pathlib.Path(BATCH_OUTPUT_PATH) / (str(p)+'_new_assigned.txt')
+        XD[XD["new_panels"] == p]["paths"].to_csv(bamspath, sep='\t',header=False,index=False)
+    return True

@@ -66,11 +66,13 @@ def render_image_cluster_clustering(us: UntangleSettings):
 
 @cache.memoize()
 def render_images_batch_separation(us: UntangleSettings):
-    return [
-        html.H1("Hello"),
-        html.H2("World"),
-        html.H3("!"),
-    ]
+    return [px.scatter(sp,x='X',y='Y',color="clustering") for sp in store.compute_batches(us)]
+    #return [
+    #    html.H1("Hello"),
+    #    px.scatter()
+    #    html.H2("World"),
+    #    html.H3("!"),
+    #]
 
 
 def render_main_content():
