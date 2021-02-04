@@ -69,7 +69,7 @@ def render_image_cluster_clustering(us: UntangleSettings):
 @cache.memoize()
 def render_images_batch_separation(us: UntangleSettings):
     # return [sns.scatterplot(data=p,x='X',y='Y',hue="batch") for p in store.compute_batches(us)]
-    return [px.scatter(p, x="X", y="Y", color="batch") for p in store.compute_batches(us)][0]
+    return [px.scatter(p, x="X", y="Y", color="batch") for p in store.compute_batches(us)]
     # return px.scatter(x=[0, 1, 2, 3, 4], y=[0, 1, 4, 9, 16])
     # return [
     #    html.H1("Hello"),
@@ -169,7 +169,6 @@ def render_main_content():
         dbc.Tab(
             make_card("container-image-cluster-clustering", type_="image"), label="New assignment"
         ),
-        dbc.Tab(make_card("container-image-batch-separation", type_="image"), label="Batches"),
         dbc.Tab(make_card("container-image-batch-separation"), label="Batches"),
         # dbc.Tab(make_card("container-image-batch-separation"), label="Batches"),
         # TODO: :-{ somehow the following crashes with
