@@ -74,4 +74,6 @@ def register_save_button(app):
     )
     def on_click_button(n_clicks):
         print("clicked save")
+        # how to get us ????
+        # store.save_results(us)
         return "%d: saving to %s" % (n_clicks or 0, BATCH_OUTPUT_PATH)

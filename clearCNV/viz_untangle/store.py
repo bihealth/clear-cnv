@@ -63,7 +63,7 @@ def _load_coverage(path, sep="\t"):
     return D0
 
 
-def _find_batches(xd, factor=0.99, _n=1, _bic=None, _df=None):
+def _find_batches(xd, factor=0.985, _n=1, _bic=None, _df=None):
     xds = xd[["X", "Y"]].to_numpy()
     xindex = xd.index
     GM = GaussianMixture(n_components=_n, n_init=10).fit(xds)
@@ -248,12 +248,12 @@ def compute_clustercoldict(us: settings.UntangleSettings):
 
 @cache.memoize()
 def compute_batches(us: settings.UntangleSettings):
-    data = store.load_all_data(us)
-    XD = store.compute_acluster(us)
+    data = load_all_data(us)
+    XD = compute_acluster(us)
     XD.index = data.D.columns
     batches = []
-    for cluster in set(XD["new_assignments"])
-        D1 = data.D.drop(columns=dropoutsamples.index)
+    for i,cluster in enumerate(sorted(set(XD["new_assignments"]))):
+        D1 = data.D.drop(columns=data.dropoutsamples.index)
         x = D1.T[XD["new_assignments"] == cluster]
         x = x.fillna(0).T[x.median(axis=0) > us.threshold].T
         d = x[x.median(axis=1) <= us.threshold]
@@ -273,7 +273,9 @@ def compute_batches(us: settings.UntangleSettings):
         xd.columns = ["X","Y"]
         xd["panel"] = data.samples.loc[x.index,"panel"]
 
-        n_batches, score, df = _find_batches(xd,BATCH_FACTOR)
+        batch_factor_ = [float(val) for val in us.batch_factor.split(',')]
+        bf = batch_factor_[i] if len(batch_factor_) > 1 else batch_factor_[0]
+        n_batches, score, df = _find_batches(xd,bf)
         batches.append(df)
 
     return batches
@@ -282,12 +284,21 @@ def compute_batches(us: settings.UntangleSettings):
 @cache.memoize()
 def save_results(us: settings.UntangleSettings):
     data = load_all_data(us)
-    print("store: save results")
     XD = compute_acluster(us)
     # save new panel assignments
     XD.index = data.allsamples.index
     XD["paths"] = data.allsamples["path"]
+    logger.info("saving new panel assignment ...")
     for p in data.panels:
         bamspath = pathlib.Path(BATCH_OUTPUT_PATH) / (str(p)+'_new_assigned.txt')
         XD[XD["new_panels"] == p]["paths"].to_csv(bamspath, sep='\t',header=False,index=False)
+    logger.info("... done saving new panel assignment.")
+    batches = compute_batches(us)
+    logger.info("saving new batch clusterings ...")
+    for batch in batches:
+        panel = set(batch["panel"]).pop()
+        for x in set(batch["clustering"]):
+            path = pathlib.Path(BATCH_OUTPUT_PATH) / str("%s_batch%.2d.txt"%(panel,x))
+            samples.T[batch[batch['clustering'] == x].index].T["path"].to_csv(path,sep='\t',header=False,index=False)
+    logger.info("... done saving new batch clusterings.")
     return True

@@ -125,7 +125,7 @@ def render_main_content():
                     dbc.Label("Batch Factor"),
                     dbc.Input(
                         id="input-batch-factor",
-                        type="number",
+                        type="text",
                         value=settings.UNTANGLE_SETTINGS.batch_factor,
                         debounce=True,
                     ),
@@ -163,10 +163,6 @@ def render_main_content():
             make_card("container-image-cluster-clustering", type_="image"), label="New assignment"
         ),
         dbc.Tab(make_card("container-image-batch-separation", type_="image"), label="Batches"),
-        # TODO: :-{ somehow the following crashes with
-        # RecursionError: maximum recursion depth exceeded while getting the str of an object
-        # dbc.Tab(make_card(render_clustermap_panels()), label="Clustermap Panels"),
-        # dbc.Tab(make_card(render_clustermap_clustering()), label="Clustermap Clustering"),
     ]
 
     return html.Div(
