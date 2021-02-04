@@ -166,16 +166,13 @@ def render_main_content():
         dbc.Tab(
             make_card("container-image-cluster-clustering", type_="image"), label="New assignment"
         ),
-<<<<<<< HEAD
         dbc.Tab(make_card("container-image-batch-separation", type_="image"), label="Batches"),
-=======
         dbc.Tab(make_card("container-image-batch-separation"), label="Batches"),
         #dbc.Tab(make_card("container-image-batch-separation"), label="Batches"),
         # TODO: :-{ somehow the following crashes with
         # RecursionError: maximum recursion depth exceeded while getting the str of an object
         # dbc.Tab(make_card(render_clustermap_panels()), label="Clustermap Panels"),
         # dbc.Tab(make_card(render_clustermap_clustering()), label="Clustermap Clustering"),
->>>>>>> 1bb6a2a97e02281bba61067f932cc562725e4b1b
     ]
 
     return html.Div(
