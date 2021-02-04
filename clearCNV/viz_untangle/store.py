@@ -69,7 +69,7 @@ def _find_batches(xd, factor=0.985, _n=1, _bic=None, _df=None):
     GM = GaussianMixture(n_components=_n, n_init=10).fit(xds)
     # print(GM.bic(xds))
     xds_df = pd.DataFrame(xds, index=xd.index, columns=["X", "Y"])
-    xds_df["clustering"] = GM.predict(xds)
+    xds_df["batch"] = GM.predict(xds)
     BIC = GM.bic(xds)
 
     if _bic and factor * _bic <= BIC:
@@ -252,7 +252,11 @@ def compute_batches(us: settings.UntangleSettings):
     XD = compute_acluster(us)
     XD.index = data.D.columns
     batches = []
+<<<<<<< HEAD
     for i,cluster in enumerate(sorted(set(XD["new_assignments"]))):
+=======
+    for cluster in set(XD["new_assignments"]):
+>>>>>>> 1bb6a2a97e02281bba61067f932cc562725e4b1b
         D1 = data.D.drop(columns=data.dropoutsamples.index)
         x = D1.T[XD["new_assignments"] == cluster]
         x = x.fillna(0).T[x.median(axis=0) > us.threshold].T
@@ -273,11 +277,14 @@ def compute_batches(us: settings.UntangleSettings):
         xd.columns = ["X","Y"]
         xd["panel"] = data.samples.loc[x.index,"panel"]
 
+<<<<<<< HEAD
         batch_factor_ = [float(val) for val in us.batch_factor.split(',')]
         bf = batch_factor_[i] if len(batch_factor_) > 1 else batch_factor_[0]
         n_batches, score, df = _find_batches(xd,bf)
+=======
+        n_batches, score, df = _find_batches(xd,us.batch_factor)
+>>>>>>> 1bb6a2a97e02281bba61067f932cc562725e4b1b
         batches.append(df)
-
     return batches
 
 

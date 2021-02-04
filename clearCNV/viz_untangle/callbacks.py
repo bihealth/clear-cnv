@@ -49,7 +49,7 @@ def register_buffer_to_graphs(app):
             Output("graph-agg-clust", "figure"),
             Output("container-image-cluster-panels", "children"),
             Output("container-image-cluster-clustering", "children"),
-            Output("container-image-batch-separation", "children"),
+            Output("container-image-batch-separation", "figure"),
         ],
         [Input("buffer-cluster-params", "children")],
     )

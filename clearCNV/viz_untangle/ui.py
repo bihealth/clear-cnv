@@ -7,6 +7,8 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.express as px
 
+import seaborn as sns
+
 from .cache import cache
 from . import settings
 from . import store
@@ -66,10 +68,11 @@ def render_image_cluster_clustering(us: UntangleSettings):
 
 @cache.memoize()
 def render_images_batch_separation(us: UntangleSettings):
-    return [px.scatter(sp,x='X',y='Y',color="clustering") for sp in store.compute_batches(us)]
+    #return [sns.scatterplot(data=p,x='X',y='Y',hue="batch") for p in store.compute_batches(us)]
+    return [px.scatter(p,x='X',y='Y',color="batch") for p in store.compute_batches(us)][0]
+    #return px.scatter(x=[0, 1, 2, 3, 4], y=[0, 1, 4, 9, 16])
     #return [
     #    html.H1("Hello"),
-    #    px.scatter()
     #    html.H2("World"),
     #    html.H3("!"),
     #]
@@ -148,7 +151,8 @@ def render_main_content():
             )
         else:
             return dbc.Card(
-                dbc.CardBody(dbc.Spinner(color="primary", id=id_), className="mt-3 text-center",),
+                dbc.CardBody(
+                    dbc.Spinner(color="primary", id=id_), className="mt-3 text-center",),
                 className="border-top-0 rounded-0",
             )
 
@@ -162,7 +166,16 @@ def render_main_content():
         dbc.Tab(
             make_card("container-image-cluster-clustering", type_="image"), label="New assignment"
         ),
+<<<<<<< HEAD
         dbc.Tab(make_card("container-image-batch-separation", type_="image"), label="Batches"),
+=======
+        dbc.Tab(make_card("container-image-batch-separation"), label="Batches"),
+        #dbc.Tab(make_card("container-image-batch-separation"), label="Batches"),
+        # TODO: :-{ somehow the following crashes with
+        # RecursionError: maximum recursion depth exceeded while getting the str of an object
+        # dbc.Tab(make_card(render_clustermap_panels()), label="Clustermap Panels"),
+        # dbc.Tab(make_card(render_clustermap_clustering()), label="Clustermap Clustering"),
+>>>>>>> 1bb6a2a97e02281bba61067f932cc562725e4b1b
     ]
 
     return html.Div(
