@@ -62,7 +62,11 @@ def cnv_calling(args):
         label=str(len(failed_samples)) + " failed samples",
     )
     plt.vlines(
-        minmatchscore, 0, max(n) * 0.75, label="cutoff at %1.4f" % minmatchscore, color="darkred",
+        minmatchscore,
+        0,
+        max(n) * 0.75,
+        label="cutoff at %1.4f" % minmatchscore,
+        color="darkred",
     )
     plt.xlabel("mean sample group score")
     plt.ylabel("samples")
@@ -113,7 +117,14 @@ def cnv_calling(args):
     for i in range(len(Matchscores_bools.columns)):
         pool.apply_async(
             util.calling_cnv,
-            args=(i, DA[0], Matchscores_bools, DA[1], EXPECTED_CNV_RATE, SENSITIVITY,),
+            args=(
+                i,
+                DA[0],
+                Matchscores_bools,
+                DA[1],
+                EXPECTED_CNV_RATE,
+                SENSITIVITY,
+            ),
             callback=collect_result,
         )
     pool.close()
@@ -137,7 +148,14 @@ def cnv_calling(args):
         for i in range(len(Matchscores_bools.columns)):
             pool.apply_async(
                 util.calling_cnv,
-                args=(i, DX[0], Matchscores_bools, DX[1], EXPECTED_CNV_RATE, SENSITIVITY,),
+                args=(
+                    i,
+                    DX[0],
+                    Matchscores_bools,
+                    DX[1],
+                    EXPECTED_CNV_RATE,
+                    SENSITIVITY,
+                ),
                 callback=collect_result,
             )
         pool.close()
@@ -159,7 +177,14 @@ def cnv_calling(args):
         for i in range(len(Matchscores_bools.columns)):
             pool.apply_async(
                 util.calling_cnv,
-                args=(i, DY[0], My, DY[1], EXPECTED_CNV_RATE, SENSITIVITY,),
+                args=(
+                    i,
+                    DY[0],
+                    My,
+                    DY[1],
+                    EXPECTED_CNV_RATE,
+                    SENSITIVITY,
+                ),
                 callback=collect_result,
             )
         pool.close()
@@ -251,7 +276,14 @@ def cnv_calling(args):
             [
                 pool.apply(
                     util.merge_score_cnvs,
-                    args=([HMM[i, :], z_scores_scaled[i, :], ratio_scores[i, :], INDEX,]),
+                    args=(
+                        [
+                            HMM[i, :],
+                            z_scores_scaled[i, :],
+                            ratio_scores[i, :],
+                            INDEX,
+                        ]
+                    ),
                 )
                 for i in cnv_carrying_indexes
             ],

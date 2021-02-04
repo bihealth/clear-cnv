@@ -68,14 +68,14 @@ def render_image_cluster_clustering(us: UntangleSettings):
 
 @cache.memoize()
 def render_images_batch_separation(us: UntangleSettings):
-    #return [sns.scatterplot(data=p,x='X',y='Y',hue="batch") for p in store.compute_batches(us)]
-    return [px.scatter(p,x='X',y='Y',color="batch") for p in store.compute_batches(us)][0]
-    #return px.scatter(x=[0, 1, 2, 3, 4], y=[0, 1, 4, 9, 16])
-    #return [
+    # return [sns.scatterplot(data=p,x='X',y='Y',hue="batch") for p in store.compute_batches(us)]
+    return [px.scatter(p, x="X", y="Y", color="batch") for p in store.compute_batches(us)][0]
+    # return px.scatter(x=[0, 1, 2, 3, 4], y=[0, 1, 4, 9, 16])
+    # return [
     #    html.H1("Hello"),
     #    html.H2("World"),
     #    html.H3("!"),
-    #]
+    # ]
 
 
 def render_main_content():
@@ -145,14 +145,17 @@ def render_main_content():
         if type_ == "graph":
             return dbc.Card(
                 dbc.CardBody(
-                    dbc.Spinner([dcc.Graph(id=id_)], color="primary"), className="mt-3 text-center",
+                    dbc.Spinner([dcc.Graph(id=id_)], color="primary"),
+                    className="mt-3 text-center",
                 ),
                 className="border-top-0 rounded-0",
             )
         else:
             return dbc.Card(
                 dbc.CardBody(
-                    dbc.Spinner(color="primary", id=id_), className="mt-3 text-center",),
+                    dbc.Spinner(color="primary", id=id_),
+                    className="mt-3 text-center",
+                ),
                 className="border-top-0 rounded-0",
             )
 
@@ -168,7 +171,7 @@ def render_main_content():
         ),
         dbc.Tab(make_card("container-image-batch-separation", type_="image"), label="Batches"),
         dbc.Tab(make_card("container-image-batch-separation"), label="Batches"),
-        #dbc.Tab(make_card("container-image-batch-separation"), label="Batches"),
+        # dbc.Tab(make_card("container-image-batch-separation"), label="Batches"),
         # TODO: :-{ somehow the following crashes with
         # RecursionError: maximum recursion depth exceeded while getting the str of an object
         # dbc.Tab(make_card(render_clustermap_panels()), label="Clustermap Panels"),
@@ -179,7 +182,11 @@ def render_main_content():
         children=[
             dbc.Row(
                 children=[
-                    dbc.Col(children=[controls], id="controls", md=3,),
+                    dbc.Col(
+                        children=[controls],
+                        id="controls",
+                        md=3,
+                    ),
                     dbc.Col(children=[dbc.Tabs(tabs_content)], id="plots", md=9),
                 ]
             )

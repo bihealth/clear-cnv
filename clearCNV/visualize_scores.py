@@ -91,7 +91,8 @@ def visualize(args):
         sp.add_trace(msize, row=1, col=4)
 
         sp.update_layout(
-            width=len(df.columns) * 3 + 300, height=len(df.index) * 3 + 300,
+            width=len(df.columns) * 3 + 300,
+            height=len(df.index) * 3 + 300,
         )
         return sp
 
