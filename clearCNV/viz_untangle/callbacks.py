@@ -49,7 +49,7 @@ def register_buffer_to_graphs(app):
             Output("graph-agg-clust", "figure"),
             Output("container-image-cluster-panels", "children"),
             Output("container-image-cluster-clustering", "children"),
-            Output("container-image-batch-separation", "figure"),
+            Output("container-image-batch-separation", "children"),
         ],
         [Input("buffer-cluster-params", "children")],
     )
@@ -70,10 +70,15 @@ def register_save_button(app):
 
     @app.callback(
         Output("buffer-save-batches-text", "children"),
-        Input("input-save-batches-button", "n_clicks"),
+        [
+            Input("input-save-batches-button", "n_clicks"),
+            Input("buffer-cluster-params", "children"),
+        ],
     )
-    def on_click_button(n_clicks):
-        print("clicked save")
-        # how to get us ????
-        # store.save_results(us)
-        return "%d: saving to %s" % (n_clicks or 0, BATCH_OUTPUT_PATH)
+    def on_click_button(n_clicks, params_str):
+        if n_clicks is not None:
+            us = UntangleSettings(**json.loads(params_str))
+            print("clicked save", n_clicks, us)
+            # how to get us ????
+            # store.save_results(us)
+            return "%d: saving to %s" % (n_clicks or 0, BATCH_OUTPUT_PATH)

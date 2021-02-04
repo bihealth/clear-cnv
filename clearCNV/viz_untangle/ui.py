@@ -69,7 +69,10 @@ def render_image_cluster_clustering(us: UntangleSettings):
 @cache.memoize()
 def render_images_batch_separation(us: UntangleSettings):
     # return [sns.scatterplot(data=p,x='X',y='Y',hue="batch") for p in store.compute_batches(us)]
-    return [px.scatter(p, x="X", y="Y", color="batch") for p in store.compute_batches(us)]
+    return [
+        dcc.Graph(figure=px.scatter(p, x="X", y="Y", color="batch"), id="batch-separation-%i" % i)
+        for (i, p) in enumerate(store.compute_batches(us))
+    ]
     # return px.scatter(x=[0, 1, 2, 3, 4], y=[0, 1, 4, 9, 16])
     # return [
     #    html.H1("Hello"),
@@ -164,12 +167,12 @@ def render_main_content():
         dbc.Tab(make_card("graph-tsne"), label="tSNE"),
         dbc.Tab(make_card("graph-agg-clust"), label="Agg. Clust."),
         dbc.Tab(
-            make_card("container-image-cluster-panels", type_="image"), label="Original assignment"
+            make_card("container-image-cluster-panels", type_="html"), label="Original assignment"
         ),
         dbc.Tab(
-            make_card("container-image-cluster-clustering", type_="image"), label="New assignment"
+            make_card("container-image-cluster-clustering", type_="html"), label="New assignment"
         ),
-        dbc.Tab(make_card("container-image-batch-separation"), label="Batches"),
+        dbc.Tab(make_card("container-image-batch-separation", type_="html"), label="Batches"),
         # dbc.Tab(make_card("container-image-batch-separation"), label="Batches"),
         # TODO: :-{ somehow the following crashes with
         # RecursionError: maximum recursion depth exceeded while getting the str of an object
