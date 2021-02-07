@@ -87,7 +87,7 @@ def render_main_content():
     # thresh: int = 50
     # min_group_size: int = 20
     # pca_components: int = 20
-    # batch_factor: float = 0.985
+    # batch_num: float = 0.985
     # pca_seed: int = 100
 
     controls = dbc.Card(
@@ -128,11 +128,11 @@ def render_main_content():
             ),
             dbc.FormGroup(
                 children=[
-                    dbc.Label("Batch Factor"),
+                    dbc.Label("number of batches (clusters)"),
                     dbc.Input(
                         id="input-batch-factor",
                         type="text",
-                        value=settings.UNTANGLE_SETTINGS.batch_factor,
+                        value=settings.UNTANGLE_SETTINGS.batch_num,
                         debounce=True,
                     ),
                 ],

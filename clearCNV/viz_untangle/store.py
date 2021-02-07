@@ -41,6 +41,7 @@ PICKLE_DATA = False
 class Data:
     BED: typing.Any
     D: typing.Any
+    D1: typing.Any
     META: typing.Any
     X: typing.Any
     allsamples: typing.Any
@@ -64,7 +65,18 @@ def _load_coverage(path, sep="\t"):
     return D0
 
 
-def _find_batches(xd, factor=0.985, _n=1, _bic=None, _df=None):
+# User must define number of batches
+def _find_batches(xd, n=1):
+    xds = xd[["X", "Y"]].to_numpy()
+    xindex = xd.index
+    GM = GaussianMixture(n_components=max([0,n]), n_init=10).fit(xds)
+    # print(GM.bic(xds))
+    xds_df = pd.DataFrame(xds, index=xd.index, columns=["X", "Y"])
+    xds_df["batch"] = GM.predict(xds)
+    BIC = GM.bic(xds)
+    return xds_df
+
+"""def _find_batches(xd, factor=0.985, _n=1, _bic=None, _df=None):
     xds = xd[["X", "Y"]].to_numpy()
     xindex = xd.index
     GM = GaussianMixture(n_components=_n, n_init=10).fit(xds)
@@ -77,7 +89,7 @@ def _find_batches(xd, factor=0.985, _n=1, _bic=None, _df=None):
         # _df.to_csv(str(savepath) + ".tsv", sep="\t", header=True, index=True)
         return (_n - 1, _bic, _df)
     else:
-        return _find_batches(xd, factor, _n + 1, BIC, xds_df)
+        return _find_batches(xd, factor, _n + 1, BIC, xds_df)"""
 
 
 @cache.memoize()
@@ -127,7 +139,6 @@ def load_all_data(us: settings.UntangleSettings):
 
     D1 = D.drop(columns=dropoutsamples.index)
     D.index = BED.apply(lambda row: "chr%s:%s" % (row[0], row[1]), axis=1)
-
     # X = D1 > us.threshold
     X = D1.ge((BED.iloc[:, 2] - BED.iloc[:, 1]) / us.threshold, axis=0)
 
@@ -165,6 +176,7 @@ def load_all_data(us: settings.UntangleSettings):
     result = Data(
         BED=BED,
         D=D,
+        D1=D1,
         X=X,
         META=META,
         allsamples=allsamples,
@@ -254,11 +266,10 @@ def compute_clustercoldict(us: settings.UntangleSettings):
 def compute_batches(us: settings.UntangleSettings):
     data = load_all_data(us)
     XD = compute_acluster(us)
-    XD.index = data.D.columns
+    XD.index = data.D1.columns
     batches = []
     for i, cluster in enumerate(sorted(set(XD["new_assignments"]))):
-        D1 = data.D.drop(columns=data.dropoutsamples.index)
-        x = D1.T[XD["new_assignments"] == cluster]
+        x = data.D1.T[XD["new_assignments"] == cluster]
         x = x.fillna(0).T[x.median(axis=0) > us.threshold].T
         d = x[x.median(axis=1) <= us.threshold]
         x = x.T[x.index.difference(d.index)].T
@@ -277,9 +288,10 @@ def compute_batches(us: settings.UntangleSettings):
         xd.columns = ["X", "Y"]
         xd["panel"] = data.samples.loc[x.index, "panel"]
 
-        batch_factor_ = [float(val) for val in us.batch_factor.split(",")]
-        bf = batch_factor_[i] if len(batch_factor_) > 1 else batch_factor_[0]
-        n_batches, score, df = _find_batches(xd, bf)
+        batch_num_ = [int(val) for val in us.batch_num.split(",")]
+        bf = batch_num_[i] if len(batch_num_) < len(set(XD["new_assignments"])) else batch_num_[0]
+        print("DEBUG:: batch_num_ = ",batch_num_," selected bf = ", bf)
+        df = _find_batches(xd,bf)
 
         batches.append(df)
     return batches

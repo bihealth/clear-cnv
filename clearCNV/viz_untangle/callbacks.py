@@ -28,13 +28,13 @@ def register_control_to_buffer(app):
             Input("input-batch-factor", "value"),
         ],
     )
-    def parameters_to_json(threshold, min_group_size, pca_components, batch_factor):
+    def parameters_to_json(threshold, min_group_size, pca_components, batch_num):
         return json.dumps(
             {
                 "threshold": threshold,
                 "min_group_size": min_group_size,
                 "pca_components": pca_components,
-                "batch_factor": batch_factor,
+                "batch_num": batch_num,
             }
         )
 

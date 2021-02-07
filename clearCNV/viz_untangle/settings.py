@@ -46,7 +46,7 @@ class UntangleSettings:
     threshold: int = 50
     min_group_size: int = 20
     pca_components: int = 20
-    batch_factor: str = "0.985"
+    batch_num: str = "2"
     pca_seed: int = 100
 
 
