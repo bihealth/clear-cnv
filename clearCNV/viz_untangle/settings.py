@@ -25,16 +25,16 @@ PATH_COVERAGES = None
 PATH_BEDFILE = None
 
 #: Path to batch definition.
-# PATH_BATCHES = None
+BATCH_OUTPUT_PATH = None
 
 #: Helper function to setup the paths based on an input path.
 def setup_paths(args):
-    global PATH_METAFILE, PATH_COVERAGES, PATH_BEDFILE  # PATH_BATCHES
+    global PATH_METAFILE, PATH_COVERAGES, PATH_BEDFILE ,BATCH_OUTPUT_PATH
     # PATH_BASE = pathlib.Path(path)
     PATH_METAFILE = args.metafile
     PATH_COVERAGES = args.coverages
     PATH_BEDFILE = args.bedfile
-    # PATH_BATCHES = args.batches
+    BATCH_OUTPUT_PATH = args.new_panel_assignments_directory
 
 
 #: Whether or not to preload data.
@@ -68,4 +68,4 @@ CACHE_REDIS_URL = None
 CACHE_PRELOAD_DATA = True
 
 #: Output path for batch separation.
-BATCH_OUTPUT_PATH = None
+#BATCH_OUTPUT_PATH = None

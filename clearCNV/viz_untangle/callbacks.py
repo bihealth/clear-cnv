@@ -80,5 +80,5 @@ def register_save_button(app):
             us = UntangleSettings(**json.loads(params_str))
             print("clicked save", n_clicks, us)
             # how to get us ????
-            # store.save_results(us)
+            store.save_results(us, n_clicks)
             return "%d: saving to %s" % (n_clicks or 0, BATCH_OUTPUT_PATH)

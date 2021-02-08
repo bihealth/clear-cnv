@@ -73,7 +73,8 @@ def _find_batches(xd, n=1):
     # print(GM.bic(xds))
     xds_df = pd.DataFrame(xds, index=xd.index, columns=["X", "Y"])
     xds_df["batch"] = GM.predict(xds)
-    BIC = GM.bic(xds)
+    xds_df["panel"] = xd["panel"]
+    #BIC = GM.bic(xds)
     return xds_df
 
 """def _find_batches(xd, factor=0.985, _n=1, _bic=None, _df=None):
@@ -289,7 +290,8 @@ def compute_batches(us: settings.UntangleSettings):
         xd["panel"] = data.samples.loc[x.index, "panel"]
 
         batch_num_ = [int(val) for val in us.batch_num.split(",")]
-        bf = batch_num_[i] if len(batch_num_) < len(set(XD["new_assignments"])) else batch_num_[0]
+        print("DEBUG:: len(batch_num_) < len(set(XD['new_assignments']))",len(batch_num_)," ",len(set(XD["new_assignments"])))
+        bf = batch_num_[i] if len(batch_num_) >= len(set(XD["new_assignments"])) else batch_num_[0]
         print("DEBUG:: batch_num_ = ",batch_num_," selected bf = ", bf)
         df = _find_batches(xd,bf)
 
@@ -298,24 +300,28 @@ def compute_batches(us: settings.UntangleSettings):
 
 
 @cache.memoize()
-def save_results(us: settings.UntangleSettings):
+def save_results(us: settings.UntangleSettings, n_clicks):
     data = load_all_data(us)
     XD = compute_acluster(us)
     # save new panel assignments
     XD.index = data.allsamples.index
     XD["paths"] = data.allsamples["path"]
     logger.info("saving new panel assignment ...")
+    pathlib.Path(settings.BATCH_OUTPUT_PATH).absolute().mkdir(parents=True, exist_ok=True)
+    print("DEBUG path: ",settings.BATCH_OUTPUT_PATH)
     for p in data.panels:
-        bamspath = pathlib.Path(BATCH_OUTPUT_PATH) / (str(p) + "_new_assigned.txt")
-        XD[XD["new_panels"] == p]["paths"].to_csv(bamspath, sep="\t", header=False, index=False)
+        bamspath = pathlib.Path(settings.BATCH_OUTPUT_PATH) / (str(p) + "_new_assigned.txt")
+        XD[XD["new_assignments"] == p]["paths"].to_csv(bamspath, sep="\t", header=False, index=False)
     logger.info("... done saving new panel assignment.")
     batches = compute_batches(us)
     logger.info("saving new batch clusterings ...")
+    print("DEBUG: ", batches[0].columns)
     for batch in batches:
         panel = set(batch["panel"]).pop()
-        for x in set(batch["clustering"]):
-            path = pathlib.Path(BATCH_OUTPUT_PATH) / str("%s_batch%.2d.txt" % (panel, x))
-            samples.T[batch[batch["clustering"] == x].index].T["path"].to_csv(
+        for x in set(batch["batch"]):
+            path = pathlib.Path(settings.BATCH_OUTPUT_PATH) / str("%s_batch%.2d_%s.txt" % (panel, x,str(n_clicks)))
+            logger.info("save batch file to: ",path)
+            data.samples.T[batch[batch["batch"] == x].index].T["path"].to_csv(
                 path, sep="\t", header=False, index=False
             )
     logger.info("... done saving new batch clusterings.")
