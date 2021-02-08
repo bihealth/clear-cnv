@@ -243,6 +243,15 @@ def compute_acluster(us: settings.UntangleSettings):
     return XD
 
 
+"""@cache.memoize()
+def compute_batchcluster(us: settings.UntangleSettings):
+    logger.info("Computing batchwise clustering ...")
+    data = load_all_data(us)
+    D1 = data.D1
+    D2 = util.normalize_within_sample(D1)
+    D3 = util.normalize_within_exon(D2)"""
+
+
 @cache.memoize()
 def compute_panelcoldict(us: settings.UntangleSettings):
     data = load_all_data(us)
