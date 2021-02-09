@@ -299,9 +299,7 @@ def compute_batches(us: settings.UntangleSettings):
         xd["panel"] = data.samples.loc[x.index, "panel"]
 
         batch_num_ = [int(val) for val in us.batch_num.split(",")]
-        print("DEBUG:: len(batch_num_) < len(set(XD['new_assignments']))",len(batch_num_)," ",len(set(XD["new_assignments"])))
         bf = batch_num_[i] if len(batch_num_) >= len(set(XD["new_assignments"])) else batch_num_[0]
-        print("DEBUG:: batch_num_ = ",batch_num_," selected bf = ", bf)
         df = _find_batches(xd,bf)
 
         batches.append(df)
@@ -317,14 +315,12 @@ def save_results(us: settings.UntangleSettings, n_clicks):
     XD["paths"] = data.allsamples["path"]
     logger.info("saving new panel assignment ...")
     pathlib.Path(settings.BATCH_OUTPUT_PATH).absolute().mkdir(parents=True, exist_ok=True)
-    print("DEBUG path: ",settings.BATCH_OUTPUT_PATH)
     for p in data.panels:
         bamspath = pathlib.Path(settings.BATCH_OUTPUT_PATH) / (str(p) + "_new_assigned.txt")
         XD[XD["new_assignments"] == p]["paths"].to_csv(bamspath, sep="\t", header=False, index=False)
     logger.info("... done saving new panel assignment.")
     batches = compute_batches(us)
     logger.info("saving new batch clusterings ...")
-    print("DEBUG: ", batches[0].columns)
     for batch in batches:
         panel = set(batch["panel"]).pop()
         for x in set(batch["batch"]):

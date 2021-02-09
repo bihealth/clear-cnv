@@ -7,6 +7,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
+from clearCNV import util
 
 from logzero import logger
 
@@ -62,12 +63,10 @@ def plot_clustermap_batches_as_base64(data, XD, clustercoldict):
     n = min([data.X.shape[0], 1000])
     m = min([data.X.shape[1], 1000])
     plt.figure(figsize=(8, 5))
-    data = load_all_data(us)
-    D1 = data.D1
-    D2 = util.normalize_within_sample(D1)
-    D3 = util.normalize_within_exon(D2)
+    D3 = util.normalize_within_exon(util.normalize_within_sample(data.D1))
+    D4 = D3.applymap(lambda x: max([0,min([x,2])]))
     sns.clustermap(
-        D3.iloc[:: math.ceil(D3.shape[0] / n), :: math.ceil(D3.shape[1] / m)],
+        D4.iloc[:: math.ceil(D4.shape[0] / n), :: math.ceil(D4.shape[1] / m)],
         col_colors=list(map(lambda x: clustercoldict[x], XD["clustering"])),
     )
     logger.info("... done creating batches clustermap.")
