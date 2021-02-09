@@ -57,6 +57,7 @@ def plot_clustermap_clustering_as_base64(data, XD, clustercoldict):
         f.seek(0)
         return base64.b64encode(f.read()).decode("ascii")
 
+
 @cache.memoize()
 def plot_clustermap_batches_as_base64(data, XD, clustercoldict):
     logger.info("Creating batches clustermap ...")
@@ -64,7 +65,7 @@ def plot_clustermap_batches_as_base64(data, XD, clustercoldict):
     m = min([data.X.shape[1], 1000])
     plt.figure(figsize=(8, 5))
     D3 = util.normalize_within_exon(util.normalize_within_sample(data.D1))
-    D4 = D3.applymap(lambda x: max([0,min([x,2])]))
+    D4 = D3.applymap(lambda x: max([0, min([x, 2])]))
     sns.clustermap(
         D4.iloc[:: math.ceil(D4.shape[0] / n), :: math.ceil(D4.shape[1] / m)],
         col_colors=list(map(lambda x: clustercoldict[x], XD["clustering"])),

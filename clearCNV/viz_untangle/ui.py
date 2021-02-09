@@ -65,8 +65,9 @@ def render_image_cluster_clustering(us: UntangleSettings):
     )
     return html.Img(src="data:image/png;base64,%s" % img_b64, className="img-responsive")
 
-#@cache.memoize()
-#def render_image_batches_clustering(us: UntangleSettings):
+
+# @cache.memoize()
+# def render_image_batches_clustering(us: UntangleSettings):
 #    data = store.load_all_data(us)
 #    img_b64 = ui_plots.plot_clustermap_batches_as_base64(
 #        data, store.compute_acluster(us), store.compute_clustercoldict(us)
@@ -80,6 +81,7 @@ def render_images_batch_separation(us: UntangleSettings):
         dcc.Graph(figure=px.scatter(p, x="X", y="Y", color="batch"), id="batch-separation-%i" % i)
         for (i, p) in enumerate(store.compute_batches(us))
     ]
+
 
 def render_main_content():
     """Render page main content"""
@@ -172,9 +174,9 @@ def render_main_content():
         dbc.Tab(
             make_card("container-image-cluster-clustering", type_="html"), label="New assignment"
         ),
-        #dbc.Tab(
+        # dbc.Tab(
         #    make_card("container-image-batch-clustering", type_="html"), label="Batches clustering"
-        #),
+        # ),
         dbc.Tab(make_card("container-image-batch-separation", type_="html"), label="Batches"),
     ]
 

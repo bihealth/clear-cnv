@@ -634,9 +634,9 @@ def get_parser():
             ui_plots.plot_clustermap_clustering_as_base64(
                 data, store.compute_acluster(us), store.compute_clustercoldict(us)
             )
-            #ui_plots.plot_clustermap_batches_as_base64(
+            # ui_plots.plot_clustermap_batches_as_base64(
             #    data, store.compute_acluster(us), store.compute_clustercoldict(us)
-            #)
+            # )
             ## XXX
             app.run_server(host=args.host, port=args.port, debug=args.debug)
 

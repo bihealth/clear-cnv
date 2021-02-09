@@ -69,13 +69,14 @@ def _load_coverage(path, sep="\t"):
 def _find_batches(xd, n=1):
     xds = xd[["X", "Y"]].to_numpy()
     xindex = xd.index
-    GM = GaussianMixture(n_components=max([0,n]), n_init=10).fit(xds)
+    GM = GaussianMixture(n_components=max([0, n]), n_init=10).fit(xds)
     # print(GM.bic(xds))
     xds_df = pd.DataFrame(xds, index=xd.index, columns=["X", "Y"])
     xds_df["batch"] = GM.predict(xds)
     xds_df["panel"] = xd["panel"]
-    #BIC = GM.bic(xds)
+    # BIC = GM.bic(xds)
     return xds_df
+
 
 """def _find_batches(xd, factor=0.985, _n=1, _bic=None, _df=None):
     xds = xd[["X", "Y"]].to_numpy()
@@ -300,7 +301,7 @@ def compute_batches(us: settings.UntangleSettings):
 
         batch_num_ = [int(val) for val in us.batch_num.split(",")]
         bf = batch_num_[i] if len(batch_num_) >= len(set(XD["new_assignments"])) else batch_num_[0]
-        df = _find_batches(xd,bf)
+        df = _find_batches(xd, bf)
 
         batches.append(df)
     return batches
@@ -317,15 +318,19 @@ def save_results(us: settings.UntangleSettings, n_clicks):
     pathlib.Path(settings.BATCH_OUTPUT_PATH).absolute().mkdir(parents=True, exist_ok=True)
     for p in data.panels:
         bamspath = pathlib.Path(settings.BATCH_OUTPUT_PATH) / (str(p) + "_new_assigned.txt")
-        XD[XD["new_assignments"] == p]["paths"].to_csv(bamspath, sep="\t", header=False, index=False)
+        XD[XD["new_assignments"] == p]["paths"].to_csv(
+            bamspath, sep="\t", header=False, index=False
+        )
     logger.info("... done saving new panel assignment.")
     batches = compute_batches(us)
     logger.info("saving new batch clusterings ...")
     for batch in batches:
         panel = set(batch["panel"]).pop()
         for x in set(batch["batch"]):
-            path = pathlib.Path(settings.BATCH_OUTPUT_PATH) / str("%s_batch%.2d_%s.txt" % (panel, x,str(n_clicks)))
-            logger.info("save batch file to: ",path)
+            path = pathlib.Path(settings.BATCH_OUTPUT_PATH) / str(
+                "%s_batch%.2d_%s.txt" % (panel, x, str(n_clicks))
+            )
+            logger.info("save batch file to: ", path)
             data.samples.T[batch[batch["batch"] == x].index].T["path"].to_csv(
                 path, sep="\t", header=False, index=False
             )

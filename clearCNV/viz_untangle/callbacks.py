@@ -49,7 +49,7 @@ def register_buffer_to_graphs(app):
             Output("graph-agg-clust", "figure"),
             Output("container-image-cluster-panels", "children"),
             Output("container-image-cluster-clustering", "children"),
-            #Output("container-image-batch-clustering", "children"),
+            # Output("container-image-batch-clustering", "children"),
             Output("container-image-batch-separation", "children"),
         ],
         [Input("buffer-cluster-params", "children")],
@@ -62,7 +62,7 @@ def register_buffer_to_graphs(app):
             ui.render_agg_clust(us),
             ui.render_image_cluster_panels(us),
             ui.render_image_cluster_clustering(us),
-            #ui.render_image_batches_clustering(us),
+            # ui.render_image_batches_clustering(us),
             ui.render_images_batch_separation(us),
         ]
 

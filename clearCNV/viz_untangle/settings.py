@@ -29,7 +29,7 @@ BATCH_OUTPUT_PATH = None
 
 #: Helper function to setup the paths based on an input path.
 def setup_paths(args):
-    global PATH_METAFILE, PATH_COVERAGES, PATH_BEDFILE ,BATCH_OUTPUT_PATH
+    global PATH_METAFILE, PATH_COVERAGES, PATH_BEDFILE, BATCH_OUTPUT_PATH
     # PATH_BASE = pathlib.Path(path)
     PATH_METAFILE = args.metafile
     PATH_COVERAGES = args.coverages
@@ -68,4 +68,4 @@ CACHE_REDIS_URL = None
 CACHE_PRELOAD_DATA = True
 
 #: Output path for batch separation.
-#BATCH_OUTPUT_PATH = None
+# BATCH_OUTPUT_PATH = None
