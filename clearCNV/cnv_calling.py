@@ -390,7 +390,7 @@ def cnv_calling(args):
         for h in ca.hitsA_not_in_hitsB(SINGLE_HITS, BIG_HITS)
     ]
     FINAL = pd.concat([RD, pd.DataFrame(X, columns=RD.columns)])
-    FINAL["score"] = FINAL["score"].astype(float).apply(x)
+    FINAL["score"] = FINAL["score"].astype(float)#.apply(x)
     FINAL = FINAL.sort_values(by="score", ascending=False)
 
     print("saving results...")
