@@ -397,5 +397,7 @@ def cnv_calling(args):
     FINAL.to_csv(calls_path, sep="\t", index=False)
     RZ.to_csv(z_scores_path, sep="\t")
     RR.to_csv(ratio_scores_path, sep="\t")
+    S.to_csv(analysis_dir / "sammple_scores.tsv", sep= '\t')
+    # analysis_dir
     print("done!")
     return RD, RZ, RR
