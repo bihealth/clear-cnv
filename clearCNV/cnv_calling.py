@@ -70,8 +70,7 @@ def cnv_calling(args):
     plt.legend()
     plt.savefig(pathlib.Path(analysis_dir) / "ANALYSIS_group_sizes_cutoff.pdf", format="pdf")
 
-# done
-util.print_clustermap(
+    util.print_clustermap(
         Matchscores_selected,
         path=pathlib.Path(analysis_dir) / "ANALYSIS_clustermap_filtered.pdf",
         title="clustered heat map of selected sample distances",
