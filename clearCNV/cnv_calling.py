@@ -72,7 +72,7 @@ def cnv_calling(args):
 
 # done
 util.print_clustermap(
-        Matchscores.loc[selected_samples,selected_samples],
+        Matchscores_selected,
         path=pathlib.Path(analysis_dir) / "ANALYSIS_clustermap_filtered.pdf",
         title="clustered heat map of selected sample distances",
     )
