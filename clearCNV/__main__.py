@@ -120,11 +120,11 @@ def get_parser():
     )
     parser_cnv_calling.add_argument(
         "-u",
-        "--minimum_sample_score",
-        help="A lower threshold results in better fitting, but smaller calling groups",
+        "--sample_score_factor",
+        help="A positive value (e.g. 0.5) causes the sample groups to be smaller and vice versa. Default is 0.0.",
         required=False,
         type=float,
-        default=0.15,
+        default=0.0,
     )
     parser_cnv_calling.add_argument(
         "-g",
@@ -426,18 +426,18 @@ def get_parser():
         default=0.02,
     )
     parser_workflow_cnv_calling.add_argument(
-        "--minimum_sample_score",
-        help="A lower threshold results in better fitting, but smaller calling groups. Default is 0.15.",
+        "--sample_score_factor",
+        help="A positive value (e.g. 0.5) causes the sample groups to be smaller and vice versa. Default is 0.0.",
         required=False,
         type=float,
-        default=0.15,
+        default=0.0,
     )
     parser_workflow_cnv_calling.add_argument(
         "--minimum_group_sizes",
-        help="Minimum group size per CNV calling group per match scores. Default is 30.",
+        help="Minimum group size per CNV calling group per match scores. Default is 20.",
         required=False,
         type=int,
-        default=30,
+        default=20,
     )
     parser_workflow_cnv_calling.add_argument(
         "--sensitivity",
