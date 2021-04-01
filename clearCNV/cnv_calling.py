@@ -117,7 +117,7 @@ def cnv_calling(args):
             args=(
                 i,
                 DA[0],
-                Matchscores_bools,
+                Matchscores_bools_selected,
                 DA[1],
                 EXPECTED_CNV_RATE,
                 SENSITIVITY,
@@ -142,7 +142,7 @@ def cnv_calling(args):
         #  --- parallelized X-chromosome calling ---  #
         print("multi threaded calling on X-chromosome")
         pool = mp.Pool(CORES)
-        for i in range(len(Matchscores_bools_selected.columns)):
+        for i in range(len(selected_samples)):
             pool.apply_async(
                 util.calling_cnv,
                 args=(
@@ -171,7 +171,7 @@ def cnv_calling(args):
         #  --- parallelized Y-chromosome calling ---  #
         print("multi threaded calling on Y-chromosome")
         pool = mp.Pool(CORES)
-        for i in range(len(Matchscores_bools_selected.columns)):
+        for i in range(len(selected_samples)):
             pool.apply_async(
                 util.calling_cnv,
                 args=(
