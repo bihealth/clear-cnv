@@ -389,6 +389,7 @@ def cnv_calling(args):
     ]
     FINAL = pd.concat([RD, pd.DataFrame(X, columns=RD.columns)])
     FINAL["score"] = FINAL["score"].astype(float)#.apply(x)
+    FINAL["score"] = FINAL["score"].apply(lambda x: float(abs(x)))
     FINAL = FINAL.sort_values(by="score", ascending=False)
 
     print("saving results...")
