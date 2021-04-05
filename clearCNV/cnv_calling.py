@@ -33,7 +33,7 @@ def cnv_calling(args):
     Matchscores = pd.read_csv(matchscores_path, sep="\t", low_memory=False, header=0, index_col=0)
 
     # adaptive threshold for group sizes
-    minmatchscore = np.median(Matchscores.median())/np.exp(SAMPLE_SCORE_FACTOR-0.7182)
+    minmatchscore = np.median(Matchscores.median())*SAMPLE_SCORE_FACTOR
     Matchscores_bools = Matchscores < minmatchscore
     selected_samples = Matchscores_bools[Matchscores_bools.sum() >= MINIMUM_SAMPLE_GROUP].index
     failed_samples = Matchscores_bools.index.difference(selected_samples)

@@ -121,10 +121,10 @@ def get_parser():
     parser_cnv_calling.add_argument(
         "-u",
         "--sample_score_factor",
-        help="A positive value (e.g. 0.5) causes the sample groups to be smaller and vice versa. Default is 0.0.",
+        help="The factor u multiplied with the median sample score to define sample groups. u should range between 1.0 < u < 5.0. Default is 2.0.",
         required=False,
         type=float,
-        default=0.0,
+        default=2.0,
     )
     parser_cnv_calling.add_argument(
         "-g",
@@ -427,10 +427,10 @@ def get_parser():
     )
     parser_workflow_cnv_calling.add_argument(
         "--sample_score_factor",
-        help="A positive value (e.g. 0.5) causes the sample groups to be smaller and vice versa. Default is 0.0.",
+        help="The factor u multiplied with the median sample score to define sample groups. u should range between 1.0 < u < 5.0. Default is 2.0.",
         required=False,
         type=float,
-        default=0.0,
+        default=2.0,
     )
     parser_workflow_cnv_calling.add_argument(
         "--minimum_group_sizes",
