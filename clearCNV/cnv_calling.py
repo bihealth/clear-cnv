@@ -42,12 +42,13 @@ def cnv_calling(args):
     Matchscores_selected = Matchscores.loc[selected_samples,selected_samples]
 
     # evaluation
-    print(
-        "%.d samples failed to have a sufficient group size. They are ignored in cnv calling."
-        % len(failed_samples)
-    )
-    for f in failed_samples:
-        print(f)
+    if len(failed_samples) > 0:
+        print(
+            "%.d samples failed to have a sufficient group size. They are ignored in cnv calling."
+            % len(failed_samples)
+        )
+        for f in failed_samples:
+            print(f)
 
     plt.figure(figsize=(6,4))
     plt.title("Threshold finding of sample groups")
