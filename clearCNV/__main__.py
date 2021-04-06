@@ -143,6 +143,20 @@ def get_parser():
         default=0.75,
     )
     parser_cnv_calling.add_argument(
+        "--del_cutoff",
+        help="A hard threshold on the ratio score for deletions. Default is 0.75.",
+        required=False,
+        type=float,
+        default=0.75,
+    )
+    parser_cnv_calling.add_argument(
+        "--dup_cutoff",
+        help="A hard threshold on the ratio score for duplications. Default is 1.35.",
+        required=False,
+        type=float,
+        default=1.35,
+    )
+    parser_cnv_calling.add_argument(
         "--cores",
         help="Number of cpu cores used in parallel processing. Default: determined automatically.",
         required=False,
@@ -452,6 +466,20 @@ def get_parser():
         required=False,
         type=int,
         default=2000,
+    )
+    parser_cnv_calling.add_argument(
+        "--del_cutoff",
+        help="A hard threshold on the ratio score for deletions. Default is 0.75.",
+        required=False,
+        type=float,
+        default=0.75,
+    )
+    parser_cnv_calling.add_argument(
+        "--dup_cutoff",
+        help="A hard threshold on the ratio score for duplications. Default is 1.35.",
+        required=False,
+        type=float,
+        default=1.35,
     )
     parser_workflow_cnv_calling.set_defaults(func=workflow_cnv_calling.workflow_cnv_calling)
 

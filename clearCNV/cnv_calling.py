@@ -27,6 +27,8 @@ def cnv_calling(args):
     MINIMUM_SAMPLE_GROUP = args.minimum_group_sizes
     SENSITIVITY = args.sensitivity if args.sensitivity >= 0 and args.sensitivity <= 1 else 0.7
     CORES = min([args.cores, mp.cpu_count()]) if args.cores else mp.cpu_count()
+    DUP_CUTOFF = args.dup_cutoff #1.35
+    DEL_CUTOFF = args.del_cutoff #0.75
 
     # load data
     D0 = util.load_dataframe(intsv_path)
@@ -205,7 +207,7 @@ def cnv_calling(args):
                         DFZ.iloc[i, c],
                         float(S[DFZ.columns[c]]),
                     ]
-                    for i, c in zip(*np.where((DFZ < -5) & (DFR < 0.65)))
+                    for i, c in zip(*np.where((DFZ < -5) & (DFR < DEL_CUTOFF)))
                 ],
                 columns=[
                     "sample",
@@ -229,7 +231,7 @@ def cnv_calling(args):
                         DFZ.iloc[i, c],
                         float(S[DFZ.columns[c]]),
                     ]
-                    for i, c in zip(*np.where((DFZ > 6) & (DFR > 1.35)))
+                    for i, c in zip(*np.where((DFZ > 6) & (DFR > DUP_CUTOFF)))
                 ],
                 columns=[
                     "sample",
@@ -280,6 +282,8 @@ def cnv_calling(args):
                             z_scores_scaled[i, :],
                             ratio_scores[i, :],
                             INDEX,
+                            DEL_CUTOFF,
+                            DUP_CUTOFF
                         ]
                     ),
                 )
@@ -324,7 +328,7 @@ def cnv_calling(args):
                         RZ.iloc[i, c],
                         float(S[RZ.columns[c]]),
                     ]
-                    for i, c in zip(*np.where((RZ < -5) & (RR < 0.65)))
+                    for i, c in zip(*np.where((RZ < -5) & (RR < DEL_CUTOFF)))
                 ],
                 columns=[
                     "sample",
@@ -348,7 +352,7 @@ def cnv_calling(args):
                         RZ.iloc[i, c],
                         float(S[RZ.columns[c]]),
                     ]
-                    for i, c in zip(*np.where((RZ > 6) & (RR > 1.35)))
+                    for i, c in zip(*np.where((RZ > 6) & (RR > DUP_CUTOFF)))
                 ],
                 columns=[
                     "sample",

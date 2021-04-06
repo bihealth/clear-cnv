@@ -34,10 +34,12 @@ ANNOT           = RESULTS_DIR / "annotations.bed"
 # options
 
 EXPECTED_ARTEFACTS   = float(config["expected_artefacts"])
-MINIMUM_SAMPLE_SCORE = float(config["minimum_sample_score"])
+SAMPLE_SCORE_FACTOR = float(config["sample_score_factor"])
 MINIMUM_GROUP_SIZES  = int(config["minimum_group_sizes"])
 SENSITIVITY          = float(config["sensitivity"])
 SIZE                 = int(config["size"])
+DEL_CUTOFF           = float(config["del_cutoff"])
+DUP_CUTOFF           = float(config["dup_cutoff"])
 
 # =============================================================================
 #  UTIL
@@ -173,7 +175,9 @@ rule cnv_calling:
         artefacts=EXPECTED_ARTEFACTS,
         min_group_size=MINIMUM_GROUP_SIZES,
         sens=SENSITIVITY,
-        sscore=MINIMUM_SAMPLE_SCORE
+        sscore=SAMPLE_SCORE_FACTOR,
+        del_cutoff=DEL_CUTOFF,
+        dup_cutoff=DUP_CUTOFF
     threads: 64
     log: folder / "logs" / "cnvcalls.log"
     shell:
@@ -189,7 +193,9 @@ rule cnv_calling:
             -g {params.min_group_size} \
             -s {params.sens} \
             -u {params.sscore} \
-            --cores {threads}"
+            --cores {threads}\
+            --del_cutoff {params.del_cutoff},
+            --dup_cutoff {params.dup_cutoff}"
 
 # =============================================================================
 #  VISUALIZE RESULTS

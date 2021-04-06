@@ -237,7 +237,7 @@ def rscore_cnv(start, end, r_scores):
 
 
 # hmm_preds,z_scores,r_scores,index = HMM[9],z_scores_scaled[9],ratio_scores[9],INDEX
-def merge_score_cnvs(hmm_preds, z_scores, r_scores, index):
+def merge_score_cnvs(hmm_preds, z_scores, r_scores, index, del_cutoff, dup_cutoff):
     CNVs = []
     length = 0 if hmm_preds[0] == 1 else 1
     start = 0
@@ -251,7 +251,7 @@ def merge_score_cnvs(hmm_preds, z_scores, r_scores, index):
             if hmm_preds[i - 1] != 1:
                 rs = rscore_cnv(start, i, r_scores)
                 # ensure that the ratio score is sufficiently high
-                if rs <= 0.65 or rs >= 1.35:
+                if rs <= del_cutoff or rs >= dup_cutoff:
                     CNVs.append(
                         ca.CNV(
                             *index[start].split("_")[:2],
