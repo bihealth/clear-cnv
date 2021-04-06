@@ -48,7 +48,7 @@ def cnv_calling(args):
     with open(pathlib.Path(analysis_dir) / "failed_samples.txt", 'w') as f:
         print(
             "%.d samples failed to have a sufficient group size. They are ignored in cnv calling."
-            % len(failed_samples, file=f)
+            % len(failed_samples), file=f)
         )
         for s in failed_samples:
             print(s,file=f)
