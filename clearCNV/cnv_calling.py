@@ -44,13 +44,14 @@ def cnv_calling(args):
     Matchscores_selected = Matchscores.loc[selected_samples,selected_samples]
 
     # evaluation
-    if len(failed_samples) > 0:
+    #if len(failed_samples) > 0:
+    with open(pathlib.Path(analysis_dir) / "failed_samples.txt", 'w') as f:
         print(
             "%.d samples failed to have a sufficient group size. They are ignored in cnv calling."
-            % len(failed_samples)
+            % len(failed_samples, file=f)
         )
-        for f in failed_samples:
-            print(f)
+        for s in failed_samples:
+            print(s,file=f)
 
     plt.figure(figsize=(6,4))
     plt.title("Threshold finding of sample groups")
