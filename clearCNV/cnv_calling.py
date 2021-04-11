@@ -403,6 +403,7 @@ def cnv_calling(args):
     RZ.to_csv(z_scores_path, sep="\t")
     RR.to_csv(ratio_scores_path, sep="\t")
     S.T.to_csv(pathlib.Path(analysis_dir) / "sample_scores.tsv", sep= '\t')
+    Matchscores_bools.to_csv(pathlib.Path(analysis_dir) / "matchgroups.tsv", sep= '\t')
     # analysis_dir
     print("done!")
     return RD, RZ, RR
