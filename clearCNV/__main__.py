@@ -157,6 +157,13 @@ def get_parser():
         default=1.35,
     )
     parser_cnv_calling.add_argument(
+        "--trans_prob",
+        help="Transition probability of the HMM to change state from WT to CNV. Default is 0.001. Lower values prefer longer CNVs, higher values prefer shorter CNVs.",
+        required=False,
+        type=float,
+        default=0.001,
+    )
+    parser_cnv_calling.add_argument(
         "--cores",
         help="Number of cpu cores used in parallel processing. Default: determined automatically.",
         required=False,
@@ -480,6 +487,13 @@ def get_parser():
         required=False,
         type=float,
         default=1.35,
+    )
+    parser_workflow_cnv_calling.add_argument(
+        "--trans_prob",
+        help="Transition probability of the HMM to change state from WT to CNV. Default is 0.001. Lower values prefer longer CNVs, higher values prefer shorter CNVs.",
+        required=False,
+        type=float,
+        default=0.001,
     )
     parser_workflow_cnv_calling.set_defaults(func=workflow_cnv_calling.workflow_cnv_calling)
 

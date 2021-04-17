@@ -18,6 +18,8 @@ def create_config(configpath, args):
         print("size: '" + str(args.size) + "'", file=f)
         print("del_cutoff '" + str(args.del_cutoff) + "'", file=f)
         print("dup_cutoff '" + str(args.dup_cutoff) + "'", file=f)
+        print("trans_prob '" + str(args.trans_prob) + "'", file=f)
+
 
 
 def workflow_cnv_calling(args):

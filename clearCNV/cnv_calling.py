@@ -29,6 +29,7 @@ def cnv_calling(args):
     CORES = min([args.cores, mp.cpu_count()]) if args.cores else mp.cpu_count()
     DUP_CUTOFF = args.dup_cutoff #1.35
     DEL_CUTOFF = args.del_cutoff #0.75
+    TRANSPROB  = args.trans_prob #0.001
 
     # load data
     D0 = util.load_dataframe(intsv_path)
@@ -39,21 +40,13 @@ def cnv_calling(args):
     Matchscores_bools = Matchscores < minmatchscore
     selected_samples = Matchscores_bools[Matchscores_bools.sum() >= MINIMUM_SAMPLE_GROUP].index
     failed_samples = Matchscores_bools.index.difference(selected_samples)
+    np.fill_diagonal(Matchscores_bools.values, False)
     # optional for neater code downstream
     Matchscores_bools_selected = Matchscores_bools.loc[selected_samples,selected_samples]
     Matchscores_selected = Matchscores.loc[selected_samples,selected_samples]
 
     # evaluation
     #if len(failed_samples) > 0:
-    with open(pathlib.Path(analysis_dir) / "failed_samples.txt", 'w') as f:
-        print(
-            "%.d samples failed to have a sufficient group size. They are ignored in cnv calling."
-            % len(failed_samples),
-            file=f
-        )
-        for s in failed_samples:
-            print(s,file=f)
-
     plt.figure(figsize=(6,4))
     plt.title("Threshold finding of sample groups")
     x = plt.hist(Matchscores.median().sort_values(),bins=30)
@@ -193,6 +186,9 @@ def cnv_calling(args):
         pool.join()
         sample_scores += sample_scores_buffer
 
+    # rescale z-scores to emphasize good quality samples
+    z_scores_scaled = (z_scores_scaled.T / np.std(z_scores_scaled,axis=1,ddof=1)).T
+
     # extract single exon CNVs
     S = pd.DataFrame(sample_scores, index=SAMPLES).T
     DFZ = pd.DataFrame(z_scores_scaled, columns=INDEX, index=SAMPLES).T
@@ -253,16 +249,27 @@ def cnv_calling(args):
     print("compute HMM on z-scores")
     # HMM guided CNV candidates
     # =========================================================================
-    # --- fix lockdown bug --- #
-    # pool = mp.Pool(CORES)
-    probs = np.array([[-2.5], [0.0], [3.5]])
+    # HMM PARAMETRIZATION
+    mean_del = np.std(z_scores_scaled.flatten(),ddof=1)*(-2.5)
+    mean_dup = np.std(z_scores_scaled.flatten(),ddof=1)*3.5
+    mean_median = np.median(z_scores_scaled.flatten())
+    # HMM guided CNV candidates
+    # =========================================================================
+    probs = np.array([[mean_del], [mean_median], [mean_dup]])
     transitionprobs = np.array(
-        [[0.9999, 0.0001, 0.0], [0.0001, 0.9998, 0.0001], [0.0, 0.0001, 0.9999]]
+        [[1.0-TRANSPROB, TRANSPROB, 0.0], [TRANSPROB, 1.0-2.0*TRANSPROB, TRANSPROB], [0.0, TRANSPROB, 1.0-TRANSPROB]]
     )
-    # HMM = np.array([pool.apply(util.hmm_scores, args=([sample,probs,transitionprobs]))
-    #                for sample in z_scores_scaled])
-    # pool.close()
     HMM = np.array([util.hmm_scores(sample, probs, transitionprobs) for sample in z_scores_scaled])
+    # =========================================================================
+    # --- fix lockdown bug --- #
+    #probs = np.array([[mean_del], [mean_median], [mean_dup]])
+    #transitionprobs = np.array(
+    #    [[1.0-TRANSPROB, TRANSPROB, 0.0], [TRANSPROB, 1.0-2.0*TRANSPROB, TRANSPROB], [0.0, TRANSPROB, 1.0-TRANSPROB]]
+    #)
+    #pool = mp.Pool(CORES)
+    #HMM = np.array([pool.apply(util.hmm_scores, args=([sample,probs,transitionprobs])) \
+    #                for sample in z_scores_scaled])
+    #pool.close()
     # --- fix lockdown bug --- #
     # =========================================================================
 
@@ -389,6 +396,8 @@ def cnv_calling(args):
             )
         ]
     )
+    FS = pd.DataFrame(Matchscores_bools.loc[failed_samples].sum(axis=1),columns=['group_size'])
+    FS['median_sample_score'] = Matchscores.loc[failed_samples].median(axis=1)
     X = [
         [*h.to_list()[:6], h.to_list()[7], h.to_list()[6], *S[h.to_list()[0]]]
         for h in ca.hitsA_not_in_hitsB(SINGLE_HITS, BIG_HITS)
@@ -403,6 +412,7 @@ def cnv_calling(args):
     RZ.to_csv(z_scores_path, sep="\t")
     RR.to_csv(ratio_scores_path, sep="\t")
     S.T.to_csv(pathlib.Path(analysis_dir) / "sample_scores.tsv", sep= '\t')
-    # analysis_dir
+    Matchscores_bools.to_csv(pathlib.Path(analysis_dir) / "samplegroups.tsv", sep= '\t')
+    FS.to_csv(pathlib.Path(analysis_dir) / "failed_samples.tsv", sep= '\t')
     print("done!")
     return RD, RZ, RR
