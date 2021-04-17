@@ -40,6 +40,7 @@ SENSITIVITY          = float(config["sensitivity"])
 SIZE                 = int(config["size"])
 DEL_CUTOFF           = float(config["del_cutoff"])
 DUP_CUTOFF           = float(config["dup_cutoff"])
+TRANSPROB            = float(config["trans_prob"])
 
 # =============================================================================
 #  UTIL
@@ -177,7 +178,8 @@ rule cnv_calling:
         sens=SENSITIVITY,
         sscore=SAMPLE_SCORE_FACTOR,
         del_cutoff=DEL_CUTOFF,
-        dup_cutoff=DUP_CUTOFF
+        dup_cutoff=DUP_CUTOFF,
+        trans_prob=TRANSPROB
     threads: 64
     log: folder / "logs" / "cnvcalls.log"
     shell:
@@ -195,7 +197,9 @@ rule cnv_calling:
             -u {params.sscore} \
             --cores {threads}\
             --del_cutoff {params.del_cutoff},
-            --dup_cutoff {params.dup_cutoff}"
+            --dup_cutoff {params.dup_cutoff},
+            --trans_prob {params.trans_prob}"
+
 
 # =============================================================================
 #  VISUALIZE RESULTS
