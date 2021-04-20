@@ -285,32 +285,28 @@ def center_samples_np(D, limit=50):
     return normalize(D, axis=1) + 1 - np.median(normalize(D, axis=1), axis=0)
 
 
-def calling_cnv(index_sample, D, MS, index, EXPECTED_CNV_RATE, SENSITIVITY=0.7):
-    # check if it is probable that more than one gene is present,
-    # then re-normalize within each sample.
-
-    sample = D[:, index_sample]
+def calling_cnv(index_sample, D, MS, index,  EXPECTED_CNV_RATE, SENSITIVITY=0.7):
+    sample_group = MS.iloc[index_sample]
+    # per target median normalized sample
     # select sample group
     D1 = D[:,sample_group]
     # normalize sample per target
-    ratio_values = sample / np.median(D1, axis=1)
+    ratio_values = D[:, index_sample] / np.median(D1, axis=1)
     # normalize sample group per target
-    D2 = util.normalize(D1, axis=1)
-    # trim samples
+    D2 = normalize(D1, axis=1)
     D3 = trim(D2, axis=0, alpha=0.1)
 
-    # new metric instead of z-scores ?
-    zscores = (ratio_values - 1) / (
-        trimmed_std_np(D3, axis=1, alpha=EXPECTED_CNV_RATE) ** (2 - SENSITIVITY)
+    # new metric instead of z-scores
+    zscores = (ratio_values - 1.0) / (
+        trimmed_std_np(D3, axis=1, alpha=EXPECTED_CNV_RATE) ** (2-SENSITIVITY)
     )
 
-    sample_score = 1 / (
+    sample_score = 1.0 / (
         trimmed_std_np(zscores[:, None], axis=0, alpha=EXPECTED_CNV_RATE)[0]
-        ** (2 - SENSITIVITY)
+        ** (2-SENSITIVITY)
     )
+    #print(index_sample,D1.shape,sample_score)
     z_scores_scaled = zscores * sample_score
-    # new metric instead of z-scores
-    # E_scores = pd.Series(util.escore_sample(D6.to_numpy(),ratio_values.to_numpy()),index=D6.index)
     return (index_sample, index, sample_score, ratio_values, z_scores_scaled)
 
 

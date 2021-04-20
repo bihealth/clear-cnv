@@ -25,7 +25,7 @@ def cnv_calling(args):
     EXPECTED_CNV_RATE = args.expected_artefacts
     SAMPLE_SCORE_FACTOR = args.sample_score_factor
     MINIMUM_SAMPLE_GROUP = args.minimum_group_sizes
-    SENSITIVITY = args.sensitivity if args.sensitivity >= 0 and args.sensitivity <= 1 else 0.7
+    SENSITIVITY = args.sensitivity if args.sensitivity >= 0 and args.sensitivity <= 2 else 0.7
     CORES = min([args.cores, mp.cpu_count()]) if args.cores else mp.cpu_count()
     DUP_CUTOFF = args.dup_cutoff #1.35
     DEL_CUTOFF = args.del_cutoff #0.75
@@ -186,9 +186,6 @@ def cnv_calling(args):
         pool.join()
         sample_scores += sample_scores_buffer
 
-    # rescale z-scores to emphasize good quality samples
-    z_scores_scaled = (z_scores_scaled.T / np.std(z_scores_scaled,axis=1,ddof=1)).T
-
     # extract single exon CNVs
     S = pd.DataFrame(sample_scores, index=SAMPLES).T
     DFZ = pd.DataFrame(z_scores_scaled, columns=INDEX, index=SAMPLES).T
@@ -250,8 +247,8 @@ def cnv_calling(args):
     # HMM guided CNV candidates
     # =========================================================================
     # HMM PARAMETRIZATION
-    mean_del = np.std(z_scores_scaled.flatten(),ddof=1)*(-2.5)
-    mean_dup = np.std(z_scores_scaled.flatten(),ddof=1)*3.5
+    mean_del = np.std(z_scores_scaled.flatten(),ddof=1)*(-2.0)
+    mean_dup = np.std(z_scores_scaled.flatten(),ddof=1)*3.0
     mean_median = np.median(z_scores_scaled.flatten())
     # HMM guided CNV candidates
     # =========================================================================
@@ -259,17 +256,13 @@ def cnv_calling(args):
     transitionprobs = np.array(
         [[1.0-TRANSPROB, TRANSPROB, 0.0], [TRANSPROB, 1.0-2.0*TRANSPROB, TRANSPROB], [0.0, TRANSPROB, 1.0-TRANSPROB]]
     )
-    HMM = np.array([util.hmm_scores(sample, probs, transitionprobs) for sample in z_scores_scaled])
+    #HMM = np.array([util.hmm_scores(sample, probs, transitionprobs) for sample in z_scores_scaled])
     # =========================================================================
     # --- fix lockdown bug --- #
-    #probs = np.array([[mean_del], [mean_median], [mean_dup]])
-    #transitionprobs = np.array(
-    #    [[1.0-TRANSPROB, TRANSPROB, 0.0], [TRANSPROB, 1.0-2.0*TRANSPROB, TRANSPROB], [0.0, TRANSPROB, 1.0-TRANSPROB]]
-    #)
-    #pool = mp.Pool(CORES)
-    #HMM = np.array([pool.apply(util.hmm_scores, args=([sample,probs,transitionprobs])) \
-    #                for sample in z_scores_scaled])
-    #pool.close()
+    pool = mp.Pool(CORES)
+    HMM = np.array([pool.apply(util.hmm_scores, args=([sample,probs,transitionprobs])) \
+                    for sample in z_scores_scaled])
+    pool.close()
     # --- fix lockdown bug --- #
     # =========================================================================
 

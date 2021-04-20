@@ -137,10 +137,10 @@ def get_parser():
     parser_cnv_calling.add_argument(
         "-s",
         "--sensitivity",
-        help="A higher sensitivity results in more CNV calls. Can only be 0.0 <= sens <= 1.0",
+        help="A higher sensitivity results in more CNV calls. Can only be 0.0 <= sens <= 2.0. Default is 0.7.",
         required=False,
         type=float,
-        default=0.75,
+        default=0.7,
     )
     parser_cnv_calling.add_argument(
         "--del_cutoff",
@@ -462,10 +462,10 @@ def get_parser():
     )
     parser_workflow_cnv_calling.add_argument(
         "--sensitivity",
-        help="A higher sensitivity results in more CNV calls. Can only be 0.0 <= sens <= 1.0. Default is 0.75.",
+        help="A higher sensitivity results in more CNV calls. Can only be 0.0 <= sens <= 2.0. Default is 0.7.",
         required=False,
         type=float,
-        default=0.75,
+        default=0.7,
     )
     parser_workflow_cnv_calling.add_argument(
         "--size",
