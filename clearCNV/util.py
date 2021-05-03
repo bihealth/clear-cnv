@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import math
+import regex as re
 from sklearn.neighbors import KernelDensity
 from sklearn.linear_model import LinearRegression
 import seaborn as sns
@@ -315,3 +316,22 @@ def turntransform(v):
     v /= max(v)
     v += np.arange(1, 0, -1 / len(v))
     return v
+
+def select_region(region,df,sample,matchscores_bools_selected,buffer = 5):
+    cols = df.columns
+    if sample:
+        #cols = np.append(np.array(df.loc[:,matchscores_bools_selected.loc[:,sample]].columns),sample)
+        cols = np.array(df.loc[:,matchscores_bools_selected.loc[:,sample]].columns)
+    target = re.split('[^0-9]',region.replace(" ", ""))
+    index = np.array([(c[0] == target[0] and int(c[1]) >= int(target[1])-5 and int(c[2]) <= int(target[2])+5) for c in [s.split('_') for s in df.index]])
+    n = index.shape[0]
+    lower = np.argmax(index==1)
+    upper = np.argmax(index[lower:]==0) + lower
+    index[max(0,lower-buffer):min(upper+buffer,n)] = True
+    #df.loc[index,cols]
+    r = df.loc[index,cols].copy()
+    if not sample:
+        return r
+    spacer = pd.DataFrame([float(round(np.mean(r.mean())))]*r.shape[0],index=r.index,columns=['spacer'])
+    rsample = pd.DataFrame(df.loc[index,sample])
+    return pd.concat([r.T,spacer.T,rsample.T]).T

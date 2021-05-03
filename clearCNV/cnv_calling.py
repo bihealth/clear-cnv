@@ -25,11 +25,12 @@ def cnv_calling(args):
     EXPECTED_CNV_RATE = args.expected_artefacts
     SAMPLE_SCORE_FACTOR = args.sample_score_factor
     MINIMUM_SAMPLE_GROUP = args.minimum_group_sizes
-    SENSITIVITY = args.sensitivity if args.sensitivity >= 0 and args.sensitivity <= 2 else 0.7
+    ZSCALE = args.zscale if args.zscale >= 0 and args.zscale <= 2 else 0.65
     CORES = min([args.cores, mp.cpu_count()]) if args.cores else mp.cpu_count()
     DUP_CUTOFF = args.dup_cutoff #1.35
     DEL_CUTOFF = args.del_cutoff #0.75
     TRANSPROB  = args.trans_prob #0.001
+    PLOT_REGIONS = args.plot_regions
 
     # load data
     D0 = util.load_dataframe(intsv_path)
@@ -118,7 +119,7 @@ def cnv_calling(args):
                 Matchscores_bools_selected,
                 DA[1],
                 EXPECTED_CNV_RATE,
-                SENSITIVITY,
+                ZSCALE,
             ),
             callback=collect_result,
         )
@@ -149,7 +150,7 @@ def cnv_calling(args):
                     Matchscores_bools_selected,
                     DX[1],
                     EXPECTED_CNV_RATE,
-                    SENSITIVITY,
+                    ZSCALE,
                 ),
                 callback=collect_result,
             )
@@ -178,7 +179,7 @@ def cnv_calling(args):
                     My,
                     DY[1],
                     EXPECTED_CNV_RATE,
-                    SENSITIVITY,
+                    ZSCALE,
                 ),
                 callback=collect_result,
             )
@@ -247,12 +248,12 @@ def cnv_calling(args):
     # HMM guided CNV candidates
     # =========================================================================
     # HMM PARAMETRIZATION
-    mean_del = np.std(z_scores_scaled.flatten(),ddof=1)*(-2.0)
-    mean_dup = np.std(z_scores_scaled.flatten(),ddof=1)*3.0
+    mean_del = np.std(z_scores_scaled.flatten(),ddof=1)*(-3.0)
+    mean_dup = np.std(z_scores_scaled.flatten(),ddof=1)*4.0
     mean_median = np.median(z_scores_scaled.flatten())
     # HMM guided CNV candidates
     # =========================================================================
-    probs = np.array([[mean_del], [mean_median], [mean_dup]])
+    means = np.array([[mean_del], [mean_median], [mean_dup]])
     transitionprobs = np.array(
         [[1.0-TRANSPROB, TRANSPROB, 0.0], [TRANSPROB, 1.0-2.0*TRANSPROB, TRANSPROB], [0.0, TRANSPROB, 1.0-TRANSPROB]]
     )
@@ -260,7 +261,7 @@ def cnv_calling(args):
     # =========================================================================
     # --- fix lockdown bug --- #
     pool = mp.Pool(CORES)
-    HMM = np.array([pool.apply(util.hmm_scores, args=([sample,probs,transitionprobs])) \
+    HMM = np.array([pool.apply(util.hmm_scores, args=([sample,means,transitionprobs])) \
                     for sample in z_scores_scaled])
     pool.close()
     # --- fix lockdown bug --- #
@@ -330,7 +331,7 @@ def cnv_calling(args):
                         RZ.iloc[i, c],
                         float(S[RZ.columns[c]]),
                     ]
-                    for i, c in zip(*np.where((RZ < -5) & (RR < DEL_CUTOFF)))
+                    for i, c in zip(*np.where((RZ < -3.5) & (RR < DEL_CUTOFF)))
                 ],
                 columns=[
                     "sample",
@@ -354,7 +355,7 @@ def cnv_calling(args):
                         RZ.iloc[i, c],
                         float(S[RZ.columns[c]]),
                     ]
-                    for i, c in zip(*np.where((RZ > 6) & (RR > DUP_CUTOFF)))
+                    for i, c in zip(*np.where((RZ > 4.5) & (RR > DUP_CUTOFF)))
                 ],
                 columns=[
                     "sample",
@@ -407,6 +408,24 @@ def cnv_calling(args):
     S.T.to_csv(pathlib.Path(analysis_dir) / "sample_scores.tsv", sep= '\t')
     Matchscores_bools.to_csv(pathlib.Path(analysis_dir) / "samplegroups.tsv", sep= '\t')
     FS.to_csv(pathlib.Path(analysis_dir) / "failed_samples.tsv", sep= '\t')
+
+    if PLOT_REGIONS:
+        print("plotting all called CNVs with sample groups")
+        import regex as re
+        factor=0.08
+        final_regions = ['-'.join(FINAL.loc[i,['chr','start','end']]) for i in FINAL.index]
+        for i,region in enumerate(final_regions):
+            sample=FINAL['sample'].iloc[i]
+            print(sample)
+            r = util.select_region(region,RR,sample,Matchscores_bools_selected,buffer=1).clip(0,2)
+            plt.figure(figsize=(factor * len(r.columns), factor * len(r.index)))
+            plt.pcolor(r)
+            plt.title(f"{sample} - {region}")
+            plt.ylabel("targets")
+            plt.xlabel("samples")
+            plt.savefig(pathlib.Path(analysis_dir) / str(sample+'_'+region+'.pdf'), format="pdf")
+            plt.close()
+
 
     print("done!")
     return RD, RZ, RR

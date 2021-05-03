@@ -19,6 +19,7 @@ def create_config(configpath, args):
         print("del_cutoff '" + str(args.del_cutoff) + "'", file=f)
         print("dup_cutoff '" + str(args.dup_cutoff) + "'", file=f)
         print("trans_prob '" + str(args.trans_prob) + "'", file=f)
+        print("plotregions '" + str(args.plot_regions) + "'", file=f)
 
 
 

@@ -136,11 +136,11 @@ def get_parser():
     )
     parser_cnv_calling.add_argument(
         "-s",
-        "--sensitivity",
-        help="A higher sensitivity results in more CNV calls. Can only be 0.0 <= sens <= 2.0. Default is 0.7.",
+        "--z-scale",
+        help="A higher z-scale results in more CNV calls. Should only be 0.0 <= z-scale <= 2.0. Default is 0.65.",
         required=False,
         type=float,
-        default=0.7,
+        default=0.65,
     )
     parser_cnv_calling.add_argument(
         "--del_cutoff",
@@ -162,6 +162,13 @@ def get_parser():
         required=False,
         type=float,
         default=0.001,
+    )
+    parser_cnv_calling.add_argument(
+        "--plot_regions",
+        help="If true, the CNV calling script plots heatmaps of the regions.",
+        required=False,
+        type=bool,
+        default=False,
     )
     parser_cnv_calling.add_argument(
         "--cores",
@@ -461,11 +468,11 @@ def get_parser():
         default=20,
     )
     parser_workflow_cnv_calling.add_argument(
-        "--sensitivity",
-        help="A higher sensitivity results in more CNV calls. Can only be 0.0 <= sens <= 2.0. Default is 0.7.",
+        "--z-scale",
+        help="A higher z-scale results in more CNV calls. Should only be 0.0 <= z-scale <= 2.0. Default is 0.65.",
         required=False,
         type=float,
-        default=0.7,
+        default=0.65,
     )
     parser_workflow_cnv_calling.add_argument(
         "--size",
@@ -494,6 +501,13 @@ def get_parser():
         required=False,
         type=float,
         default=0.001,
+    )
+    parser_workflow_cnv_calling.add_argument(
+        "--plot_regions",
+        help="If true, the CNV calling script plots heatmaps of the regions.",
+        required=False,
+        type=bool,
+        default=False,
     )
     parser_workflow_cnv_calling.set_defaults(func=workflow_cnv_calling.workflow_cnv_calling)
 
