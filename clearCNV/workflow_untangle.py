@@ -16,10 +16,13 @@ def create_config(configpath, args):
 
 
 def workflow_untangle(args):
-    args.bamsfile = pathlib.Path(args.workdir) / "allbams.txt"
-    args.bedfile = pathlib.Path(args.workdir) / "union.bed"
-    args.coverages = pathlib.Path(args.workdir) / "coverages.tsv"
-    args.cov_dir = pathlib.Path(args.workdir) / "covs"
+    args.bamsfile = (pathlib.Path(args.workdir) / "allbams.txt").absolute()
+    args.cov_dir = (pathlib.Path(args.workdir) / "covs").absolute()
+    args.bedfile = pathlib.Path(args.bedfile).absolute()
+    args.coverages = pathlib.Path(args.coverages).absolute()
+    args.metafile = pathlib.Path(args.metafile).absolute()
+    args.reference = pathlib.Path(args.reference).absolute()
+
     misc.prepare_untangling(args)
 
     configpath = (
@@ -50,11 +53,12 @@ def workflow_untangle(args):
         arguments.append("--drmaa")
         arguments.append(
             str(
-                f" --mem={args.drmaa_mem} --time={args.drmaa_time} --output={args.workdir}/sge_log/%x-%j.log"
+                f" --mem={args.drmaa_mem} --time={args.drmaa_time} --output={args.workdir}sge_log/%x-%j.log"
             )
         )
 
     # How to create the dir the best way?
-    subprocess.check_call(["mkdir", "-p", f"{args.workdir}/sge_log"])
+    subprocess.check_call(["mkdir", "-p", f"{args.workdir}sge_log"])
+    subprocess.check_call(["mkdir", "-p", f"{args.workdir}covs"])
 
     subprocess.check_call(arguments)

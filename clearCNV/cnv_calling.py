@@ -23,60 +23,60 @@ def cnv_calling(args):
     ratio_scores_path = args.ratio_scores
     z_scores_path = args.z_scores
     EXPECTED_CNV_RATE = args.expected_artefacts
-    MINIMUM_SAMPLE_SCORE = args.minimum_sample_score
+    SAMPLE_SCORE_FACTOR = args.sample_score_factor
     MINIMUM_SAMPLE_GROUP = args.minimum_group_sizes
-    SENSITIVITY = args.sensitivity if args.sensitivity >= 0 and args.sensitivity <= 1 else 0.7
+    ZSCALE = args.zscale if args.zscale >= 0 and args.zscale <= 2 else 0.65
     CORES = min([args.cores, mp.cpu_count()]) if args.cores else mp.cpu_count()
+    DUP_CUTOFF = args.dup_cutoff #1.35
+    DEL_CUTOFF = args.del_cutoff #0.75
+    TRANSPROB  = args.trans_prob #0.001
+    PLOT_REGIONS = args.plot_regions
 
     # load data
     D0 = util.load_dataframe(intsv_path)
     Matchscores = pd.read_csv(matchscores_path, sep="\t", low_memory=False, header=0, index_col=0)
 
     # adaptive threshold for group sizes
-    matchmatrix = pd.DataFrame()
-    for sample in Matchscores.columns:
-        matchmatrix[sample] = Matchscores[sample] <= np.quantile(
-            Matchscores[sample], MINIMUM_SAMPLE_GROUP / len(Matchscores.columns)
-        )
-
-    v = util.turntransform((Matchscores * matchmatrix).mean(axis=0).sort_values())
-    minmatchscore = min(
-        [(Matchscores * matchmatrix).mean(axis=0)[v[v <= min(v)].index[0]], MINIMUM_SAMPLE_SCORE]
-    )
-    failed_samples = matchmatrix[((Matchscores * matchmatrix).mean(axis=0) >= minmatchscore)].index
-    selected_samples = matchmatrix.columns.difference(failed_samples)
-    Matchscores_bools = matchmatrix[selected_samples].drop(index=failed_samples)
+    minmatchscore = np.median(Matchscores.median())*SAMPLE_SCORE_FACTOR
+    Matchscores_bools = Matchscores < minmatchscore
+    selected_samples = Matchscores_bools[Matchscores_bools.sum() >= MINIMUM_SAMPLE_GROUP].index
+    failed_samples = Matchscores_bools.index.difference(selected_samples)
+    np.fill_diagonal(Matchscores_bools.values, False)
+    # optional for neater code downstream
+    Matchscores_bools_selected = Matchscores_bools.loc[selected_samples,selected_samples]
+    Matchscores_selected = Matchscores.loc[selected_samples,selected_samples]
 
     # evaluation
-    print(
-        "%.d samples failed to have a sufficient group size. They are ignored in cnv calling."
-        % len(failed_samples)
-    )
-    for f in failed_samples:
-        print(f)
+    #if len(failed_samples) > 0:
+    plt.figure(figsize=(6,4))
+    plt.title("Threshold finding of sample groups")
+    x = plt.hist(Matchscores.median().sort_values(),bins=30)
+    plt.vlines(minmatchscore,0,max(x[0]),color='orange',label="threshold")
+    plt.xlim(0,1)
+    plt.ylabel("number of samples")
+    plt.xlabel("median matchscore")
+    plt.legend()
+    plt.savefig(pathlib.Path(analysis_dir) / "ANALYSIS_group_sizes_threshold.pdf", format="pdf")
 
-    plt.figure(figsize=(8, 4), dpi=200)
-    n, _bins, _patches = plt.hist(
-        (Matchscores * matchmatrix).mean(),
-        int(len(matchmatrix.columns) / 2),
-        label=str(len(failed_samples)) + " failed samples",
-    )
-    plt.vlines(
-        minmatchscore, 0, max(n) * 0.75, label="cutoff at %1.4f" % minmatchscore, color="darkred",
-    )
-    plt.xlabel("mean sample group score")
-    plt.ylabel("samples")
+
+    plt.figure(figsize=(6,4))
+    plt.title("Sample group sizes and cutoff")
+    x = plt.hist(Matchscores_bools.sum().sort_values(),bins=round(len(selected_samples)/3),range=(0,len(selected_samples)))
+    plt.vlines(MINIMUM_SAMPLE_GROUP,0,max(x[0]),color='darkred',label="cutoff")
+    plt.xlim(0,len(selected_samples))
+    plt.ylabel("number of samples")
+    plt.xlabel("group size")
     plt.legend()
     plt.savefig(pathlib.Path(analysis_dir) / "ANALYSIS_group_sizes_cutoff.pdf", format="pdf")
 
     util.print_clustermap(
-        Matchscores,
+        Matchscores_selected,
         path=pathlib.Path(analysis_dir) / "ANALYSIS_clustermap_filtered.pdf",
         title="clustered heat map of selected sample distances",
     )
 
     # separate chr subsets
-    DS0 = util.filter_by_coverage(D0[Matchscores.columns])
+    DS0 = util.filter_by_coverage(D0[selected_samples])
     INDEX = DS0.index.copy()
     SAMPLES = DS0.columns.copy()
     DS1 = util.normalize_within_sample(DS0)
@@ -110,10 +110,17 @@ def cnv_calling(args):
     #  parallelized autosomal calling
     pool = mp.Pool(CORES)
     print("multi threaded calling autosomal targets")
-    for i in range(len(Matchscores_bools.columns)):
+    for i in range(len(selected_samples)):
         pool.apply_async(
             util.calling_cnv,
-            args=(i, DA[0], Matchscores_bools, DA[1], EXPECTED_CNV_RATE, SENSITIVITY,),
+            args=(
+                i,
+                DA[0],
+                Matchscores_bools_selected,
+                DA[1],
+                EXPECTED_CNV_RATE,
+                ZSCALE,
+            ),
             callback=collect_result,
         )
     pool.close()
@@ -122,9 +129,9 @@ def cnv_calling(args):
     #  calculate expected X-cov ratio and prepare match scores
     if sum(DX[1]) > 0 and np.max(DX[0].mean(axis=0)) / np.min(DX[0].mean(axis=0)) > 1.5:
         kmeans = KMeans(n_clusters=2).fit(DX[0].mean(axis=0).reshape(-1, 1))
-        Mx = Matchscores_bools.copy()
+        Mx = Matchscores_bools_selected.copy()
         for i, x in enumerate(kmeans.labels_):
-            sample = Matchscores_bools.index[i]
+            sample = Matchscores_bools_selected.index[i]
             if x:
                 Mx[sample] &= kmeans.labels_ == x
             else:
@@ -134,10 +141,17 @@ def cnv_calling(args):
         #  --- parallelized X-chromosome calling ---  #
         print("multi threaded calling on X-chromosome")
         pool = mp.Pool(CORES)
-        for i in range(len(Matchscores_bools.columns)):
+        for i in range(len(selected_samples)):
             pool.apply_async(
                 util.calling_cnv,
-                args=(i, DX[0], Matchscores_bools, DX[1], EXPECTED_CNV_RATE, SENSITIVITY,),
+                args=(
+                    i,
+                    DX[0],
+                    Matchscores_bools_selected,
+                    DX[1],
+                    EXPECTED_CNV_RATE,
+                    ZSCALE,
+                ),
                 callback=collect_result,
             )
         pool.close()
@@ -147,19 +161,26 @@ def cnv_calling(args):
     #  calculate expected Y-cov ratio and prepare match scores
     if sum(DY[1]) > 0 and np.max(DY[0].mean(axis=0)) / np.min(DY[0].mean(axis=0)) > 1.5:
         kmeans = KMeans(n_clusters=2).fit(DY[0].mean(axis=0).reshape(-1, 1))
-        My = Matchscores_bools.copy()
+        My = Matchscores_bools_selected.copy()
         for i, y in enumerate(kmeans.labels_):
-            sample = Matchscores_bools.index[i]
+            sample = Matchscores_bools_selected.index[i]
             My[sample] &= kmeans.labels_ == y
 
         sample_scores_buffer = sample_scores.copy()
         #  --- parallelized Y-chromosome calling ---  #
         print("multi threaded calling on Y-chromosome")
         pool = mp.Pool(CORES)
-        for i in range(len(Matchscores_bools.columns)):
+        for i in range(len(selected_samples)):
             pool.apply_async(
                 util.calling_cnv,
-                args=(i, DY[0], My, DY[1], EXPECTED_CNV_RATE, SENSITIVITY,),
+                args=(
+                    i,
+                    DY[0],
+                    My,
+                    DY[1],
+                    EXPECTED_CNV_RATE,
+                    ZSCALE,
+                ),
                 callback=collect_result,
             )
         pool.close()
@@ -182,7 +203,7 @@ def cnv_calling(args):
                         DFZ.iloc[i, c],
                         float(S[DFZ.columns[c]]),
                     ]
-                    for i, c in zip(*np.where((DFZ < -5) & (DFR < 0.65)))
+                    for i, c in zip(*np.where((DFZ < -5) & (DFR < DEL_CUTOFF)))
                 ],
                 columns=[
                     "sample",
@@ -206,7 +227,7 @@ def cnv_calling(args):
                         DFZ.iloc[i, c],
                         float(S[DFZ.columns[c]]),
                     ]
-                    for i, c in zip(*np.where((DFZ > 6) & (DFR > 1.35)))
+                    for i, c in zip(*np.where((DFZ > 6) & (DFR > DUP_CUTOFF)))
                 ],
                 columns=[
                     "sample",
@@ -226,16 +247,23 @@ def cnv_calling(args):
     print("compute HMM on z-scores")
     # HMM guided CNV candidates
     # =========================================================================
-    # --- fix lockdown bug --- #
-    # pool = mp.Pool(CORES)
-    probs = np.array([[-2.5], [0.0], [3.5]])
+    # HMM PARAMETRIZATION
+    mean_del = np.std(z_scores_scaled.flatten(),ddof=1)*(-3.0)
+    mean_dup = np.std(z_scores_scaled.flatten(),ddof=1)*4.0
+    mean_median = np.median(z_scores_scaled.flatten())
+    # HMM guided CNV candidates
+    # =========================================================================
+    means = np.array([[mean_del], [mean_median], [mean_dup]])
     transitionprobs = np.array(
-        [[0.9999, 0.0001, 0.0], [0.0001, 0.9998, 0.0001], [0.0, 0.0001, 0.9999]]
+        [[1.0-TRANSPROB, TRANSPROB, 0.0], [TRANSPROB, 1.0-2.0*TRANSPROB, TRANSPROB], [0.0, TRANSPROB, 1.0-TRANSPROB]]
     )
-    # HMM = np.array([pool.apply(util.hmm_scores, args=([sample,probs,transitionprobs]))
-    #                for sample in z_scores_scaled])
-    # pool.close()
-    HMM = np.array([util.hmm_scores(sample, probs, transitionprobs) for sample in z_scores_scaled])
+    #HMM = np.array([util.hmm_scores(sample, probs, transitionprobs) for sample in z_scores_scaled])
+    # =========================================================================
+    # --- fix lockdown bug --- #
+    pool = mp.Pool(CORES)
+    HMM = np.array([pool.apply(util.hmm_scores, args=([sample,means,transitionprobs])) \
+                    for sample in z_scores_scaled])
+    pool.close()
     # --- fix lockdown bug --- #
     # =========================================================================
 
@@ -251,7 +279,16 @@ def cnv_calling(args):
             [
                 pool.apply(
                     util.merge_score_cnvs,
-                    args=([HMM[i, :], z_scores_scaled[i, :], ratio_scores[i, :], INDEX,]),
+                    args=(
+                        [
+                            HMM[i, :],
+                            z_scores_scaled[i, :],
+                            ratio_scores[i, :],
+                            INDEX,
+                            DEL_CUTOFF,
+                            DUP_CUTOFF
+                        ]
+                    ),
                 )
                 for i in cnv_carrying_indexes
             ],
@@ -294,7 +331,7 @@ def cnv_calling(args):
                         RZ.iloc[i, c],
                         float(S[RZ.columns[c]]),
                     ]
-                    for i, c in zip(*np.where((RZ < -5) & (RR < 0.65)))
+                    for i, c in zip(*np.where((RZ < -3.5) & (RR < DEL_CUTOFF)))
                 ],
                 columns=[
                     "sample",
@@ -318,7 +355,7 @@ def cnv_calling(args):
                         RZ.iloc[i, c],
                         float(S[RZ.columns[c]]),
                     ]
-                    for i, c in zip(*np.where((RZ > 6) & (RR > 1.35)))
+                    for i, c in zip(*np.where((RZ > 4.5) & (RR > DUP_CUTOFF)))
                 ],
                 columns=[
                     "sample",
@@ -353,17 +390,42 @@ def cnv_calling(args):
             )
         ]
     )
+    FS = pd.DataFrame(Matchscores_bools.loc[failed_samples].sum(axis=1),columns=['group_size'])
+    FS['median_sample_score'] = Matchscores.loc[failed_samples].median(axis=1)
     X = [
         [*h.to_list()[:6], h.to_list()[7], h.to_list()[6], *S[h.to_list()[0]]]
         for h in ca.hitsA_not_in_hitsB(SINGLE_HITS, BIG_HITS)
     ]
     FINAL = pd.concat([RD, pd.DataFrame(X, columns=RD.columns)])
-    FINAL["score"] = FINAL["score"].astype(float).apply(x)
+    FINAL["score"] = FINAL["score"].astype(float)#.apply(x)
+    FINAL["score"] = FINAL["score"].apply(lambda x: float(abs(x)))
     FINAL = FINAL.sort_values(by="score", ascending=False)
 
     print("saving results...")
     FINAL.to_csv(calls_path, sep="\t", index=False)
     RZ.to_csv(z_scores_path, sep="\t")
     RR.to_csv(ratio_scores_path, sep="\t")
+    S.T.to_csv(pathlib.Path(analysis_dir) / "sample_scores.tsv", sep= '\t')
+    Matchscores_bools.to_csv(pathlib.Path(analysis_dir) / "samplegroups.tsv", sep= '\t')
+    FS.to_csv(pathlib.Path(analysis_dir) / "failed_samples.tsv", sep= '\t')
+
+    if PLOT_REGIONS:
+        print("plotting all called CNVs with sample groups")
+        import regex as re
+        factor=0.08
+        final_regions = ['-'.join(FINAL.loc[i,['chr','start','end']]) for i in FINAL.index]
+        for i,region in enumerate(final_regions):
+            sample=FINAL['sample'].iloc[i]
+            print(sample)
+            r = util.select_region(region,RR,sample,Matchscores_bools_selected,buffer=1).clip(0,2)
+            plt.figure(figsize=(factor * len(r.columns), factor * len(r.index)))
+            plt.pcolor(r)
+            plt.title(f"{sample} - {region}")
+            plt.ylabel("targets")
+            plt.xlabel("samples")
+            plt.savefig(pathlib.Path(analysis_dir) / str(sample+'_'+region+'.pdf'), format="pdf")
+            plt.close()
+
+
     print("done!")
     return RD, RZ, RR

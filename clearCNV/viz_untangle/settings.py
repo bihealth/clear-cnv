@@ -13,7 +13,7 @@ import cattr
 HOME_BRAND = "clear-CNV"
 
 #: Base input path.
-PATH_BASE = None
+# PATH_BASE = None
 
 #: Path to metafile.
 PATH_METAFILE = None
@@ -25,16 +25,16 @@ PATH_COVERAGES = None
 PATH_BEDFILE = None
 
 #: Path to batch definition.
-PATH_BATCHES = None
+BATCH_OUTPUT_PATH = None
 
 #: Helper function to setup the paths based on an input path.
-def setup_paths(path):
-    global PATH_BASE, PATH_METAFILE, PATH_COVERAGES, PATH_BEDFILE, PATH_BATCHES
-    PATH_BASE = pathlib.Path(path)
-    PATH_METAFILE = PATH_BASE / "meta.tsv"
-    PATH_COVERAGES = PATH_BASE / "coverages.tsv"
-    PATH_BEDFILE = PATH_BASE / "union.bed"
-    PATH_BATCHES = PATH_BASE / "batches"
+def setup_paths(args):
+    global PATH_METAFILE, PATH_COVERAGES, PATH_BEDFILE, BATCH_OUTPUT_PATH
+    # PATH_BASE = pathlib.Path(path)
+    PATH_METAFILE = args.metafile
+    PATH_COVERAGES = args.coverages
+    PATH_BEDFILE = args.bedfile
+    BATCH_OUTPUT_PATH = args.new_panel_assignments_directory
 
 
 #: Whether or not to preload data.
@@ -46,7 +46,7 @@ class UntangleSettings:
     threshold: int = 50
     min_group_size: int = 20
     pca_components: int = 20
-    batch_factor: float = 0.985
+    batch_num: str = "2"
     pca_seed: int = 100
 
 
@@ -66,3 +66,6 @@ CACHE_DIR = None
 CACHE_REDIS_URL = None
 #: whether or not to preload data on startup
 CACHE_PRELOAD_DATA = True
+
+#: Output path for batch separation.
+# BATCH_OUTPUT_PATH = None

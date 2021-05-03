@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import math
+import regex as re
 from sklearn.neighbors import KernelDensity
 from sklearn.linear_model import LinearRegression
 import seaborn as sns
@@ -237,7 +238,7 @@ def rscore_cnv(start, end, r_scores):
 
 
 # hmm_preds,z_scores,r_scores,index = HMM[9],z_scores_scaled[9],ratio_scores[9],INDEX
-def merge_score_cnvs(hmm_preds, z_scores, r_scores, index):
+def merge_score_cnvs(hmm_preds, z_scores, r_scores, index, del_cutoff, dup_cutoff):
     CNVs = []
     length = 0 if hmm_preds[0] == 1 else 1
     start = 0
@@ -251,7 +252,7 @@ def merge_score_cnvs(hmm_preds, z_scores, r_scores, index):
             if hmm_preds[i - 1] != 1:
                 rs = rscore_cnv(start, i, r_scores)
                 # ensure that the ratio score is sufficiently high
-                if rs <= 0.65 or rs >= 1.35:
+                if rs <= del_cutoff or rs >= dup_cutoff:
                     CNVs.append(
                         ca.CNV(
                             *index[start].split("_")[:2],
@@ -285,35 +286,28 @@ def center_samples_np(D, limit=50):
     return normalize(D, axis=1) + 1 - np.median(normalize(D, axis=1), axis=0)
 
 
-def calling_cnv(index_sample, D, MS, index, EXPECTED_CNV_RATE, SENSITIVITY=0.7):
-    # de-bias samples
-    # check if it is probable that more than one gene is present,
-    # then re-normalize within each sample.
-
-    D = center_samples_np(D)
+def calling_cnv(index_sample, D, MS, index,  EXPECTED_CNV_RATE, SENSITIVITY=0.7):
+    sample_group = MS.iloc[index_sample]
     # per target median normalized sample
-    sample = D[:, index_sample] / np.median(D, axis=1)
     # select sample group
-    D1 = D[:, np.array(np.arange(len(MS.columns)))[MS[MS.columns[index_sample]].to_numpy()]]
-    # per target median normalization
+    D1 = D[:,sample_group]
+    # normalize sample per target
+    ratio_values = D[:, index_sample] / np.median(D1, axis=1)
+    # normalize sample group per target
     D2 = normalize(D1, axis=1)
-    # trim samples
     D3 = trim(D2, axis=0, alpha=0.1)
 
-    ratio_values = sample / np.median(np.asarray(D3), axis=1)
-
     # new metric instead of z-scores
-    zscores = (ratio_values - 1) / (
-        trimmed_std_np(D3, axis=1, alpha=EXPECTED_CNV_RATE) ** (1 - SENSITIVITY + 1)
+    zscores = (ratio_values - 1.0) / (
+        trimmed_std_np(D3, axis=1, alpha=EXPECTED_CNV_RATE) ** (2-SENSITIVITY)
     )
 
-    sample_score = 1 / (
+    sample_score = 1.0 / (
         trimmed_std_np(zscores[:, None], axis=0, alpha=EXPECTED_CNV_RATE)[0]
-        ** (1 - SENSITIVITY + 1)
+        ** (2-SENSITIVITY)
     )
+    #print(index_sample,D1.shape,sample_score)
     z_scores_scaled = zscores * sample_score
-    # new metric instead of z-scores
-    # E_scores = pd.Series(util.escore_sample(D6.to_numpy(),ratio_values.to_numpy()),index=D6.index)
     return (index_sample, index, sample_score, ratio_values, z_scores_scaled)
 
 
@@ -322,3 +316,22 @@ def turntransform(v):
     v /= max(v)
     v += np.arange(1, 0, -1 / len(v))
     return v
+
+def select_region(region,df,sample,matchscores_bools_selected,buffer = 5):
+    cols = df.columns
+    if sample:
+        #cols = np.append(np.array(df.loc[:,matchscores_bools_selected.loc[:,sample]].columns),sample)
+        cols = np.array(df.loc[:,matchscores_bools_selected.loc[:,sample]].columns)
+    target = re.split('[^0-9]',region.replace(" ", ""))
+    index = np.array([(c[0] == target[0] and int(c[1]) >= int(target[1])-5 and int(c[2]) <= int(target[2])+5) for c in [s.split('_') for s in df.index]])
+    n = index.shape[0]
+    lower = np.argmax(index==1)
+    upper = np.argmax(index[lower:]==0) + lower
+    index[max(0,lower-buffer):min(upper+buffer,n)] = True
+    #df.loc[index,cols]
+    r = df.loc[index,cols].copy()
+    if not sample:
+        return r
+    spacer = pd.DataFrame([float(round(np.mean(r.mean())))]*r.shape[0],index=r.index,columns=['spacer'])
+    rsample = pd.DataFrame(df.loc[index,sample])
+    return pd.concat([r.T,spacer.T,rsample.T]).T

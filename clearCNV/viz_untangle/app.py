@@ -50,3 +50,4 @@ app.layout = build_layout()
 #
 callbacks.register_control_to_buffer(app)
 callbacks.register_buffer_to_graphs(app)
+callbacks.register_save_button(app)

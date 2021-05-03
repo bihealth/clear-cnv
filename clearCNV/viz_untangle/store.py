@@ -34,13 +34,14 @@ from . import ui_plots
 
 
 #: Whether or not to pickle data (for development only).
-PICKLE_DATA = True
+PICKLE_DATA = False
 
 
 @attr.s(auto_attribs=True, frozen=True)
 class Data:
     BED: typing.Any
     D: typing.Any
+    D1: typing.Any
     META: typing.Any
     X: typing.Any
     allsamples: typing.Any
@@ -64,23 +65,33 @@ def _load_coverage(path, sep="\t"):
     return D0
 
 
-def _find_batches(xd, savepath, factor=0.99, _n=1, _bic=None, _df=None):
+# User must define number of batches
+def _find_batches(xd, n=1):
+    xds = xd[["X", "Y"]].to_numpy()
+    xindex = xd.index
+    GM = GaussianMixture(n_components=max([0, n]), n_init=10).fit(xds)
+    # print(GM.bic(xds))
+    xds_df = pd.DataFrame(xds, index=xd.index, columns=["X", "Y"])
+    xds_df["batch"] = GM.predict(xds)
+    xds_df["panel"] = xd["panel"]
+    # BIC = GM.bic(xds)
+    return xds_df
+
+
+"""def _find_batches(xd, factor=0.985, _n=1, _bic=None, _df=None):
     xds = xd[["X", "Y"]].to_numpy()
     xindex = xd.index
     GM = GaussianMixture(n_components=_n, n_init=10).fit(xds)
     # print(GM.bic(xds))
     xds_df = pd.DataFrame(xds, index=xd.index, columns=["X", "Y"])
-    xds_df["clustering"] = GM.predict(xds)
+    xds_df["batch"] = GM.predict(xds)
     BIC = GM.bic(xds)
 
     if _bic and factor * _bic <= BIC:
-        plt.figure(figsize=(10, 6))
-        sns.scatterplot(data=_df, x="X", y="Y", hue="clustering")
-        plt.savefig(savepath)
-        _df.to_csv(str(savepath) + ".tsv", sep="\t", header=True, index=True)
+        # _df.to_csv(str(savepath) + ".tsv", sep="\t", header=True, index=True)
         return (_n - 1, _bic, _df)
     else:
-        return _find_batches(xd, savepath, factor, _n + 1, BIC, xds_df)
+        return _find_batches(xd, factor, _n + 1, BIC, xds_df)"""
 
 
 @cache.memoize()
@@ -130,7 +141,6 @@ def load_all_data(us: settings.UntangleSettings):
 
     D1 = D.drop(columns=dropoutsamples.index)
     D.index = BED.apply(lambda row: "chr%s:%s" % (row[0], row[1]), axis=1)
-
     # X = D1 > us.threshold
     X = D1.ge((BED.iloc[:, 2] - BED.iloc[:, 1]) / us.threshold, axis=0)
 
@@ -168,6 +178,7 @@ def load_all_data(us: settings.UntangleSettings):
     result = Data(
         BED=BED,
         D=D,
+        D1=D1,
         X=X,
         META=META,
         allsamples=allsamples,
@@ -198,7 +209,10 @@ def compute_pca(us: settings.UntangleSettings):
 def compute_tsne(us: settings.UntangleSettings):
     logger.info("Computing tSNE ...")
     data = load_all_data(us)
-    pca = PCA(n_components=us.pca_components, random_state=us.pca_seed,)
+    pca = PCA(
+        n_components=us.pca_components,
+        random_state=us.pca_seed,
+    )
     XT = pca.fit_transform(data.X.dropna(0).T)
 
     X_embedded = TSNE(n_components=2, random_state=us.pca_seed).fit_transform(XT)
@@ -220,8 +234,23 @@ def compute_acluster(us: settings.UntangleSettings):
     clustering = AgglomerativeClustering(n_clusters=len(data.panels)).fit(XD[["X", "Y"]].to_numpy())
     # TODO: yikes, inplace update with cached data...
     XD["clustering"] = clustering.labels_
+    # majority vote for panel assignments
+    cluster_panel_dict = {
+        i: Counter(data.samples[clustering.labels_ == i]["panel"]).most_common()[0][0]
+        for i in range(len(data.panels))
+    }
+    XD["new_assignments"] = list(map(lambda x: cluster_panel_dict[x], clustering.labels_))
     logger.info("... done computing Agglomerative Clustering.")
     return XD
+
+
+"""@cache.memoize()
+def compute_batchcluster(us: settings.UntangleSettings):
+    logger.info("Computing batchwise clustering ...")
+    data = load_all_data(us)
+    D1 = data.D1
+    D2 = util.normalize_within_sample(D1)
+    D3 = util.normalize_within_exon(D2)"""
 
 
 @cache.memoize()
@@ -242,3 +271,68 @@ def compute_clustercoldict(us: settings.UntangleSettings):
         i: c for i, c in enumerate(clustercolors(np.linspace(0, 1, len(data.panels))))
     }
     return clustercoldict
+
+
+@cache.memoize()
+def compute_batches(us: settings.UntangleSettings):
+    data = load_all_data(us)
+    XD = compute_acluster(us)
+    XD.index = data.D1.columns
+    batches = []
+    for i, cluster in enumerate(sorted(set(XD["new_assignments"]))):
+        x = data.D1.T[XD["new_assignments"] == cluster]
+        x = x.fillna(0).T[x.median(axis=0) > us.threshold].T
+        d = x[x.median(axis=1) <= us.threshold]
+        x = x.T[x.index.difference(d.index)].T
+        p = x.index
+        x = pd.DataFrame(util.normalize(util.normalize(x, axis=1), axis=0)).T.fillna(1).T
+        x.index = p
+
+        # perform clustering
+        pca = PCA(n_components=us.pca_components)
+        xt = pca.fit_transform(x)
+
+        x_embedded = TSNE(n_components=2).fit_transform(xt)
+
+        xd = pd.DataFrame(x_embedded)
+        xd.index = x.index
+        xd.columns = ["X", "Y"]
+        xd["panel"] = data.samples.loc[x.index, "panel"]
+
+        batch_num_ = [int(val) for val in us.batch_num.split(",")]
+        bf = batch_num_[i] if len(batch_num_) >= len(set(XD["new_assignments"])) else batch_num_[0]
+        df = _find_batches(xd, bf)
+
+        batches.append(df)
+    return batches
+
+
+@cache.memoize()
+def save_results(us: settings.UntangleSettings, n_clicks):
+    data = load_all_data(us)
+    XD = compute_acluster(us)
+    # save new panel assignments
+    XD.index = data.allsamples.index
+    XD["paths"] = data.allsamples["path"]
+    logger.info("saving new panel assignment ...")
+    pathlib.Path(settings.BATCH_OUTPUT_PATH).absolute().mkdir(parents=True, exist_ok=True)
+    for p in data.panels:
+        bamspath = pathlib.Path(settings.BATCH_OUTPUT_PATH) / (str(p) + "_new_assigned.txt")
+        XD[XD["new_assignments"] == p]["paths"].to_csv(
+            bamspath, sep="\t", header=False, index=False
+        )
+    logger.info("... done saving new panel assignment.")
+    batches = compute_batches(us)
+    logger.info("saving new batch clusterings ...")
+    for batch in batches:
+        panel = set(batch["panel"]).pop()
+        for x in set(batch["batch"]):
+            path = pathlib.Path(settings.BATCH_OUTPUT_PATH) / str(
+                "%s_batch%.2d_%s.txt" % (panel, x, str(n_clicks))
+            )
+            logger.info("save batch file to: ", path)
+            data.samples.T[batch[batch["batch"] == x].index].T["path"].to_csv(
+                path, sep="\t", header=False, index=False
+            )
+    logger.info("... done saving new batch clusterings.")
+    return True

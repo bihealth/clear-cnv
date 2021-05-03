@@ -120,11 +120,11 @@ def get_parser():
     )
     parser_cnv_calling.add_argument(
         "-u",
-        "--minimum_sample_score",
-        help="A lower threshold results in better fitting, but smaller calling groups",
+        "--sample_score_factor",
+        help="The factor u multiplied with the median sample score to define sample groups. u should range between 1.0 < u < 5.0. Default is 2.0.",
         required=False,
         type=float,
-        default=0.15,
+        default=2.0,
     )
     parser_cnv_calling.add_argument(
         "-g",
@@ -136,11 +136,39 @@ def get_parser():
     )
     parser_cnv_calling.add_argument(
         "-s",
-        "--sensitivity",
-        help="A higher sensitivity results in more CNV calls. Can only be 0.0 <= sens <= 1.0",
+        "--z-scale",
+        help="A higher z-scale results in more CNV calls. Should only be 0.0 <= z-scale <= 2.0. Default is 0.65.",
+        required=False,
+        type=float,
+        default=0.65,
+    )
+    parser_cnv_calling.add_argument(
+        "--del_cutoff",
+        help="A hard threshold on the ratio score for deletions. Default is 0.75.",
         required=False,
         type=float,
         default=0.75,
+    )
+    parser_cnv_calling.add_argument(
+        "--dup_cutoff",
+        help="A hard threshold on the ratio score for duplications. Default is 1.35.",
+        required=False,
+        type=float,
+        default=1.35,
+    )
+    parser_cnv_calling.add_argument(
+        "--trans_prob",
+        help="Transition probability of the HMM to change state from WT to CNV. Default is 0.001. Lower values prefer longer CNVs, higher values prefer shorter CNVs.",
+        required=False,
+        type=float,
+        default=0.001,
+    )
+    parser_cnv_calling.add_argument(
+        "--plot_regions",
+        help="If true, the CNV calling script plots heatmaps of the regions.",
+        required=False,
+        type=bool,
+        default=False,
     )
     parser_cnv_calling.add_argument(
         "--cores",
@@ -204,13 +232,22 @@ def get_parser():
     #  merge bed
     # =========================================================================
     parser_merge_bed = subparsers.add_parser(
-        "merge_bed", description=("Merges bed files to non-overlapping intervals."),
+        "merge_bed",
+        description=("Merges bed files to non-overlapping intervals."),
     )
     parser_merge_bed.add_argument(
-        "-i", "--infile", help="Path to the original .bed file.", required=True, type=str,
+        "-i",
+        "--infile",
+        help="Path to the original .bed file.",
+        required=True,
+        type=str,
     )
     parser_merge_bed.add_argument(
-        "-o", "--outfile", help="Output path to the merged .bed file.", required=True, type=str,
+        "-o",
+        "--outfile",
+        help="Output path to the merged .bed file.",
+        required=True,
+        type=str,
     )
     parser_merge_bed.set_defaults(func=misc.merge_bedfile)
 
@@ -259,13 +296,25 @@ def get_parser():
         ),
     )
     parser_rtbeds.add_argument(
-        "-i", "--inbam", help="Path to the .bam file of the sample.", required=True, type=str,
+        "-i",
+        "--inbam",
+        help="Path to the .bam file of the sample.",
+        required=True,
+        type=str,
     )
     parser_rtbeds.add_argument(
-        "-b", "--bedfile", help="Path to the merged .bed file.", required=True, type=str,
+        "-b",
+        "--bedfile",
+        help="Path to the merged .bed file.",
+        required=True,
+        type=str,
     )
     parser_rtbeds.add_argument(
-        "-r", "--rtbed", help="Output file in .rtbed format.", required=True, type=str,
+        "-r",
+        "--rtbed",
+        help="Output file in .rtbed format.",
+        required=True,
+        type=str,
     )
     parser_rtbeds.set_defaults(func=misc.count_pair)
 
@@ -273,16 +322,30 @@ def get_parser():
     # merge rtbeds
 
     parser_merge_rtbeds = subparsers.add_parser(
-        "merge_coverages", description=("Merges all .rtbed files into one table in .tsv format."),
+        "merge_coverages",
+        description=("Merges all .rtbed files into one table in .tsv format."),
     )
     parser_merge_rtbeds.add_argument(
-        "-b", "--bedfile", help="Path to the merged .bed file.", required=True, type=str,
+        "-b",
+        "--bedfile",
+        help="Path to the merged .bed file.",
+        required=True,
+        type=str,
     )
     parser_merge_rtbeds.add_argument(
-        "-r", "--rtbeds", help="Input .rtbed file paths.", required=True, nargs="+", type=str,
+        "-r",
+        "--rtbeds",
+        help="Input .rtbed file paths.",
+        required=True,
+        nargs="+",
+        type=str,
     )
     parser_merge_rtbeds.add_argument(
-        "-c", "--coverages", help="Output table in .tsv format.", required=True, type=str,
+        "-c",
+        "--coverages",
+        help="Output table in .tsv format.",
+        required=True,
+        type=str,
     )
     parser_merge_rtbeds.set_defaults(func=misc.merge_rtbeds)
 
@@ -290,13 +353,22 @@ def get_parser():
     #  annotations
     # =========================================================================
     parser_annotations = subparsers.add_parser(
-        "annotations", description=("Creates annotations file."),
+        "annotations",
+        description=("Creates annotations file."),
     )
     parser_annotations.add_argument(
-        "-r", "--reference", help="Path to the genomic reference.", required=True, type=str,
+        "-r",
+        "--reference",
+        help="Path to the genomic reference.",
+        required=True,
+        type=str,
     )
     parser_annotations.add_argument(
-        "-b", "--bedfile", help="Path to the merged .bed file.", required=True, type=str,
+        "-b",
+        "--bedfile",
+        help="Path to the merged .bed file.",
+        required=True,
+        type=str,
     )
     parser_annotations.add_argument(
         "-k",
@@ -306,7 +378,11 @@ def get_parser():
         type=str,
     )
     parser_annotations.add_argument(
-        "-a", "--annotations", help="Output file in .bed format.", required=True, type=str,
+        "-a",
+        "--annotations",
+        help="Output file in .bed format.",
+        required=True,
+        type=str,
     )
     parser_annotations.set_defaults(func=misc.create_annotations_file)
 
@@ -320,13 +396,25 @@ def get_parser():
         ),
     )
     parser_workflow_cnv_calling.add_argument(
-        "-w", "--workdir", help="Path to the snakemake workdir.", required=True, type=str,
+        "-w",
+        "--workdir",
+        help="Path to the snakemake workdir.",
+        required=True,
+        type=str,
     )
     parser_workflow_cnv_calling.add_argument(
-        "-p", "--panelname", help="name of the panel or dataset.", required=True, type=str,
+        "-p",
+        "--panelname",
+        help="name of the panel or dataset.",
+        required=True,
+        type=str,
     )
     parser_workflow_cnv_calling.add_argument(
-        "-r", "--reference", help="Path to the genomic reference.", required=True, type=str,
+        "-r",
+        "--reference",
+        help="Path to the genomic reference.",
+        required=True,
+        type=str,
     )
     parser_workflow_cnv_calling.add_argument(
         "-b",
@@ -336,7 +424,11 @@ def get_parser():
         type=str,
     )
     parser_workflow_cnv_calling.add_argument(
-        "-d", "--bedfile", help="Path to the .bed file.", required=True, type=str,
+        "-d",
+        "--bedfile",
+        help="Path to the .bed file.",
+        required=True,
+        type=str,
     )
     parser_workflow_cnv_calling.add_argument(
         "-k",
@@ -362,25 +454,25 @@ def get_parser():
         default=0.02,
     )
     parser_workflow_cnv_calling.add_argument(
-        "--minimum_sample_score",
-        help="A lower threshold results in better fitting, but smaller calling groups. Default is 0.15.",
+        "--sample_score_factor",
+        help="The factor u multiplied with the median sample score to define sample groups. u should range between 1.0 < u < 5.0. Default is 2.0.",
         required=False,
         type=float,
-        default=0.15,
+        default=2.0,
     )
     parser_workflow_cnv_calling.add_argument(
         "--minimum_group_sizes",
-        help="Minimum group size per CNV calling group per match scores. Default is 30.",
+        help="Minimum group size per CNV calling group per match scores. Default is 20.",
         required=False,
         type=int,
-        default=30,
+        default=20,
     )
     parser_workflow_cnv_calling.add_argument(
-        "--sensitivity",
-        help="A higher sensitivity results in more CNV calls. Can only be 0.0 <= sens <= 1.0. Default is 0.75.",
+        "--z-scale",
+        help="A higher z-scale results in more CNV calls. Should only be 0.0 <= z-scale <= 2.0. Default is 0.65.",
         required=False,
         type=float,
-        default=0.75,
+        default=0.65,
     )
     parser_workflow_cnv_calling.add_argument(
         "--size",
@@ -388,6 +480,34 @@ def get_parser():
         required=False,
         type=int,
         default=2000,
+    )
+    parser_workflow_cnv_calling.add_argument(
+        "--del_cutoff",
+        help="A hard threshold on the ratio score for deletions. Default is 0.75.",
+        required=False,
+        type=float,
+        default=0.75,
+    )
+    parser_workflow_cnv_calling.add_argument(
+        "--dup_cutoff",
+        help="A hard threshold on the ratio score for duplications. Default is 1.35.",
+        required=False,
+        type=float,
+        default=1.35,
+    )
+    parser_workflow_cnv_calling.add_argument(
+        "--trans_prob",
+        help="Transition probability of the HMM to change state from WT to CNV. Default is 0.001. Lower values prefer longer CNVs, higher values prefer shorter CNVs.",
+        required=False,
+        type=float,
+        default=0.001,
+    )
+    parser_workflow_cnv_calling.add_argument(
+        "--plot_regions",
+        help="If true, the CNV calling script plots heatmaps of the regions.",
+        required=False,
+        type=bool,
+        default=False,
     )
     parser_workflow_cnv_calling.set_defaults(func=workflow_cnv_calling.workflow_cnv_calling)
 
@@ -401,15 +521,23 @@ def get_parser():
         ),
     )
     parser_workflow_untangle.add_argument(
-        "-w", "--workdir", help="Path to the snakemake workdir.", required=True, type=str,
+        "-w",
+        "--workdir",
+        help="Path to the snakemake workdir.",
+        required=True,
+        type=str,
     )
     parser_workflow_untangle.add_argument(
-        "-r", "--reference", help="Path to the genomic reference.", required=True, type=str,
+        "-r",
+        "--reference",
+        help="Path to the genomic reference.",
+        required=True,
+        type=str,
     )
     parser_workflow_untangle.add_argument(
         "-m",
         "--metafile",
-        help="Path to the file containing the meta information. It is a .tsv of the scheme -panel bams.txt bed.bed. \
+        help="Path to the file containing the meta information. It is a .tsv of the scheme [panel] [bams.txt] [bed.bed]. \
             It aligns each desired panel name with the corresponding .bam files and the .bed file.",
         required=True,
         type=str,
@@ -417,6 +545,21 @@ def get_parser():
 
     parser_workflow_untangle.add_argument(
         "-c",
+        "--coverages",
+        help="Output file path to coverages matrix (e.g. coverages.tsv).",
+        required=True,
+        type=str,
+    )
+
+    parser_workflow_untangle.add_argument(
+        "-b",
+        "--bedfile",
+        required=True,
+        type=str,
+        help="Output file path to BED file that will contain the union of all given BED files",
+    )
+
+    parser_workflow_untangle.add_argument(
         "--cores",
         help="Number of used cores in snakemake workflow. Default is 32.",
         required=False,
@@ -432,26 +575,20 @@ def get_parser():
         default="",
     )
 
-    #    parser_workflow_untangle.add_argument(
-    #        '--drmaa',
-    #        dest='drmaa',
-    #        action='store_true'
-    #    )
-
     parser_workflow_untangle.add_argument(
         "--drmaa_mem",
-        help="Number of megabytes used with drmaa. Default is 16000",
+        help="Number of megabytes used with drmaa. Suggested is 16000. If --drmaa_mem and --drmaa_time are given, this workflow will automatically use --drmaa in its snakemake call.",
         required=False,
         type=int,
-        default=16000,
+        default=None,
     )
 
     parser_workflow_untangle.add_argument(
         "--drmaa_time",
-        help="Maximum number of hours:minutes per job. Default is 4:00",
+        help="Maximum number of hh:mm per job. Suggested is 4:00.",
         required=False,
         type=str,
-        default="4:00",
+        default=None,
     )
 
     parser_workflow_untangle.set_defaults(func=workflow_untangle.workflow_untangle)
@@ -460,7 +597,8 @@ def get_parser():
     #  visualize untangling
     # =========================================================================
     parser_visualize_untangle = subparsers.add_parser(
-        "visualize_untangle", description=("Interactive untangling visualization"),
+        "visualize_untangle",
+        description=("Interactive untangling visualization"),
     )
 
     parser_visualize_untangle.add_argument(
@@ -479,7 +617,51 @@ def get_parser():
         "--cache-dir", help="Optional path to cache directory, avoids repeating startup computation"
     )
 
-    parser_visualize_untangle.add_argument("path", help="Path to untangling directory")
+    parser_visualize_untangle.add_argument(
+        "-m",
+        "--metafile",
+        help="Path to the file containing the meta information. It is a .tsv of the scheme [panel name] [path of bams.txt] [path of targets.bed]. \
+            It aligns each desired panel name with the corresponding .bam files and the .bed file.",
+        required=True,
+        type=str,
+    )
+
+    parser_visualize_untangle.add_argument(
+        "-c",
+        "--coverages",
+        required=True,
+        type=str,
+        help="Matrix in tsv format containing coverage values. Is output of 'workflow_untangle' step",
+    )
+
+    parser_visualize_untangle.add_argument(
+        "-b",
+        "--bedfile",
+        required=True,
+        type=str,
+        help="Path to BED file that will contain the union of all given BED files",
+    )
+
+    parser_visualize_untangle.add_argument(
+        "-d",
+        "--new_panel_assignments_directory",
+        help="Path to directory that will contain the output lists of paths to .bam-files, which were re-assigned to the given panels according to clustering.",
+    )
+
+    # parser_visualize_untangle.add_argument(
+    #    "-p",
+    #    "--panels",
+    #    required=True,
+    #    type=str,
+    #    help="Path to the directory that will contain the final lists of bam-files grouped by panels")
+
+    # parser_visualize_untangle.add_argument(
+    #    "-a",
+    #    "--batches",
+    #    required=True,
+    #    type=str,
+    #    help="Path to the directory that will contain the final lists of bam-files grouped by batches",
+    # )
 
     def viz_untangle(args):
         """Helper function that launches the Dash webserver for untangling visualization."""
@@ -491,13 +673,27 @@ def get_parser():
             else:
                 settings.CACHE_DIR = os.path.join(tmpdir, "cache")
             os.makedirs(settings.CACHE_DIR, exist_ok=True)
-            settings.setup_paths(args.path)
+            settings.setup_paths(args)
+
+            settings.BATCH_OUTPUT_PATH = args.new_panel_assignments_directory
 
             from .viz_untangle.app import app  # noqa
             from .viz_untangle import store
 
             if settings.CACHE_PRELOAD_DATA:
                 store.load_all_data(settings.UNTANGLE_SETTINGS)
+            from .viz_untangle import ui_plots
+
+            ## XXX
+            us = settings.UNTANGLE_SETTINGS
+            data = store.load_all_data(us)
+            ui_plots.plot_clustermap_clustering_as_base64(
+                data, store.compute_acluster(us), store.compute_clustercoldict(us)
+            )
+            # ui_plots.plot_clustermap_batches_as_base64(
+            #    data, store.compute_acluster(us), store.compute_clustercoldict(us)
+            # )
+            ## XXX
             app.run_server(host=args.host, port=args.port, debug=args.debug)
 
     parser_visualize_untangle.set_defaults(func=viz_untangle)

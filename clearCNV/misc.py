@@ -23,6 +23,7 @@ def execs_available(execs: typing.List[str]) -> None:
 
 def merge_bedfile(args):
     # TODO: used anywhere besides tests?
+    # Yes! Each time target counts are created from bam files!
     cmd_merge = ["bedtools", "merge", "-i", args.infile, "-c", "4", "-o", "collapse"]
     cmd_sort = ["sort", "-V", "-k1,1", "-k2,2"]
     with open(args.outfile, "wt") as f:
@@ -67,10 +68,11 @@ def prepare_untangling(args):
     META = pd.read_csv(args.metafile, sep="\t")
     # prepare bamsfile
     pathlib.Path(args.bamsfile).absolute().parent.mkdir(parents=True, exist_ok=True)
-    with open(args.bamsfile, "wt") as f:
-        L = [[l.rstrip("\n") for l in open(bam)] for bam in META.iloc[:, 1]]
-        for b in set([val for l in L for val in l]):
-            print(b, file=f)
+    f = open(args.bamsfile, "wt")
+    L = [[l.rstrip("\n") for l in open(bam)] for bam in META.iloc[:, 1]]
+    for b in set([val for l in L for val in l]):
+        print(b, file=f)
+    f.close()
     merge_bedfiles(META.iloc[:, 2], args.bedfile)
 
 

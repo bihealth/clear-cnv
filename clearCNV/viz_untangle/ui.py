@@ -7,6 +7,8 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.express as px
 
+import seaborn as sns
+
 from .cache import cache
 from . import settings
 from . import store
@@ -45,23 +47,40 @@ def render_tsne(us: UntangleSettings):
 
 @cache.memoize()
 def render_agg_clust(us: UntangleSettings):
-    return px.scatter(store.compute_acluster(us), x="X", y="Y", color="clustering")
+    return px.scatter(store.compute_acluster(us), x="X", y="Y", color="new_assignments")
 
 
 @cache.memoize()
-def render_clustermap_panels(us: UntangleSettings):
+def render_image_cluster_panels(us: UntangleSettings):
     data = store.load_all_data(us)
     img_b64 = ui_plots.plot_clustermap_panels_as_base64(data, store.compute_panelcoldict(us))
     return html.Img(src="data:image/png;base64,%s" % img_b64, className="img-responsive")
 
 
 @cache.memoize()
-def render_clustermap_clustering(us: UntangleSettings):
+def render_image_cluster_clustering(us: UntangleSettings):
     data = store.load_all_data(us)
     img_b64 = ui_plots.plot_clustermap_clustering_as_base64(
         data, store.compute_acluster(us), store.compute_clustercoldict(us)
     )
     return html.Img(src="data:image/png;base64,%s" % img_b64, className="img-responsive")
+
+
+# @cache.memoize()
+# def render_image_batches_clustering(us: UntangleSettings):
+#    data = store.load_all_data(us)
+#    img_b64 = ui_plots.plot_clustermap_batches_as_base64(
+#        data, store.compute_acluster(us), store.compute_clustercoldict(us)
+#    )
+#    return html.Img(src="data:image/png;base64,%s" % img_b64, className="img-responsive")
+
+
+@cache.memoize()
+def render_images_batch_separation(us: UntangleSettings):
+    return [
+        dcc.Graph(figure=px.scatter(p, x="X", y="Y", color="batch"), id="batch-separation-%i" % i)
+        for (i, p) in enumerate(store.compute_batches(us))
+    ]
 
 
 def render_main_content():
@@ -70,7 +89,7 @@ def render_main_content():
     # thresh: int = 50
     # min_group_size: int = 20
     # pca_components: int = 20
-    # batch_factor: float = 0.985
+    # batch_num: float = 0.985
     # pca_seed: int = 100
 
     controls = dbc.Card(
@@ -111,43 +130,65 @@ def render_main_content():
             ),
             dbc.FormGroup(
                 children=[
-                    dbc.Label("Batch Factor"),
+                    dbc.Label("number of batches (clusters)"),
                     dbc.Input(
                         id="input-batch-factor",
-                        type="number",
-                        value=settings.UNTANGLE_SETTINGS.batch_factor,
+                        type="text",
+                        value=settings.UNTANGLE_SETTINGS.batch_num,
                         debounce=True,
                     ),
                 ],
             ),
             html.Div(id="buffer-cluster-params", style={"display": "none"}),
+            dbc.Button("Save", id="input-save-batches-button"),
+            html.P(id="buffer-save-batches-text"),
         ],
         body=True,
     )
 
-    def make_card(id_):
-        return dbc.Card(
-            dbc.CardBody(
-                dbc.Spinner([dcc.Graph(id=id_)], color="primary"), className="mt-3 text-center",
-            ),
-            className="border-top-0 rounded-0",
-        )
+    def make_card(id_, type_="graph"):
+        if type_ == "graph":
+            return dbc.Card(
+                dbc.CardBody(
+                    dbc.Spinner([dcc.Graph(id=id_)], color="primary"),
+                    className="mt-3 text-center",
+                ),
+                className="border-top-0 rounded-0",
+            )
+        else:
+            return dbc.Card(
+                dbc.CardBody(
+                    dbc.Spinner(color="primary", id=id_),
+                    className="mt-3 text-center",
+                ),
+                className="border-top-0 rounded-0",
+            )
 
     tabs_content = [
         dbc.Tab(make_card("graph-pca"), label="PCA"),
         dbc.Tab(make_card("graph-tsne"), label="tSNE"),
         dbc.Tab(make_card("graph-agg-clust"), label="Agg. Clust."),
-        # TODO: :-{ somehow the following crashes with
-        # RecursionError: maximum recursion depth exceeded while getting the str of an object
-        # dbc.Tab(make_card(render_clustermap_panels()), label="Clustermap Panels"),
-        # dbc.Tab(make_card(render_clustermap_clustering()), label="Clustermap Clustering"),
+        dbc.Tab(
+            make_card("container-image-cluster-panels", type_="html"), label="Original assignment"
+        ),
+        dbc.Tab(
+            make_card("container-image-cluster-clustering", type_="html"), label="New assignment"
+        ),
+        # dbc.Tab(
+        #    make_card("container-image-batch-clustering", type_="html"), label="Batches clustering"
+        # ),
+        dbc.Tab(make_card("container-image-batch-separation", type_="html"), label="Batches"),
     ]
 
     return html.Div(
         children=[
             dbc.Row(
                 children=[
-                    dbc.Col(children=[controls], id="controls", md=3,),
+                    dbc.Col(
+                        children=[controls],
+                        id="controls",
+                        md=3,
+                    ),
                     dbc.Col(children=[dbc.Tabs(tabs_content)], id="plots", md=9),
                 ]
             )
