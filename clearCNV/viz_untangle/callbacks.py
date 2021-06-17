@@ -23,16 +23,14 @@ def register_control_to_buffer(app):
         Output("buffer-cluster-params", "children"),
         [
             Input("input-thresh", "value"),
-            Input("input-min-group-size", "value"),
             Input("input-pca-components", "value"),
             Input("input-batch-factor", "value"),
         ],
     )
-    def parameters_to_json(threshold, min_group_size, pca_components, batch_num):
+    def parameters_to_json(threshold, pca_components, batch_num):
         return json.dumps(
             {
                 "threshold": threshold,
-                "min_group_size": min_group_size,
                 "pca_components": pca_components,
                 "batch_num": batch_num,
             }

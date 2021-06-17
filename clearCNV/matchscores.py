@@ -13,8 +13,8 @@ def matchscores(args):
     intsv_path = args.coverages
     matchscores_path = args.matchscores
     expected_cnv_rate = args.expected_artefacts
-    CORES = min([args.cores, mp.cpu_count()]) if args.cores else mp.cpu_count()
-    fast = True
+    CORES = args.cores if args.cores else mp.cpu_count()
+    fast = True if args.fast else False
 
     D0 = util.load_dataframe(intsv_path)
     D3a = util.normalize_within_exon(
@@ -24,9 +24,6 @@ def matchscores(args):
             )
         )
     )
-    # center biased samples
-    D3a = util.center_samples(D3a)
-
     # only take every i-th target into account to speed up
     if fast:
         X = D3a.T[D3a.index[:: min([len(D3a.index), math.ceil(len(D3a.index) / 1000)])]].T

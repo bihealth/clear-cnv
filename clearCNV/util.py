@@ -159,18 +159,18 @@ def print_clustermap(df, path, title, fileformat="pdf"):
     plt.savefig(path, format=fileformat)
 
 
-def hmm_predict(D):
-    df = D.copy()
-    model = hmm.GaussianHMM(n_components=3, covariance_type="full")
-    model.startprob_ = np.array([0.0001, 0.9998, 0.0001])
-    model.transmat_ = np.array(
-        [[0.9999, 0.0001, 0.0], [0.0001, 0.9998, 0.0001], [0.0, 0.0001, 0.9999]]
-    )
-    model.means_ = np.array([[-2], [0.0], [2]])
-    model.covars_ = np.tile(np.identity(1), (3, 1, 1))
-    for col in D.columns:
-        df[col] = model.predict([[s] for s in D[col]])
-    return df
+#def hmm_predict(D):
+#    df = D.copy()
+#    model = hmm.GaussianHMM(n_components=3, covariance_type="full")
+#    model.startprob_ = np.array([0.0001, 0.9998, 0.0001])
+#    model.transmat_ = np.array(
+#        [[0.9999, 0.0001, 0.0], [0.0001, 0.9998, 0.0001], [0.0, 0.0001, 0.9999]]
+#    )
+#    model.means_ = np.array([[-2], [0.0], [2]])
+#    model.covars_ = np.tile(np.identity(1), (3, 1, 1))
+#    for col in D.columns:
+#        df[col] = model.predict([[s] for s in D[col]])
+#    return df
 
 
 def escore(target, rs):
@@ -214,13 +214,13 @@ def npcolor(D, factor=0.08):
 
 def hmm_scores(
     X,
-    means=np.array([[-3.0], [0.0], [5.0]]),
+    means=np.array([[-3.5], [0.0], [4.5]]),
     transitionprobs=np.array(
-        [[0.9999, 0.0001, 0.0], [0.0001, 0.99989, 0.00001], [0.0, 0.00001, 0.99999]]
+        [[0.999, 0.001, 0.0], [0.001, 0.998, 0.001], [0.0, 0.001, 0.999]]
     ),
 ):
     model = hmm.GaussianHMM(n_components=3, covariance_type="full")
-    model.startprob_ = np.array([0.0001, 0.9998, 0.0001])
+    model.startprob_ = np.array([0.001, 0.998, 0.001])
     model.transmat_ = np.array(transitionprobs)
     model.means_ = np.array(means)
     model.covars_ = np.tile(np.identity(1), (3, 1, 1))

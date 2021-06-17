@@ -14,7 +14,7 @@ def create_config(configpath, args):
         print("expected_artefacts: '" + str(args.expected_artefacts) + "'", file=f)
         print("sample_score_factor: '" + str(args.sample_score_factor) + "'", file=f)
         print("minimum_group_sizes: '" + str(args.minimum_group_sizes) + "'", file=f)
-        print("sensitivity: '" + str(args.sensitivity) + "'", file=f)
+        print("zscale: '" + str(args.zscale) + "'", file=f)
         print("size: '" + str(args.size) + "'", file=f)
         print("del_cutoff '" + str(args.del_cutoff) + "'", file=f)
         print("dup_cutoff '" + str(args.dup_cutoff) + "'", file=f)

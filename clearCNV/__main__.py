@@ -56,7 +56,14 @@ def get_parser():
         type=int,
         default=0,
     )
-    parser_matchscores.set_defaults(func=matchscores.matchscores)
+    parser_matchscores.add_argument(
+        "--fast",
+        help="If set, clearCNV will speed up matchscore calculation by taking only at most 2.000 targets per sample into account.",
+        required=False,
+        dest='fast',
+        action='store_true'
+    )
+    parser_matchscores.set_defaults(fast=False, func=matchscores.matchscores)
 
     # =========================================================================
     #  cnv calling
@@ -136,8 +143,8 @@ def get_parser():
     )
     parser_cnv_calling.add_argument(
         "-s",
-        "--z-scale",
-        help="A higher z-scale results in more CNV calls. Should only be 0.0 <= z-scale <= 2.0. Default is 0.65.",
+        "--zscale",
+        help="A higher z-scale results in more CNV calls. Should only be 0.0 <= zscale <= 2.0. Default is 0.65.",
         required=False,
         type=float,
         default=0.65,
@@ -468,8 +475,8 @@ def get_parser():
         default=20,
     )
     parser_workflow_cnv_calling.add_argument(
-        "--z-scale",
-        help="A higher z-scale results in more CNV calls. Should only be 0.0 <= z-scale <= 2.0. Default is 0.65.",
+        "--zscale",
+        help="A higher z-scale results in more CNV calls. Should only be 0.0 <= zscale <= 2.0. Default is 0.65.",
         required=False,
         type=float,
         default=0.65,

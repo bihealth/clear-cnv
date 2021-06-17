@@ -188,62 +188,6 @@ def cnv_calling(args):
         sample_scores += sample_scores_buffer
 
     # extract single exon CNVs
-    S = pd.DataFrame(sample_scores, index=SAMPLES).T
-    DFZ = pd.DataFrame(z_scores_scaled, columns=INDEX, index=SAMPLES).T
-    DFR = pd.DataFrame(ratio_scores, columns=INDEX, index=SAMPLES).T
-    SINGLE_EXONS = pd.concat(
-        [
-            pd.DataFrame(
-                [
-                    [
-                        DFZ.columns[c],
-                        *DFZ.index[i].split("_"),
-                        "DEL",
-                        1,
-                        DFZ.iloc[i, c],
-                        float(S[DFZ.columns[c]]),
-                    ]
-                    for i, c in zip(*np.where((DFZ < -5) & (DFR < DEL_CUTOFF)))
-                ],
-                columns=[
-                    "sample",
-                    "chr",
-                    "start",
-                    "end",
-                    "gene",
-                    "aberration",
-                    "size",
-                    "score",
-                    "sample_score",
-                ],
-            ),
-            pd.DataFrame(
-                [
-                    [
-                        DFZ.columns[c],
-                        *DFZ.index[i].split("_"),
-                        "DUP",
-                        1,
-                        DFZ.iloc[i, c],
-                        float(S[DFZ.columns[c]]),
-                    ]
-                    for i, c in zip(*np.where((DFZ > 6) & (DFR > DUP_CUTOFF)))
-                ],
-                columns=[
-                    "sample",
-                    "chr",
-                    "start",
-                    "end",
-                    "gene",
-                    "aberration",
-                    "size",
-                    "score",
-                    "sample_score",
-                ],
-            ),
-        ]
-    )
-
     print("compute HMM on z-scores")
     # HMM guided CNV candidates
     # =========================================================================
@@ -254,8 +198,10 @@ def cnv_calling(args):
     # HMM guided CNV candidates
     # =========================================================================
     means = np.array([[mean_del], [mean_median], [mean_dup]])
+    p_trans = TRANSPROB
+    p_stay  = 1.0-(2.0*TRANSPROB)
     transitionprobs = np.array(
-        [[1.0-TRANSPROB, TRANSPROB, 0.0], [TRANSPROB, 1.0-2.0*TRANSPROB, TRANSPROB], [0.0, TRANSPROB, 1.0-TRANSPROB]]
+        [[p_stay, p_trans, p_trans], [p_trans, p_stay, p_trans], [p_trans, p_trans, p_stay]]
     )
     #HMM = np.array([util.hmm_scores(sample, probs, transitionprobs) for sample in z_scores_scaled])
     # =========================================================================
@@ -315,9 +261,11 @@ def cnv_calling(args):
             "sample_score",
         ],
     ).sort_values(by="score", ascending=False)
+
+
+    # extract single exon CNVs
     RZ = pd.DataFrame(z_scores_scaled, columns=INDEX, index=SAMPLES).T
     RR = pd.DataFrame(ratio_scores, columns=INDEX, index=SAMPLES).T
-
     S = pd.DataFrame(sample_scores, index=SAMPLES).T
     SINGLE_EXONS = pd.concat(
         [
@@ -397,8 +345,7 @@ def cnv_calling(args):
         for h in ca.hitsA_not_in_hitsB(SINGLE_HITS, BIG_HITS)
     ]
     FINAL = pd.concat([RD, pd.DataFrame(X, columns=RD.columns)])
-    FINAL["score"] = FINAL["score"].astype(float)#.apply(x)
-    FINAL["score"] = FINAL["score"].apply(lambda x: float(abs(x)))
+    FINAL["score"] = FINAL["score"].astype(float).apply(lambda x: float(abs(x)))
     FINAL = FINAL.sort_values(by="score", ascending=False)
 
     print("saving results...")

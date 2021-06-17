@@ -87,7 +87,6 @@ def render_main_content():
     """Render page main content"""
 
     # thresh: int = 50
-    # min_group_size: int = 20
     # pca_components: int = 20
     # batch_num: float = 0.985
     # pca_seed: int = 100
@@ -102,17 +101,6 @@ def render_main_content():
                         id="input-thresh",
                         type="number",
                         value=settings.UNTANGLE_SETTINGS.threshold,
-                        debounce=True,
-                    ),
-                ],
-            ),
-            dbc.FormGroup(
-                children=[
-                    dbc.Label("Min. Group Size"),
-                    dbc.Input(
-                        id="input-min-group-size",
-                        type="number",
-                        value=settings.UNTANGLE_SETTINGS.min_group_size,
                         debounce=True,
                     ),
                 ],

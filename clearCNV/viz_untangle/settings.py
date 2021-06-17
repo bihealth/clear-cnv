@@ -44,7 +44,6 @@ CACHE_PRELOAD_DATA = True
 @attr.s(frozen=True, auto_attribs=True)
 class UntangleSettings:
     threshold: int = 50
-    min_group_size: int = 20
     pca_components: int = 20
     batch_num: str = "2"
     pca_seed: int = 100
