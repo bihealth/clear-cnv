@@ -240,6 +240,11 @@ def compute_acluster(us: settings.UntangleSettings):
         for i in range(len(data.panels))
     }
     XD["new_assignments"] = list(map(lambda x: cluster_panel_dict[x], clustering.labels_))
+    #############
+    ### DEBUG ###
+    XD.to_csv("/home/memsonmi/Desktop/test.tsv",sep='\t')
+    ### DEBUG ###
+    #############
     logger.info("... done computing Agglomerative Clustering.")
     return XD
 
