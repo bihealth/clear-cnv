@@ -6,6 +6,7 @@ import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.express as px
+from matplotlib.colors import rgb2hex
 
 import seaborn as sns
 
@@ -37,17 +38,17 @@ def render_navbar():
 
 @cache.memoize()
 def render_pca(us: UntangleSettings):
-    return px.scatter(store.compute_pca(us), x="X", y="Y", color="panel")
+    return px.scatter(store.compute_pca(us), x="X", y="Y", color="panel",color_discrete_sequence=[rgb2hex(v) for v in store.compute_clustercoldict(us).values()])
 
 
 @cache.memoize()
 def render_tsne(us: UntangleSettings):
-    return px.scatter(store.compute_tsne(us), x="X", y="Y", color="panel")
+    return px.scatter(store.compute_tsne(us), x="X", y="Y", color="panel",color_discrete_sequence=[rgb2hex(v) for v in store.compute_clustercoldict(us).values()])
 
 
 @cache.memoize()
 def render_agg_clust(us: UntangleSettings):
-    return px.scatter(store.compute_acluster(us), x="X", y="Y", color="new_assignments")
+    return px.scatter(store.compute_acluster(us)[0], x="X", y="Y", color="new_assignments",color_discrete_sequence=[rgb2hex(v) for v in store.compute_clustercoldict(us).values()])
 
 
 @cache.memoize()
@@ -61,7 +62,7 @@ def render_image_cluster_panels(us: UntangleSettings):
 def render_image_cluster_clustering(us: UntangleSettings):
     data = store.load_all_data(us)
     img_b64 = ui_plots.plot_clustermap_clustering_as_base64(
-        data, store.compute_acluster(us), store.compute_clustercoldict(us)
+        data, *store.compute_acluster(us), store.compute_clustercoldict(us)
     )
     return html.Img(src="data:image/png;base64,%s" % img_b64, className="img-responsive")
 

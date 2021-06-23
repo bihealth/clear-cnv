@@ -72,7 +72,7 @@ def _find_batches(xd, n=1):
     GM = GaussianMixture(n_components=max([0, n]), n_init=10).fit(xds)
     # print(GM.bic(xds))
     xds_df = pd.DataFrame(xds, index=xd.index, columns=["X", "Y"])
-    xds_df["batch"] = GM.predict(xds)
+    xds_df["batch"] = GM.predict(xds).astype(str)
     xds_df["panel"] = xd["panel"]
     # BIC = GM.bic(xds)
     return xds_df
@@ -220,8 +220,6 @@ def compute_tsne(us: settings.UntangleSettings):
     XD = pd.DataFrame(X_embedded)
     XD.columns = ["X", "Y"]
     XD["panel"] = list(data.samples["panel"])
-    # for paper demo only
-    # XD["panel"] = [paneldict[p] for p in XD["panel"]]
     logger.info("... done computing tSNE.")
     return XD
 
@@ -233,6 +231,7 @@ def compute_acluster(us: settings.UntangleSettings):
     XD = compute_tsne(us)
     clustering = AgglomerativeClustering(n_clusters=len(data.panels)).fit(XD[["X", "Y"]].to_numpy())
     # TODO: yikes, inplace update with cached data...
+    # A: not really. 'XD["clustering"]' is a new column.
     XD["clustering"] = clustering.labels_
     # majority vote for panel assignments
     cluster_panel_dict = {
@@ -240,13 +239,8 @@ def compute_acluster(us: settings.UntangleSettings):
         for i in range(len(data.panels))
     }
     XD["new_assignments"] = list(map(lambda x: cluster_panel_dict[x], clustering.labels_))
-    #############
-    ### DEBUG ###
-    XD.to_csv("/home/memsonmi/Desktop/test.tsv",sep='\t')
-    ### DEBUG ###
-    #############
     logger.info("... done computing Agglomerative Clustering.")
-    return XD
+    return (XD,cluster_panel_dict)
 
 
 """@cache.memoize()
@@ -261,7 +255,7 @@ def compute_batchcluster(us: settings.UntangleSettings):
 @cache.memoize()
 def compute_panelcoldict(us: settings.UntangleSettings):
     data = load_all_data(us)
-    clustercolors = cm.get_cmap("viridis", len(data.panels))
+    clustercolors = cm.get_cmap(us.colormap, len(data.panels))
     panelcoldict = {
         data.panels[i]: c for i, c in enumerate(clustercolors(np.linspace(0, 1, len(data.panels))))
     }
@@ -271,7 +265,8 @@ def compute_panelcoldict(us: settings.UntangleSettings):
 @cache.memoize()
 def compute_clustercoldict(us: settings.UntangleSettings):
     data = load_all_data(us)
-    clustercolors = cm.get_cmap("viridis", len(data.panels))
+    clustercolors = cm.get_cmap(us.colormap, len(data.panels))
+    # cluster ~ color ~ panel
     clustercoldict = {
         i: c for i, c in enumerate(clustercolors(np.linspace(0, 1, len(data.panels))))
     }
@@ -281,7 +276,7 @@ def compute_clustercoldict(us: settings.UntangleSettings):
 @cache.memoize()
 def compute_batches(us: settings.UntangleSettings):
     data = load_all_data(us)
-    XD = compute_acluster(us)
+    XD,cluster_panel_dict = compute_acluster(us)
     XD.index = data.D1.columns
     batches = []
     for i, cluster in enumerate(sorted(set(XD["new_assignments"]))):
@@ -315,7 +310,7 @@ def compute_batches(us: settings.UntangleSettings):
 @cache.memoize()
 def save_results(us: settings.UntangleSettings, n_clicks):
     data = load_all_data(us)
-    XD = compute_acluster(us)
+    XD,cluster_panel_dict = compute_acluster(us)
     # save new panel assignments
     XD.index = data.allsamples.index
     XD["paths"] = data.allsamples["path"]

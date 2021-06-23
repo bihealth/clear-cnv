@@ -695,7 +695,7 @@ def get_parser():
             us = settings.UNTANGLE_SETTINGS
             data = store.load_all_data(us)
             ui_plots.plot_clustermap_clustering_as_base64(
-                data, store.compute_acluster(us), store.compute_clustercoldict(us)
+                data, *store.compute_acluster(us), store.compute_clustercoldict(us)
             )
             # ui_plots.plot_clustermap_batches_as_base64(
             #    data, store.compute_acluster(us), store.compute_clustercoldict(us)
