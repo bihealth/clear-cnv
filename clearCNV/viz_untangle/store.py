@@ -77,23 +77,6 @@ def _find_batches(xd, n=1):
     # BIC = GM.bic(xds)
     return xds_df
 
-
-"""def _find_batches(xd, factor=0.985, _n=1, _bic=None, _df=None):
-    xds = xd[["X", "Y"]].to_numpy()
-    xindex = xd.index
-    GM = GaussianMixture(n_components=_n, n_init=10).fit(xds)
-    # print(GM.bic(xds))
-    xds_df = pd.DataFrame(xds, index=xd.index, columns=["X", "Y"])
-    xds_df["batch"] = GM.predict(xds)
-    BIC = GM.bic(xds)
-
-    if _bic and factor * _bic <= BIC:
-        # _df.to_csv(str(savepath) + ".tsv", sep="\t", header=True, index=True)
-        return (_n - 1, _bic, _df)
-    else:
-        return _find_batches(xd, factor, _n + 1, BIC, xds_df)"""
-
-
 @cache.memoize()
 def load_all_data(us: settings.UntangleSettings):
     if PICKLE_DATA and os.path.exists("all_data.bin"):
