@@ -22,7 +22,6 @@ def create_config(configpath, args):
         print("plotregions '" + str(args.plot_regions) + "'", file=f)
 
 
-
 def workflow_cnv_calling(args):
     configpath = (
         pathlib.Path(__file__).absolute().parent

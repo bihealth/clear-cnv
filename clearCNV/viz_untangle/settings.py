@@ -47,7 +47,7 @@ class UntangleSettings:
     pca_components: int = 20
     batch_num: str = "2"
     pca_seed: int = 100
-    colormap = 'tab20'
+    colormap = "tab20"
 
 
 #: Configuration for untangling.

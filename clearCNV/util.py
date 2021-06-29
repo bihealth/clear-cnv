@@ -159,7 +159,7 @@ def print_clustermap(df, path, title, fileformat="pdf"):
     plt.savefig(path, format=fileformat)
 
 
-#def hmm_predict(D):
+# def hmm_predict(D):
 #    df = D.copy()
 #    model = hmm.GaussianHMM(n_components=3, covariance_type="full")
 #    model.startprob_ = np.array([0.0001, 0.9998, 0.0001])
@@ -215,9 +215,7 @@ def npcolor(D, factor=0.08):
 def hmm_scores(
     X,
     means=np.array([[-3.5], [0.0], [4.5]]),
-    transitionprobs=np.array(
-        [[0.999, 0.001, 0.0], [0.001, 0.998, 0.001], [0.0, 0.001, 0.999]]
-    ),
+    transitionprobs=np.array([[0.999, 0.001, 0.0], [0.001, 0.998, 0.001], [0.0, 0.001, 0.999]]),
 ):
     model = hmm.GaussianHMM(n_components=3, covariance_type="full")
     model.startprob_ = np.array([0.001, 0.998, 0.001])
@@ -286,11 +284,11 @@ def center_samples_np(D, limit=50):
     return normalize(D, axis=1) + 1 - np.median(normalize(D, axis=1), axis=0)
 
 
-def calling_cnv(index_sample, D, MS, index,  EXPECTED_CNV_RATE, SENSITIVITY=0.7):
+def calling_cnv(index_sample, D, MS, index, EXPECTED_CNV_RATE, SENSITIVITY=0.7):
     sample_group = MS.iloc[index_sample]
     # per target median normalized sample
     # select sample group
-    D1 = D[:,sample_group]
+    D1 = D[:, sample_group]
     # normalize sample per target
     ratio_values = D[:, index_sample] / np.median(D1, axis=1)
     # normalize sample group per target
@@ -299,14 +297,13 @@ def calling_cnv(index_sample, D, MS, index,  EXPECTED_CNV_RATE, SENSITIVITY=0.7)
 
     # new metric instead of z-scores
     zscores = (ratio_values - 1.0) / (
-        trimmed_std_np(D3, axis=1, alpha=EXPECTED_CNV_RATE) ** (2-SENSITIVITY)
+        trimmed_std_np(D3, axis=1, alpha=EXPECTED_CNV_RATE) ** (2 - SENSITIVITY)
     )
 
     sample_score = 1.0 / (
-        trimmed_std_np(zscores[:, None], axis=0, alpha=EXPECTED_CNV_RATE)[0]
-        ** (2-SENSITIVITY)
+        trimmed_std_np(zscores[:, None], axis=0, alpha=EXPECTED_CNV_RATE)[0] ** (2 - SENSITIVITY)
     )
-    #print(index_sample,D1.shape,sample_score)
+    # print(index_sample,D1.shape,sample_score)
     z_scores_scaled = zscores * sample_score
     return (index_sample, index, sample_score, ratio_values, z_scores_scaled)
 
@@ -317,21 +314,33 @@ def turntransform(v):
     v += np.arange(1, 0, -1 / len(v))
     return v
 
-def select_region(region,df,sample,matchscores_bools_selected,buffer = 5):
+
+def select_region(region, df, sample, matchscores_bools_selected, buffer=5):
     cols = df.columns
     if sample:
-        #cols = np.append(np.array(df.loc[:,matchscores_bools_selected.loc[:,sample]].columns),sample)
-        cols = np.array(df.loc[:,matchscores_bools_selected.loc[:,sample]].columns)
-    target = re.split('[^0-9]',region.replace(" ", ""))
-    index = np.array([(c[0] == target[0] and int(c[1]) >= int(target[1])-5 and int(c[2]) <= int(target[2])+5) for c in [s.split('_') for s in df.index]])
+        # cols = np.append(np.array(df.loc[:,matchscores_bools_selected.loc[:,sample]].columns),sample)
+        cols = np.array(df.loc[:, matchscores_bools_selected.loc[:, sample]].columns)
+    target = re.split("[^0-9]", region.replace(" ", ""))
+    index = np.array(
+        [
+            (
+                c[0] == target[0]
+                and int(c[1]) >= int(target[1]) - 5
+                and int(c[2]) <= int(target[2]) + 5
+            )
+            for c in [s.split("_") for s in df.index]
+        ]
+    )
     n = index.shape[0]
-    lower = np.argmax(index==1)
-    upper = np.argmax(index[lower:]==0) + lower
-    index[max(0,lower-buffer):min(upper+buffer,n)] = True
-    #df.loc[index,cols]
-    r = df.loc[index,cols].copy()
+    lower = np.argmax(index == 1)
+    upper = np.argmax(index[lower:] == 0) + lower
+    index[max(0, lower - buffer) : min(upper + buffer, n)] = True
+    # df.loc[index,cols]
+    r = df.loc[index, cols].copy()
     if not sample:
         return r
-    spacer = pd.DataFrame([float(round(np.mean(r.mean())))]*r.shape[0],index=r.index,columns=['spacer'])
-    rsample = pd.DataFrame(df.loc[index,sample])
-    return pd.concat([r.T,spacer.T,rsample.T]).T
+    spacer = pd.DataFrame(
+        [float(round(np.mean(r.mean())))] * r.shape[0], index=r.index, columns=["spacer"]
+    )
+    rsample = pd.DataFrame(df.loc[index, sample])
+    return pd.concat([r.T, spacer.T, rsample.T]).T
