@@ -27,13 +27,14 @@ Also, a cluster config file in .json format can be given with `--cluster_configf
 
 #### 2. Visualize and adjust the clusterings and final panel assignments
 
-Again, run the following shell command from `clear-cnv/`:
+Run the following shell command from `clear-cnv/`:
 ```clearCNV visualize_untangle --metafile tests/testdata/meta.tsv --coverages tests/testdata/cov_untangling.tsv --bedfile tests/testdata/untangling_union.bed --new_panel_assignments_directory tests/testdata/panel_assignments```
 
 INPUT: files given by `--metafile`, `--coverages` and `--bedfile`.
 OUTPUT: files found in given directory `--new_panel_assignments_directory`.
 
-In this exact example, we used different file names but, if you use your own data, use the exact same file paths for `--metafile`, `--coverages` and `--bedfile` both on  `clearCNV workflow_untangle` and `clearCNV visualize_untangle`
+#### NOTE
+If you do sample re-asignment on your own data, followed by CNV-calling, then only one metafile, one coverages file and one bedfile will be used. This means that `--metafile`, `--coverages` and `--bedfile` are given the same file paths in both workflow steps `clearCNV workflow_untangle` and `clearCNV visualize_untangle` of clearCNV.
 
 ### Running Checks
 
