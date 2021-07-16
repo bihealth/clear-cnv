@@ -70,11 +70,12 @@ def _find_batches(xd, n=1):
     xds = xd[["X", "Y"]].to_numpy()
     xindex = xd.index
     GM = GaussianMixture(n_components=max([0, n]), n_init=10).fit(xds)
+    # print(GM.bic(xds))
     xds_df = pd.DataFrame(xds, index=xd.index, columns=["X", "Y"])
     xds_df["batch"] = GM.predict(xds).astype(str)
     xds_df["panel"] = xd["panel"]
+    # BIC = GM.bic(xds)
     return xds_df
-
 
 @cache.memoize()
 def load_all_data(us: settings.UntangleSettings):
@@ -191,7 +192,10 @@ def compute_pca(us: settings.UntangleSettings):
 def compute_tsne(us: settings.UntangleSettings):
     logger.info("Computing tSNE ...")
     data = load_all_data(us)
-    pca = PCA(n_components=us.pca_components, random_state=us.pca_seed,)
+    pca = PCA(
+        n_components=us.pca_components,
+        random_state=us.pca_seed,
+    )
     XT = pca.fit_transform(data.X.dropna(0).T)
 
     X_embedded = TSNE(n_components=2, random_state=us.pca_seed).fit_transform(XT)
@@ -219,17 +223,7 @@ def compute_acluster(us: settings.UntangleSettings):
     }
     XD["new_assignments"] = list(map(lambda x: cluster_panel_dict[x], clustering.labels_))
     logger.info("... done computing Agglomerative Clustering.")
-    return (XD, cluster_panel_dict)
-
-
-"""@cache.memoize()
-def compute_batchcluster(us: settings.UntangleSettings):
-    logger.info("Computing batchwise clustering ...")
-    data = load_all_data(us)
-    D1 = data.D1
-    D2 = util.normalize_within_sample(D1)
-    D3 = util.normalize_within_exon(D2)"""
-
+    return (XD,cluster_panel_dict)
 
 @cache.memoize()
 def compute_panelcoldict(us: settings.UntangleSettings):
@@ -255,7 +249,7 @@ def compute_clustercoldict(us: settings.UntangleSettings):
 @cache.memoize()
 def compute_batches(us: settings.UntangleSettings):
     data = load_all_data(us)
-    XD, cluster_panel_dict = compute_acluster(us)
+    XD,cluster_panel_dict = compute_acluster(us)
     XD.index = data.D1.columns
     batches = []
     for i, cluster in enumerate(sorted(set(XD["new_assignments"]))):
@@ -289,7 +283,7 @@ def compute_batches(us: settings.UntangleSettings):
 @cache.memoize()
 def save_results(us: settings.UntangleSettings, n_clicks):
     data = load_all_data(us)
-    XD, cluster_panel_dict = compute_acluster(us)
+    XD,cluster_panel_dict = compute_acluster(us)
     # save new panel assignments
     XD.index = data.allsamples.index
     XD["paths"] = data.allsamples["path"]

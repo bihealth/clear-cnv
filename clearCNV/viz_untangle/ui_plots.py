@@ -29,13 +29,8 @@ def plot_clustermap_panels_as_base64(data, panelcoldict):
     plt.figure(figsize=(8, 5))
     sns.clustermap(
         data.X.iloc[:: math.ceil(data.X.shape[0] / n), :: math.ceil(data.X.shape[1] / m)],
-        col_colors=list(
-            map(
-                lambda x: panelcoldict[x],
-                data.samples["panel"].iloc[:: math.ceil(data.X.shape[1] / m)],
-            )
-        ),
-        cbar_kws={"ticks": [0, 1]},
+        col_colors=list(map(lambda x: panelcoldict[x], data.samples["panel"].iloc[:: math.ceil(data.X.shape[1] / m)])),
+        cbar_kws={"ticks":[0,1]}
     )
     logger.info("... done creating panels clustermap.")
     with tempfile.NamedTemporaryFile(suffix=".png") as f:
@@ -47,21 +42,16 @@ def plot_clustermap_panels_as_base64(data, panelcoldict):
 
 @cache.memoize()
 def plot_clustermap_clustering_as_base64(data, XD, cluster_panel_dict, clustercoldict):
-    # assign_clustercolors_to_panels = ACP
-    ACP = {i: data.panels.index(p) for i, p in enumerate(cluster_panel_dict.values())}
+    #assign_clustercolors_to_panels = ACP
+    ACP = {i:data.panels.index(p) for i,p in enumerate(cluster_panel_dict.values())}
     logger.info("Creating clustering clustermap ...")
     n = min([data.X.shape[0], 1000])
     m = min([data.X.shape[1], 1000])
     plt.figure(figsize=(8, 5))
     sns.clustermap(
         data.X.iloc[:: math.ceil(data.X.shape[0] / n), :: math.ceil(data.X.shape[1] / m)],
-        col_colors=list(
-            map(
-                lambda x: clustercoldict[ACP[x]],
-                XD["clustering"].iloc[:: math.ceil(data.X.shape[1] / m)],
-            )
-        ),
-        cbar_kws={"ticks": [0, 1]},
+        col_colors=list(map(lambda x: clustercoldict[ACP[x]], XD["clustering"].iloc[:: math.ceil(data.X.shape[1] / m)])),
+        cbar_kws={"ticks":[0,1]}
     )
 
     logger.info("... done creating clustering clustermap.")
@@ -82,13 +72,8 @@ def plot_clustermap_batches_as_base64(data, XD, clustercoldict):
     D4 = D3.applymap(lambda x: max([0, min([x, 2])]))
     sns.clustermap(
         D4.iloc[:: math.ceil(D4.shape[0] / n), :: math.ceil(D4.shape[1] / m)],
-        col_colors=list(
-            map(
-                lambda x: clustercoldict[x],
-                XD["clustering"].iloc[:: math.ceil(data.X.shape[1] / m)],
-            )
-        ),
-        cbar_kws={"ticks": [0, 1]},
+        col_colors=list(map(lambda x: clustercoldict[x], XD["clustering"].iloc[:: math.ceil(data.X.shape[1] / m)])),
+        cbar_kws={"ticks":[0,1]}
     )
     logger.info("... done creating batches clustermap.")
     with tempfile.NamedTemporaryFile(suffix=".png") as f:

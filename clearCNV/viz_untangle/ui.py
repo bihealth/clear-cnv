@@ -38,35 +38,17 @@ def render_navbar():
 
 @cache.memoize()
 def render_pca(us: UntangleSettings):
-    return px.scatter(
-        store.compute_pca(us),
-        x="X",
-        y="Y",
-        color="panel",
-        color_discrete_sequence=[rgb2hex(v) for v in store.compute_clustercoldict(us).values()],
-    )
+    return px.scatter(store.compute_pca(us).sort_values(by='panel'), x="X", y="Y", color="panel",color_discrete_sequence=[rgb2hex(v) for v in store.compute_clustercoldict(us).values()])
 
 
 @cache.memoize()
 def render_tsne(us: UntangleSettings):
-    return px.scatter(
-        store.compute_tsne(us),
-        x="X",
-        y="Y",
-        color="panel",
-        color_discrete_sequence=[rgb2hex(v) for v in store.compute_clustercoldict(us).values()],
-    )
+    return px.scatter(store.compute_tsne(us).sort_values(by='panel'), x="X", y="Y", color="panel",color_discrete_sequence=[rgb2hex(v) for v in store.compute_clustercoldict(us).values()])
 
 
 @cache.memoize()
 def render_agg_clust(us: UntangleSettings):
-    return px.scatter(
-        store.compute_acluster(us)[0],
-        x="X",
-        y="Y",
-        color="new_assignments",
-        color_discrete_sequence=[rgb2hex(v) for v in store.compute_clustercoldict(us).values()],
-    )
+    return px.scatter(store.compute_acluster(us)[0].sort_values(by='new_assignments'), x="X", y="Y", color="new_assignments",color_discrete_sequence=[rgb2hex(v) for v in store.compute_clustercoldict(us).values()])
 
 
 @cache.memoize()
@@ -97,10 +79,7 @@ def render_image_cluster_clustering(us: UntangleSettings):
 @cache.memoize()
 def render_images_batch_separation(us: UntangleSettings):
     return [
-        dcc.Graph(
-            figure=px.scatter(p, x="X", y="Y", color="batch", title=list(p["panel"])[0]),
-            id="batch-separation-%i" % i,
-        )
+        dcc.Graph(figure=px.scatter(p, x="X", y="Y", color="batch"), id="batch-separation-%i" % i)
         for (i, p) in enumerate(store.compute_batches(us))
     ]
 
@@ -160,13 +139,17 @@ def render_main_content():
         if type_ == "graph":
             return dbc.Card(
                 dbc.CardBody(
-                    dbc.Spinner([dcc.Graph(id=id_)], color="primary"), className="mt-3 text-center",
+                    dbc.Spinner([dcc.Graph(id=id_)], color="primary"),
+                    className="mt-3 text-center",
                 ),
                 className="border-top-0 rounded-0",
             )
         else:
             return dbc.Card(
-                dbc.CardBody(dbc.Spinner(color="primary", id=id_), className="mt-3 text-center",),
+                dbc.CardBody(
+                    dbc.Spinner(color="primary", id=id_),
+                    className="mt-3 text-center",
+                ),
                 className="border-top-0 rounded-0",
             )
 
@@ -190,7 +173,11 @@ def render_main_content():
         children=[
             dbc.Row(
                 children=[
-                    dbc.Col(children=[controls], id="controls", md=3,),
+                    dbc.Col(
+                        children=[controls],
+                        id="controls",
+                        md=3,
+                    ),
                     dbc.Col(children=[dbc.Tabs(tabs_content)], id="plots", md=9),
                 ]
             )
