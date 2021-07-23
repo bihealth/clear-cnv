@@ -171,12 +171,20 @@ def get_parser():
         default=0.001,
     )
     parser_cnv_calling.add_argument(
-        "--plot_regions",
-        help="If true, the CNV calling script plots heatmaps of the regions.",
+        '--plot_regions',
+        dest='plot_regions',
+        help="If set, the CNV calling script plots heatmaps of the CNV called regions with the corresponding sample group taken as background.",
         required=False,
-        type=bool,
-        default=False,
+        action='store_true'
     )
+    parser_cnv_calling.set_defaults(plot_regions=False)
+    #parser_cnv_calling.add_argument(
+    #    "--plot_regions",
+    #    help="If true, the CNV calling script plots heatmaps of the regions.",
+    #    required=False,
+    #    type=bool,
+    #    default=False,
+    #)
     parser_cnv_calling.add_argument(
         "--cores",
         help="Number of cpu cores used in parallel processing. Default: determined automatically.",
@@ -221,7 +229,7 @@ def get_parser():
     parser_visualize.add_argument(
         "-n",
         "--annotated",
-        help="CALL_GROUPS.py analysis_directory z_scores.tsv ratio_scores.tsv annotations.bed",
+        help="BED-formatted annotatins file generated with clearCNV annotations. E.g. annotations.bed.",
         required=True,
         type=str,
     )
@@ -446,12 +454,20 @@ def get_parser():
         default=0.001,
     )
     parser_workflow_cnv_calling.add_argument(
-        "--plot_regions",
-        help="If true, the CNV calling script plots heatmaps of the regions.",
+        '--plot_regions',
+        dest='plot_regions',
+        help="If set, the CNV calling script plots heatmaps of the CNV called regions with the corresponding sample group taken as background.",
         required=False,
-        type=bool,
-        default=False,
+        action='store_true'
     )
+    parser_workflow_cnv_calling.set_defaults(plot_regions=False)
+    #parser_workflow_cnv_calling.add_argument(
+    #    "--plot_regions",
+    #    help="If true, the CNV calling script plots heatmaps of the regions.",
+    #    required=False,
+    #    type=bool,
+    #    default=False,
+    #)
     parser_workflow_cnv_calling.set_defaults(func=workflow_cnv_calling.workflow_cnv_calling)
 
     # =========================================================================

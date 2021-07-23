@@ -285,8 +285,9 @@ def save_results(us: settings.UntangleSettings, n_clicks):
     data = load_all_data(us)
     XD,cluster_panel_dict = compute_acluster(us)
     # save new panel assignments
-    XD.index = data.allsamples.index
-    XD["paths"] = data.allsamples["path"]
+    # index changes after implicit filtering (?)
+    XD.index = data.samples.index
+    XD["paths"] = data.samples["path"]
     logger.info("saving new panel assignment ...")
     pathlib.Path(settings.BATCH_OUTPUT_PATH).absolute().mkdir(parents=True, exist_ok=True)
     for p in data.panels:
@@ -299,9 +300,9 @@ def save_results(us: settings.UntangleSettings, n_clicks):
     logger.info("saving new batch clusterings ...")
     for batch in batches:
         panel = set(batch["panel"]).pop()
-        for x in set(batch["batch"]):
+        for i,x in enumerate(set(batch["batch"])):
             path = pathlib.Path(settings.BATCH_OUTPUT_PATH) / str(
-                "%s_batch%.2d_%s.txt" % (panel, x, str(n_clicks))
+                "%s_batch%.2d_%s.txt" % (panel, i, str(n_clicks))
             )
             logger.info("save batch file to: ", path)
             data.samples.T[batch[batch["batch"] == x].index].T["path"].to_csv(

@@ -187,7 +187,6 @@ def cnv_calling(args):
     )
     # HMM = np.array([util.hmm_scores(sample, probs, transitionprobs) for sample in z_scores_scaled])
     # =========================================================================
-    # --- fix lockdown bug --- #
     pool = mp.Pool(CORES)
     HMM = np.array(
         [
@@ -196,7 +195,6 @@ def cnv_calling(args):
         ]
     )
     pool.close()
-    # --- fix lockdown bug --- #
     # =========================================================================
 
     print("iterate HMM-labels and condense CNVs")
@@ -332,6 +330,7 @@ def cnv_calling(args):
     FINAL = pd.concat([RD, pd.DataFrame(X, columns=RD.columns)])
     FINAL["score"] = FINAL["score"].astype(float).apply(lambda x: float(abs(x)))
     FINAL = FINAL.sort_values(by="score", ascending=False)
+    FINAL.index = list(range(FINAL.shape[0]))
 
     print("saving results...")
     FINAL.to_csv(calls_path, sep="\t", index=False)
@@ -344,13 +343,11 @@ def cnv_calling(args):
     if PLOT_REGIONS:
         print("plotting all called CNVs with sample groups")
         import regex as re
-
         factor = 0.08
         final_regions = ["-".join(FINAL.loc[i, ["chr", "start", "end"]]) for i in FINAL.index]
         for i, region in enumerate(final_regions):
             sample = FINAL["sample"].iloc[i]
-            print(sample)
-            r = util.select_region(region, RR, sample, Matchscores_bools_selected, buffer=1).clip(
+            r = util.select_region(region, RR, sample, Matchscores_bools_selected, buffer=2).clip(
                 0, 2
             )
             plt.figure(figsize=(factor * len(r.columns), factor * len(r.index)))

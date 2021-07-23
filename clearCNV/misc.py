@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import contextlib
-import os
 import pathlib
 import subprocess
 import tempfile
@@ -46,7 +45,7 @@ def _popen(cmd, stdin=None, stdout=None):
 
 
 def merge_bedfiles(beds, bedfile):
-    os.makedirs(os.path.dirname(bedfile), exist_ok=True)
+    pathlib.Path().absolute().parent.mkdir(parents=True, exist_ok=True)
 
     cmd_merge = ["bedops", "--merge", *map(str.rstrip, beds)]
     cmd_sort = ["sort", "-V", "-k1,1", "-k2,2"]
@@ -73,7 +72,7 @@ def prepare_untangling(args):
     for b in set([val for l in L for val in l]):
         print(b, file=f)
     f.close()
-    merge_bedfiles(META.iloc[:, 2], args.bedfile)
+    merge_bedfiles(list(META['bedfiles']), args.bedfile)
 
 
 # =============================================================================
