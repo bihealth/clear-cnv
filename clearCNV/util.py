@@ -316,7 +316,6 @@ def turntransform(v):
 
 
 def select_region(region, df, sample, matchscores_bools_selected, buffer=2):
-    print("REGION:: ", str(region))
     cols = df.columns
     if sample:
         # cols = np.append(np.array(df.loc[:,matchscores_bools_selected.loc[:,sample]].columns),sample)

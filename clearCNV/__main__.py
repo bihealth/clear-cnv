@@ -461,13 +461,29 @@ def get_parser():
         action='store_true'
     )
     parser_workflow_cnv_calling.set_defaults(plot_regions=False)
-    #parser_workflow_cnv_calling.add_argument(
-    #    "--plot_regions",
-    #    help="If true, the CNV calling script plots heatmaps of the regions.",
-    #    required=False,
-    #    type=bool,
-    #    default=False,
-    #)
+    parser_workflow_cnv_calling.add_argument(
+        "--cluster_configfile",
+        help="Path to the cluster config file.",
+        required=False,
+        type=str,
+        default="",
+    )
+
+    parser_workflow_cnv_calling.add_argument(
+        "--drmaa_mem",
+        help="Number of megabytes used with drmaa. Suggested is 16000. If --drmaa_mem and --drmaa_time are given, this workflow will automatically use --drmaa in its snakemake call.",
+        required=False,
+        type=int,
+        default=None,
+    )
+
+    parser_workflow_cnv_calling.add_argument(
+        "--drmaa_time",
+        help="Maximum number of hh:mm per job. Suggested is 4:00.",
+        required=False,
+        type=str,
+        default=None,
+    )
     parser_workflow_cnv_calling.set_defaults(func=workflow_cnv_calling.workflow_cnv_calling)
 
     # =========================================================================

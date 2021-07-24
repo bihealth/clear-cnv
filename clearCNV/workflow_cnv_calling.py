@@ -3,6 +3,7 @@ import pathlib
 
 
 def create_config(configpath, args):
+    print("CREATE CONFIG:: ", str(args.plot_regions))
     with open(configpath, "wt") as f:
         print("workdir: '" + args.workdir + "'", file=f)
         print("panelname: '" + args.panelname + "'", file=f)
@@ -16,10 +17,10 @@ def create_config(configpath, args):
         print("minimum_group_sizes: '" + str(args.minimum_group_sizes) + "'", file=f)
         print("zscale: '" + str(args.zscale) + "'", file=f)
         print("size: '" + str(args.size) + "'", file=f)
-        print("del_cutoff '" + str(args.del_cutoff) + "'", file=f)
-        print("dup_cutoff '" + str(args.dup_cutoff) + "'", file=f)
-        print("trans_prob '" + str(args.trans_prob) + "'", file=f)
-        print("plotregions '" + str(args.plot_regions) + "'", file=f)
+        print("del_cutoff: '" + str(args.del_cutoff) + "'", file=f)
+        print("dup_cutoff: '" + str(args.dup_cutoff) + "'", file=f)
+        print("trans_prob: '" + str(args.trans_prob) + "'", file=f)
+        print("plot_regions: '" + str(args.plot_regions) + "'", file=f)
 
 
 def workflow_cnv_calling(args):
@@ -43,6 +44,17 @@ def workflow_cnv_calling(args):
         "--cores",
         str(args.cores),
     ]
+    if args.cluster_configfile:
+        arguments.append("--cluster-config")
+        arguments.append(args.cluster_configfile)
+    if args.drmaa_mem and args.drmaa_time:
+        arguments.append("-p")
+        arguments.append("--drmaa")
+        arguments.append(
+            str(
+                f" --mem={args.drmaa_mem} --time={args.drmaa_time} --output={args.workdir}sge_log/%x-%j.log"
+            )
+        )
     subprocess.check_call(arguments)
 
     # "panelname="+args.panelname,

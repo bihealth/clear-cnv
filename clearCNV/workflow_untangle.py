@@ -26,7 +26,6 @@ def workflow_untangle(args):
     misc.prepare_untangling(args)
 
     configpath = (
-        # os.path.dirname(os.path.abspath(__file__))
         pathlib.Path(__file__).absolute().parent
         / pathlib.Path("workflow")
         / pathlib.Path("config_untangle.yml")

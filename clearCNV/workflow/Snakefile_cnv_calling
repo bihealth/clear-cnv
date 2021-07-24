@@ -180,7 +180,7 @@ rule cnv_calling:
         sscore=SAMPLE_SCORE_FACTOR,
         del_cutoff=DEL_CUTOFF,
         dup_cutoff=DUP_CUTOFF,
-        trans_prob=TRANSPROB
+        trans_prob=TRANSPROB,
         plot_regions=PLOTREGIONS
     threads: 64
     log: folder / "logs" / "cnvcalls.log"
@@ -197,10 +197,10 @@ rule cnv_calling:
             -g {params.min_group_size} \
             -s {params.zscale} \
             -u {params.sscore} \
-            --cores {threads}\
-            --del_cutoff {params.del_cutoff},
-            --dup_cutoff {params.dup_cutoff},
-            --trans_prob {params.trans_prob},
+            --cores {threads} \
+            --del_cutoff {params.del_cutoff} \
+            --dup_cutoff {params.dup_cutoff} \
+            --trans_prob {params.trans_prob} \
             --plot_regions {params.plot_regions}"
 
 
