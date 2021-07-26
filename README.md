@@ -49,7 +49,7 @@ This creates the file `tests/testdata/testpanel/results/cnv_calls.tsv` which sho
 
 ## HOW TO and WORKFLOW
 
-clearCNV comprises of two major workflows comprising three major commads:
+clearCNV comprises of two major workflows and three major commads:
 
 #### workflow
 
