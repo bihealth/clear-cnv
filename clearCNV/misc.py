@@ -41,7 +41,7 @@ def _popen(cmd, stdin=None, stdout=None):
 
 
 # =============================================================================
-#  UNTANGLING - preparations
+#  reassignment - preparations
 
 
 def merge_bedfiles(beds, bedfile):
@@ -63,7 +63,7 @@ def merge_bedfiles(beds, bedfile):
         p_merge2.wait()
 
 
-def prepare_untangling(args):
+def prepare_reassignment(args):
     META = pd.read_csv(args.metafile, sep="\t")
     # prepare bamsfile
     pathlib.Path(args.bamsfile).absolute().parent.mkdir(parents=True, exist_ok=True)

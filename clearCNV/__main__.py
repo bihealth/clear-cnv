@@ -11,7 +11,7 @@ from . import matchscores
 from . import cnv_calling
 from . import visualize_scores
 from . import workflow_cnv_calling
-from . import workflow_untangle
+from . import workflow_reassign
 from . import __version__
 
 #: The executables required for running clear-CNV.
@@ -258,17 +258,17 @@ def get_parser():
     parser_merge_bed.set_defaults(func=misc.merge_bedfile)
 
     # =========================================================================
-    #  UNTANGLE
+    #  reassign
     # =========================================================================
 
     # prepare - maybe exclude in future
-    parser_prepare_untangle = subparsers.add_parser(
-        "prepare_untangling",
+    parser_prepare_reassign = subparsers.add_parser(
+        "prepare_reassignment",
         description=(
-            "Prepares the necessary files to perform panel untangling on a set of .bed files and corresponding .bam file data sets."
+            "Prepares the necessary files to perform panel reassignment on a set of .bed files and corresponding .bam file data sets."
         ),
     )
-    parser_prepare_untangle.add_argument(
+    parser_prepare_reassign.add_argument(
         "-m",
         "--metafile",
         help="Path to the file containing the meta information. It is a .tsv of the scheme -panel bams.txt bed.bed. \
@@ -276,21 +276,21 @@ def get_parser():
         required=True,
         type=str,
     )
-    parser_prepare_untangle.add_argument(
+    parser_prepare_reassign.add_argument(
         "-b",
         "--bamsfile",
         help="Output .txt file. It will contain the distinct set of all given .bam file paths.",
         required=True,
         type=str,
     )
-    parser_prepare_untangle.add_argument(
+    parser_prepare_reassign.add_argument(
         "-d",
         "--bedfile",
         help="Output .bed file. It will contain the merged union of all given .bed files.",
         required=True,
         type=str,
     )
-    parser_prepare_untangle.set_defaults(func=misc.prepare_untangling)
+    parser_prepare_reassign.set_defaults(func=misc.prepare_reassignment)
 
     # =========================================================================
     #  coverage
@@ -379,7 +379,7 @@ def get_parser():
         type=str,
     )
     parser_workflow_cnv_calling.add_argument(
-        "-d", "--bedfile", help="Path to the .bed file.", required=True, type=str,
+        "-d", "--bedfile", help="Path to the BED file that contains all targets of the sequencing panel. It must contain the columns: chr, start, end, gene.", required=True, type=str,
     )
     parser_workflow_cnv_calling.add_argument(
         "-k",
@@ -487,21 +487,21 @@ def get_parser():
     parser_workflow_cnv_calling.set_defaults(func=workflow_cnv_calling.workflow_cnv_calling)
 
     # =========================================================================
-    #  workflow untangling
+    #  workflow reassignment
     # =========================================================================
-    parser_workflow_untangle = subparsers.add_parser(
-        "workflow_untangle",
+    parser_workflow_reassign = subparsers.add_parser(
+        "workflow_reassign",
         description=(
             "Complete CNV-calling snakemake-workflow to run on data from a single sequencing panel (bed-file)."
         ),
     )
-    parser_workflow_untangle.add_argument(
+    parser_workflow_reassign.add_argument(
         "-w", "--workdir", help="Path to the snakemake workdir.", required=True, type=str,
     )
-    parser_workflow_untangle.add_argument(
+    parser_workflow_reassign.add_argument(
         "-r", "--reference", help="Path to the genomic reference.", required=True, type=str,
     )
-    parser_workflow_untangle.add_argument(
+    parser_workflow_reassign.add_argument(
         "-m",
         "--metafile",
         help="Path to the file containing the meta information. It is a .tsv of the scheme [panel] [bams.txt] [bed.bed]. \
@@ -510,7 +510,7 @@ def get_parser():
         type=str,
     )
 
-    parser_workflow_untangle.add_argument(
+    parser_workflow_reassign.add_argument(
         "-c",
         "--coverages",
         help="Output file path to coverages matrix (e.g. coverages.tsv).",
@@ -518,7 +518,7 @@ def get_parser():
         type=str,
     )
 
-    parser_workflow_untangle.add_argument(
+    parser_workflow_reassign.add_argument(
         "-b",
         "--bedfile",
         required=True,
@@ -526,7 +526,7 @@ def get_parser():
         help="Output file path to BED file that will contain the union of all given BED files",
     )
 
-    parser_workflow_untangle.add_argument(
+    parser_workflow_reassign.add_argument(
         "--cores",
         help="Number of used cores in snakemake workflow. Default is 32.",
         required=False,
@@ -534,7 +534,7 @@ def get_parser():
         default=32,
     )
 
-    parser_workflow_untangle.add_argument(
+    parser_workflow_reassign.add_argument(
         "--cluster_configfile",
         help="Path to the cluster config file.",
         required=False,
@@ -542,7 +542,7 @@ def get_parser():
         default="",
     )
 
-    parser_workflow_untangle.add_argument(
+    parser_workflow_reassign.add_argument(
         "--drmaa_mem",
         help="Number of megabytes used with drmaa. Suggested is 16000. If --drmaa_mem and --drmaa_time are given, this workflow will automatically use --drmaa in its snakemake call.",
         required=False,
@@ -550,7 +550,7 @@ def get_parser():
         default=None,
     )
 
-    parser_workflow_untangle.add_argument(
+    parser_workflow_reassign.add_argument(
         "--drmaa_time",
         help="Maximum number of hh:mm per job. Suggested is 4:00.",
         required=False,
@@ -558,32 +558,32 @@ def get_parser():
         default=None,
     )
 
-    parser_workflow_untangle.set_defaults(func=workflow_untangle.workflow_untangle)
+    parser_workflow_reassign.set_defaults(func=workflow_reassign.workflow_reassign)
 
     # =========================================================================
-    #  visualize untangling
+    #  visualize reassignment
     # =========================================================================
-    parser_visualize_untangle = subparsers.add_parser(
-        "visualize_untangle", description=("Interactive untangling visualization"),
+    parser_visualize_reassignment = subparsers.add_parser(
+        "visualize_reassign", description=("Interactive reassignment visualization"),
     )
 
-    parser_visualize_untangle.add_argument(
+    parser_visualize_reassignment.add_argument(
         "--host", default="0.0.0.0", help="Host to run server on, defaults to 0.0.0.0"
     )
 
-    parser_visualize_untangle.add_argument(
+    parser_visualize_reassignment.add_argument(
         "--port", type=int, default=8080, help="Port to run server on"
     )
 
-    parser_visualize_untangle.add_argument(
+    parser_visualize_reassignment.add_argument(
         "--debug", default=False, action="store_true", help="Whether or not to enable debugging"
     )
 
-    parser_visualize_untangle.add_argument(
+    parser_visualize_reassignment.add_argument(
         "--cache-dir", help="Optional path to cache directory, avoids repeating startup computation"
     )
 
-    parser_visualize_untangle.add_argument(
+    parser_visualize_reassignment.add_argument(
         "-m",
         "--metafile",
         help="Path to the file containing the meta information. It is a .tsv of the scheme [panel name] [path of bams.txt] [path of targets.bed]. \
@@ -592,15 +592,15 @@ def get_parser():
         type=str,
     )
 
-    parser_visualize_untangle.add_argument(
+    parser_visualize_reassignment.add_argument(
         "-c",
         "--coverages",
         required=True,
         type=str,
-        help="Matrix in tsv format containing coverage values. Is output of 'workflow_untangle' step",
+        help="Matrix in tsv format containing coverage values. Is output of 'workflow_reassign' step",
     )
 
-    parser_visualize_untangle.add_argument(
+    parser_visualize_reassignment.add_argument(
         "-b",
         "--bedfile",
         required=True,
@@ -608,20 +608,20 @@ def get_parser():
         help="Path to BED file that will contain the union of all given BED files",
     )
 
-    parser_visualize_untangle.add_argument(
+    parser_visualize_reassignment.add_argument(
         "-d",
         "--new_panel_assignments_directory",
         help="Path to directory that will contain the output lists of paths to .bam-files, which were re-assigned to the given panels according to clustering.",
     )
 
-    # parser_visualize_untangle.add_argument(
+    # parser_visualize_reassignment.add_argument(
     #    "-p",
     #    "--panels",
     #    required=True,
     #    type=str,
     #    help="Path to the directory that will contain the final lists of bam-files grouped by panels")
 
-    # parser_visualize_untangle.add_argument(
+    # parser_visualize_reassignment.add_argument(
     #    "-a",
     #    "--batches",
     #    required=True,
@@ -629,10 +629,10 @@ def get_parser():
     #    help="Path to the directory that will contain the final lists of bam-files grouped by batches",
     # )
 
-    def viz_untangle(args):
-        """Helper function that launches the Dash webserver for untangling visualization."""
+    def viz_reassignment(args):
+        """Helper function that launches the Dash webserver for reassignment visualization."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            from .viz_untangle import settings
+            from .viz_reassignment import settings
 
             if args.cache_dir:
                 settings.CACHE_DIR = args.cache_dir
@@ -643,15 +643,15 @@ def get_parser():
 
             settings.BATCH_OUTPUT_PATH = args.new_panel_assignments_directory
 
-            from .viz_untangle.app import app  # noqa
-            from .viz_untangle import store
+            from .viz_reassignment.app import app  # noqa
+            from .viz_reassignment import store
 
             if settings.CACHE_PRELOAD_DATA:
-                store.load_all_data(settings.UNTANGLE_SETTINGS)
-            from .viz_untangle import ui_plots
+                store.load_all_data(settings.reassign_SETTINGS)
+            from .viz_reassignment import ui_plots
 
             ## XXX
-            us = settings.UNTANGLE_SETTINGS
+            us = settings.reassign_SETTINGS
             data = store.load_all_data(us)
             ui_plots.plot_clustermap_clustering_as_base64(
                 data, *store.compute_acluster(us), store.compute_clustercoldict(us)
@@ -662,7 +662,7 @@ def get_parser():
             ## XXX
             app.run_server(host=args.host, port=args.port, debug=args.debug)
 
-    parser_visualize_untangle.set_defaults(func=viz_untangle)
+    parser_visualize_reassignment.set_defaults(func=viz_reassignment)
 
     return parser
 

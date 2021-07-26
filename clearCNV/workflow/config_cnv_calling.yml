@@ -1,7 +1,7 @@
 workdir: '.'
 panelname: 'SDAG2_0'
 bedfile: '/fast/users/vmay_m/work/workflow/beds/SDAG2.bed'
-bamsfile: '../UNTANGLING/run_003/assignment/SDAG2_batch00_1.txt'
+bamsfile: '../reassignment/run_003/assignment/SDAG2_batch00_1.txt'
 reference: '/fast/work/projects/cubit/18.12/static_data/reference/GRCh37/hs37d5/hs37d5.fa'
 kmer_align: '/fast/work/projects/cubit/18.12/static_data/db/goldenpath/variable/GRCh37/wgEncodeCrgMapabilityAlign50mer.lt_1.bed'
 expected_artefacts: '0.02'

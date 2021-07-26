@@ -1,3 +1,3 @@
 panel	bamsfiles	bedfiles
-panel1	/home/memsonmi/DEV/clear-cnv/tests/testdata/untangling_p1_bamfiles.txt	/home/memsonmi/DEV/clear-cnv/tests/testdata/panel1.bed
-panel2	/home/memsonmi/DEV/clear-cnv/tests/testdata/untangling_p2_bamfiles.txt	/home/memsonmi/DEV/clear-cnv/tests/testdata/panel2.bed
+panel1	/home/memsonmi/DEV/clear-cnv/tests/testdata/reassignment_p1_bamfiles.txt	/home/memsonmi/DEV/clear-cnv/tests/testdata/panel1.bed
+panel2	/home/memsonmi/DEV/clear-cnv/tests/testdata/reassignment_p2_bamfiles.txt	/home/memsonmi/DEV/clear-cnv/tests/testdata/panel2.bed

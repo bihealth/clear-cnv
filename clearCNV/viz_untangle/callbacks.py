@@ -13,7 +13,7 @@ from logzero import logger
 from werkzeug.utils import secure_filename
 
 from . import ui, settings, store
-from .settings import UntangleSettings, BATCH_OUTPUT_PATH
+from .settings import reassignSettings, BATCH_OUTPUT_PATH
 
 
 def register_control_to_buffer(app):
@@ -49,7 +49,7 @@ def register_buffer_to_graphs(app):
         [Input("buffer-cluster-params", "children")],
     )
     def parameters_to_json(params_str):
-        us = UntangleSettings(**json.loads(params_str))
+        us = reassignSettings(**json.loads(params_str))
         return [
             ui.render_pca(us),
             ui.render_tsne(us),
@@ -73,7 +73,7 @@ def register_save_button(app):
     )
     def on_click_button(n_clicks, params_str):
         if n_clicks is not None:
-            us = UntangleSettings(**json.loads(params_str))
+            us = reassignSettings(**json.loads(params_str))
             print("clicked save", n_clicks, us)
             # how to get us ????
             store.save_results(us, n_clicks)

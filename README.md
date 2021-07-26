@@ -9,11 +9,11 @@
 
 ## Developer Documentation
 
-### HOW TO - panel untangling
-#### 1. Create all files to do untangling
+### HOW TO - panel reassignment
+#### 1. Create all files to do reassignment
 
 Go to the directory `clear-cnv/` and execute the shell commad:
-```clearCNV workflow_untangle --workdir tests/testdata/ --reference tests/testdata/test_untangling_ref.fa --metafile tests/testdata/test_untangle_meta.tsv --coverages tests/testdata/test_untangling_coverages.tsv --bedfile tests/testdata/test_untangling_union.bed --cores 2```
+```clearCNV workflow_reassign --workdir tests/testdata/ --reference tests/testdata/test_reassignment_ref.fa --metafile tests/testdata/test_reassign_meta.tsv --coverages tests/testdata/test_reassignment_coverages.tsv --bedfile tests/testdata/test_reassignment_union.bed --cores 2```
 
 INPUT: working directory given by `--workdir`, the files given by `--reference` and `--metafile`.
 OUTPUT: files created at `--coverages` and `--bedfile`. They are used in the next step.
@@ -28,13 +28,13 @@ Also, a cluster config file in .json format can be given with `--cluster_configf
 #### 2. Visualize and adjust the clusterings and final panel assignments
 
 Run the following shell command from `clear-cnv/`:
-```clearCNV visualize_untangle --metafile tests/testdata/meta.tsv --coverages tests/testdata/cov_untangling.tsv --bedfile tests/testdata/untangling_union.bed --new_panel_assignments_directory tests/testdata/panel_assignments```
+```clearCNV visualize_reassign --metafile tests/testdata/meta.tsv --coverages tests/testdata/cov_reassignment.tsv --bedfile tests/testdata/reassignment_union.bed --new_panel_assignments_directory tests/testdata/panel_assignments```
 
 INPUT: files given by `--metafile`, `--coverages` and `--bedfile`.
 OUTPUT: files found in given directory `--new_panel_assignments_directory`.
 
 #### NOTE
-If you do sample re-asignment on your own data, followed by CNV-calling, then only one metafile, one coverages file and one bedfile will be used. This means that `--metafile`, `--coverages` and `--bedfile` are given the same file paths in both workflow steps `clearCNV workflow_untangle` and `clearCNV visualize_untangle` of clearCNV.
+If you do sample re-asignment on your own data, followed by CNV-calling, then only one metafile, one coverages file and one bedfile will be used. This means that `--metafile`, `--coverages` and `--bedfile` are given the same file paths in both workflow steps `clearCNV workflow_reassign` and `clearCNV visualize_reassign` of clearCNV.
 
 ### Running Checks
 

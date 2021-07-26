@@ -1,4 +1,4 @@
-"""Settings for the Dash-based visual untangling.
+"""Settings for the Dash-based visual reassignment.
 
 While it is general best practice not to have global state such as this settings module, the
 Flask-based architecture of Dash forces us to use it.
@@ -42,7 +42,7 @@ CACHE_PRELOAD_DATA = True
 
 
 @attr.s(frozen=True, auto_attribs=True)
-class UntangleSettings:
+class reassignSettings:
     threshold: int = 50
     pca_components: int = 20
     batch_num: str = "2"
@@ -50,8 +50,8 @@ class UntangleSettings:
     colormap = "tab20"
 
 
-#: Configuration for untangling.
-UNTANGLE_SETTINGS = UntangleSettings()
+#: Configuration for reassignment.
+reassign_SETTINGS = reassignSettings()
 
 #: Whether or not to enable debugging.
 DEBUG = False

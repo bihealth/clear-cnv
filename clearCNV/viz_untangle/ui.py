@@ -15,7 +15,7 @@ from . import settings
 from . import store
 from . import ui_plots
 from ..__init__ import __version__
-from .settings import UntangleSettings
+from .settings import reassignSettings
 
 
 def render_navbar():
@@ -37,29 +37,29 @@ def render_navbar():
 
 
 @cache.memoize()
-def render_pca(us: UntangleSettings):
+def render_pca(us: reassignSettings):
     return px.scatter(store.compute_pca(us).sort_values(by='panel'), x="X", y="Y", color="panel",color_discrete_sequence=[rgb2hex(v) for v in store.compute_clustercoldict(us).values()])
 
 
 @cache.memoize()
-def render_tsne(us: UntangleSettings):
+def render_tsne(us: reassignSettings):
     return px.scatter(store.compute_tsne(us).sort_values(by='panel'), x="X", y="Y", color="panel",color_discrete_sequence=[rgb2hex(v) for v in store.compute_clustercoldict(us).values()])
 
 
 @cache.memoize()
-def render_agg_clust(us: UntangleSettings):
+def render_agg_clust(us: reassignSettings):
     return px.scatter(store.compute_acluster(us)[0].sort_values(by='new_assignments'), x="X", y="Y", color="new_assignments",color_discrete_sequence=[rgb2hex(v) for v in store.compute_clustercoldict(us).values()])
 
 
 @cache.memoize()
-def render_image_cluster_panels(us: UntangleSettings):
+def render_image_cluster_panels(us: reassignSettings):
     data = store.load_all_data(us)
     img_b64 = ui_plots.plot_clustermap_panels_as_base64(data, store.compute_panelcoldict(us))
     return html.Img(src="data:image/png;base64,%s" % img_b64, className="img-responsive")
 
 
 @cache.memoize()
-def render_image_cluster_clustering(us: UntangleSettings):
+def render_image_cluster_clustering(us: reassignSettings):
     data = store.load_all_data(us)
     img_b64 = ui_plots.plot_clustermap_clustering_as_base64(
         data, *store.compute_acluster(us), store.compute_clustercoldict(us)
@@ -68,7 +68,7 @@ def render_image_cluster_clustering(us: UntangleSettings):
 
 
 # @cache.memoize()
-# def render_image_batches_clustering(us: UntangleSettings):
+# def render_image_batches_clustering(us: reassignSettings):
 #    data = store.load_all_data(us)
 #    img_b64 = ui_plots.plot_clustermap_batches_as_base64(
 #        data, store.compute_acluster(us), store.compute_clustercoldict(us)
@@ -77,7 +77,7 @@ def render_image_cluster_clustering(us: UntangleSettings):
 
 
 @cache.memoize()
-def render_images_batch_separation(us: UntangleSettings):
+def render_images_batch_separation(us: reassignSettings):
     return [
         dcc.Graph(figure=px.scatter(p, x="X", y="Y", color="batch"), id="batch-separation-%i" % i)
         for (i, p) in enumerate(store.compute_batches(us))
@@ -101,7 +101,7 @@ def render_main_content():
                     dbc.Input(
                         id="input-thresh",
                         type="number",
-                        value=settings.UNTANGLE_SETTINGS.threshold,
+                        value=settings.reassign_SETTINGS.threshold,
                         debounce=True,
                     ),
                 ],
@@ -112,7 +112,7 @@ def render_main_content():
                     dbc.Input(
                         id="input-pca-components",
                         type="number",
-                        value=settings.UNTANGLE_SETTINGS.pca_components,
+                        value=settings.reassign_SETTINGS.pca_components,
                         debounce=True,
                     ),
                 ],
@@ -123,7 +123,7 @@ def render_main_content():
                     dbc.Input(
                         id="input-batch-factor",
                         type="text",
-                        value=settings.UNTANGLE_SETTINGS.batch_num,
+                        value=settings.reassign_SETTINGS.batch_num,
                         debounce=True,
                     ),
                 ],
