@@ -43,9 +43,7 @@ Now execute this shell command:
 
 ```clearCNV cnv_calling -p testpanel -c tests/testdata/cov.tsv -a tests/testdata/testpanel/analysis -m tests/testdata/matchscores.tsv -C tests/testdata/testpanel/results/cnv_calls.tsv -r tests/testdata/testpanel/results/rscores.tsv -z tests/testdata/testpanel/results/zscores.tsv -g 15 -u 3```
 
-This creates the file `tests/testdata/testpanel/results/cnv_calls.tsv` which shows one called deletion.
-
-
+This creates the file `tests/testdata/testpanel/results/cnv_calls.tsv` which shows one called deletion. if you copy & paste this for your own data, please don't use the `-g 15 -u 3` configuration. We use these in here just to be able to work with a tiny example.
 
 ## HOW TO and WORKFLOW
 
