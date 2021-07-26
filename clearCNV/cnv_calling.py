@@ -35,7 +35,7 @@ def cnv_calling(args):
     # load data
     D0 = util.load_dataframe(intsv_path)
     Matchscores = pd.read_csv(matchscores_path, sep="\t", low_memory=False, header=0, index_col=0)
-    pathlib.Path(analysis_dir).mkdir(parents=True, exist_ok=True)
+
     # adaptive threshold for group sizes
     minmatchscore = np.median(Matchscores.median()) * SAMPLE_SCORE_FACTOR
     Matchscores_bools = Matchscores < minmatchscore
@@ -46,8 +46,14 @@ def cnv_calling(args):
     Matchscores_bools_selected = Matchscores_bools.loc[selected_samples, selected_samples]
     Matchscores_selected = Matchscores.loc[selected_samples, selected_samples]
 
-    # evaluation
+    if len(selected_samples) == 0:
+        print("ERROR: NO SAMPLES IN ANALYSIS. There were no samples selected to perform CNV calling. Try to pick a lower value for MINIMUM_GROUP_SIZES or a higher value for SAMPLE_SCORE_FACTOR. Aborting.")
+        raise Exception('No samples selected to smaple group. Try to pick a lower value for MINIMUM_GROUP_SIZES or a higher value for SAMPLE_SCORE_FACTOR.')
 
+    for p in [calls_path,z_scores_path,ratio_scores_path,analysis_dir]:
+        pathlib.Path(p).parent.mkdir(parents=True, exist_ok=True)
+
+    # evaluation
     # if len(failed_samples) > 0:
     plt.figure(figsize=(6, 4))
     plt.title("Threshold finding of sample groups")
@@ -63,7 +69,7 @@ def cnv_calling(args):
     plt.title("Sample group sizes and cutoff")
     x = plt.hist(
         Matchscores_bools.sum().sort_values(),
-        bins=round(len(selected_samples) / 3),
+        bins=int(len(selected_samples) / 3)+1,
         range=(0, len(selected_samples)),
     )
     plt.vlines(MINIMUM_SAMPLE_GROUP, 0, max(x[0]), color="darkred", label="cutoff")
