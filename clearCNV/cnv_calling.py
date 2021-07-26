@@ -123,7 +123,7 @@ def cnv_calling(args):
     pool.join()
 
     #  calculate expected X-cov ratio and prepare match scores
-    if sum(DX[1]) > 0 and np.max(DX[0].mean(axis=0)) / np.min(DX[0].mean(axis=0)) > 1.5:
+    if sum(DX[1]) > 0 and np.max(DX[0].mean(axis=0)) / np.min(DX[0].mean(axis=0)) > 1.25:
         kmeans = KMeans(n_clusters=2).fit(DX[0].mean(axis=0).reshape(-1, 1))
         Mx = Matchscores_bools_selected.copy()
         for i, x in enumerate(kmeans.labels_):
@@ -132,39 +132,41 @@ def cnv_calling(args):
                 Mx[sample] &= kmeans.labels_ == x
             else:
                 Mx[sample] &= (1 - kmeans.labels_) == x
-
+        Mx &= Mx.T
         sample_scores_buffer = sample_scores.copy()
         #  --- parallelized X-chromosome calling ---  #
         print("multi threaded calling on X-chromosome")
         pool = mp.Pool(CORES)
         for i in range(len(selected_samples)):
-            pool.apply_async(
-                util.calling_cnv,
-                args=(i, DX[0], Matchscores_bools_selected, DX[1], EXPECTED_CNV_RATE, ZSCALE,),
-                callback=collect_result,
-            )
+            if sum(Mx.iloc[i]) >= MINIMUM_SAMPLE_GROUP:
+                pool.apply_async(
+                    util.calling_cnv,
+                    args=(i, DX[0], Mx, DX[1], EXPECTED_CNV_RATE, ZSCALE,),
+                    callback=collect_result,
+                )
         pool.close()
         pool.join()
         sample_scores += sample_scores_buffer
 
     #  calculate expected Y-cov ratio and prepare match scores
-    if sum(DY[1]) > 0 and np.max(DY[0].mean(axis=0)) / np.min(DY[0].mean(axis=0)) > 1.5:
+    if sum(DY[1]) > 0 and np.max(DY[0].mean(axis=0)) / np.min(DY[0].mean(axis=0)) > 1.25:
         kmeans = KMeans(n_clusters=2).fit(DY[0].mean(axis=0).reshape(-1, 1))
         My = Matchscores_bools_selected.copy()
         for i, y in enumerate(kmeans.labels_):
             sample = Matchscores_bools_selected.index[i]
             My[sample] &= kmeans.labels_ == y
-
+        My &= My.T
         sample_scores_buffer = sample_scores.copy()
         #  --- parallelized Y-chromosome calling ---  #
         print("multi threaded calling on Y-chromosome")
         pool = mp.Pool(CORES)
         for i in range(len(selected_samples)):
-            pool.apply_async(
-                util.calling_cnv,
-                args=(i, DY[0], My, DY[1], EXPECTED_CNV_RATE, ZSCALE,),
-                callback=collect_result,
-            )
+            if sum(My.iloc[i]) >= MINIMUM_SAMPLE_GROUP:
+                pool.apply_async(
+                    util.calling_cnv,
+                    args=(i, DY[0], My, DY[1], EXPECTED_CNV_RATE, ZSCALE,),
+                    callback=collect_result,
+                )
         pool.close()
         pool.join()
         sample_scores += sample_scores_buffer
@@ -302,7 +304,7 @@ def cnv_calling(args):
             ),
         ]
     )
-    print("extract single exon CNVs.")
+    print("extract single exon CNVs")
     BIG_HITS = ca.flatten_list(
         [
             l.get_hits()
@@ -342,7 +344,6 @@ def cnv_calling(args):
 
     if PLOT_REGIONS:
         print("plotting all called CNVs with sample groups...")
-        import regex as re
         factor = 0.08
         final_regions = ["-".join(FINAL.loc[i, ["chr", "start", "end"]]) for i in FINAL.index]
         for i, region in enumerate(final_regions):

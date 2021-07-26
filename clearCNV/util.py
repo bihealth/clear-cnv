@@ -113,16 +113,15 @@ def normalize(D, axis=1):
     return np.apply_along_axis(lambda v: v / np.median(v[np.nonzero(v)]), axis, np.asarray(D))
 
 
-
 def normalize_within_exon(D0_):
     c,i = D0_.columns, D0_.index
-    x = np.apply_along_axis(lambda v: v / np.median(v[np.nonzero(v)]), 0, np.asarray(D0_))
+    x = np.apply_along_axis(lambda v: v / np.median(v[np.nonzero(v)]), 1, np.asarray(D0_))
     return pd.DataFrame(x,columns=c, index=i)
 
 
 def normalize_within_sample(D0_):
     c,i = D0_.columns, D0_.index
-    x = np.apply_along_axis(lambda v: v / np.median(v[np.nonzero(v)]), 1, np.asarray(D0_))
+    x = np.apply_along_axis(lambda v: v / np.median(v[np.nonzero(v)]), 0, np.asarray(D0_))
     return pd.DataFrame(x,columns=c, index=i)
 
 
@@ -295,6 +294,7 @@ def calling_cnv(index_sample, D, MS, index, EXPECTED_CNV_RATE, SENSITIVITY=0.7):
     ratio_values = D[:, index_sample] / np.median(D1, axis=1)
     # normalize sample group per target
     D2 = normalize(D1, axis=1)
+    np.nan_to_num(D2, copy=False, nan=1.0)
     D3 = trim(D2, axis=0, alpha=0.1)
 
     # new metric instead of z-scores
