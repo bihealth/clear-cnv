@@ -83,7 +83,7 @@ Some files have to be acquired or created before these commands can be run:
     d) A k-mer alignability file in .bed format. Such files can be downloaded from UCSC (e.g. for Hg19 [here](http://genome.ucsc.edu/cgi-bin/hgFileUi?db=hg19&g=wgEncodeMapability)). A k-mer mappability track can also be created for example using [GenMap](https://github.com/cpockrandt/genmap). In both cases the resulting Wig or BigWig files need to be converted to .bed to be used by clearCNV.
 
 #### notes
-The chromosome name scheme in the reference and .bed-file should be of the forms: ChrX, chrx, X or Chr1, chr1, 1.
+The chromosome name scheme in the reference and .bed-file should be of the forms: ChrX, chrX, X or Chr1, chr1, 1.
 
 
 #### NOTE
