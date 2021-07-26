@@ -35,7 +35,7 @@ def cnv_calling(args):
     # load data
     D0 = util.load_dataframe(intsv_path)
     Matchscores = pd.read_csv(matchscores_path, sep="\t", low_memory=False, header=0, index_col=0)
-
+    pathlib.Path(analysis_dir).mkdir(parents=True, exist_ok=True)
     # adaptive threshold for group sizes
     minmatchscore = np.median(Matchscores.median()) * SAMPLE_SCORE_FACTOR
     Matchscores_bools = Matchscores < minmatchscore
@@ -47,6 +47,7 @@ def cnv_calling(args):
     Matchscores_selected = Matchscores.loc[selected_samples, selected_samples]
 
     # evaluation
+
     # if len(failed_samples) > 0:
     plt.figure(figsize=(6, 4))
     plt.title("Threshold finding of sample groups")
