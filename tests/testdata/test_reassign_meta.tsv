@@ -1,0 +1,3 @@
+panel	bamsfiles	bedfiles
+panel1	tests/testdata/test_reassignment_p1_bamfiles.txt	tests/testdata/test_reassign_panel1.bed
+panel2	tests/testdata/test_reassignment_p2_bamfiles.txt	tests/testdata/test_reassign_panel1.bed
