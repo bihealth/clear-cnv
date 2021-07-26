@@ -39,7 +39,7 @@ At first, match scores are claculated. Go to the directory `clear-cnv/` and exec
 ```clearCNV matchscores -p testpanel -c tests/testdata/cov.tsv -m tests/testdata/matchscores.tsv```
 
 This creates a match score matrix which is used in the CNV calling step.
-Now execute execute this shell command:
+Now execute this shell command:
 
 ```clearCNV cnv_calling -p testpanel -c tests/testdata/cov.tsv -a tests/testdata/testpanel/analysis -m tests/testdata/matchscores.tsv -C tests/testdata/testpanel/results/cnv_calls.tsv -r tests/testdata/testpanel/results/rscores.tsv -z tests/testdata/testpanel/results/zscores.tsv -g 15 -u 3```
 
