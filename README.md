@@ -9,7 +9,6 @@
 
 ## Quick run checks and examples
 
-### HOW TO - panel reassignment
 #### 1. Create all files to do reassignment
 
 Go to the directory `clear-cnv/` and execute the shell commamd:
@@ -33,7 +32,7 @@ Run the following shell command from `clear-cnv/`:
 INPUT: files given by `--metafile`, `--coverages` and `--bedfile`.
 OUTPUT: files found in given directory `--new_panel_assignments_directory`.
 
-### HOW To - CNV calling
+#### 3. Call CNVs
 
 At first, match scores are claculated. Go to the directory `clear-cnv/` and execute the shell command:
 
@@ -45,6 +44,8 @@ Now execute execute this shell command:
 ```clearCNV cnv_calling -p testpanel -c tests/testdata/cov.tsv -a tests/testdata/testpanel/analysis -m tests/testdata/matchscores.tsv -C tests/testdata/testpanel/results/cnv_calls.tsv -r tests/testdata/testpanel/results/rscores.tsv -z tests/testdata/testpanel/results/zscores.tsv -g 15 -u 3```
 
 This creates the file `tests/testdata/testpanel/results/cnv_calls.tsv` which shows one called deletion.
+
+
 
 ## HOW TO and WORKFLOW
 
@@ -59,8 +60,9 @@ clearCNV comprises of two major workflows comprising three major commads:
 
 Some files have to be acquired or created before these commands can be run:
 1) re-assignment:
-  a) meta-file.
-    This file is a tab-separated file and one example can be found [here](tests/testdata/meta.tsv).
+  a) For each sequencing panel a .bed file is needed following this [form](tests/testdata/panel1.bed)
+  b) For each sequencing panel (or .bed-file containing all target informations) a simple list of the according .bam files is needed. An example can be found [here](tests/testdata/reassignment_p1_bamfiles.txt)
+  c) meta-file. This file is a tab-separated file and one example can be found [here](tests/testdata/meta.tsv).
 
 
 
