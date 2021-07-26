@@ -7,18 +7,18 @@
 
 - Code Formatting: [black](https://github.com/psf/black)
 
-## Developer Documentation
+## Quick run checks and examples
 
 ### HOW TO - panel reassignment
 #### 1. Create all files to do reassignment
 
-Go to the directory `clear-cnv/` and execute the shell commad:
+Go to the directory `clear-cnv/` and execute the shell commamd:
 ```clearCNV workflow_reassignment --workdir tests/testdata/ --reference tests/testdata/test_reassignment_ref.fa --metafile tests/testdata/test_reassign_meta.tsv --coverages tests/testdata/test_reassignment_coverages.tsv --bedfile tests/testdata/test_reassignment_union.bed --cores 2```
 
 INPUT: working directory given by `--workdir`, the files given by `--reference` and `--metafile`.
 OUTPUT: files created at `--coverages` and `--bedfile`. They are used in the next step.
 
-If you want to create the necessary files for your own data just edit the meta.tsv file analogously to the example at `clearCNV/tests/testdata/meta.tsv`, where you can add more rows for each targets file (BED-file). It is recommended to use absolute paths in the meta file.
+If you want to create the necessary files for yourown data just edit the meta.tsv file analogously to the example at `clearCNV/tests/testdata/meta.tsv`, where you can add more rows for each targets file (BED-file). It is recommended to use absolute paths in the meta file.
 
 Optionally, **drmaa** can be used, if the two flags are present:
 `--drmaa_mem 1600 --drmaa_time 4:00`,
@@ -33,8 +33,39 @@ Run the following shell command from `clear-cnv/`:
 INPUT: files given by `--metafile`, `--coverages` and `--bedfile`.
 OUTPUT: files found in given directory `--new_panel_assignments_directory`.
 
+### HOW To - CNV calling
+
+At first, match scores are claculated. Go to the directory `clear-cnv/` and execute the shell command:
+
+```clearCNV matchscores -p testpanel -c tests/testdata/cov.tsv -m tests/testdata/matchscores.tsv```
+
+This creates a match score matrix which is used in the CNV calling step.
+Now execute execute this shell command:
+
+```clearCNV cnv_calling -p testpanel -c tests/testdata/cov.tsv -a tests/testdata/testpanel/analysis -m tests/testdata/matchscores.tsv -C tests/testdata/testpanel/results/cnv_calls.tsv -r tests/testdata/testpanel/results/rscores.tsv -z tests/testdata/testpanel/results/zscores.tsv -g 15 -u 3```
+
+This creates the file `tests/testdata/testpanel/results/cnv_calls.tsv` which shows one called deletion.
+
+## HOW TO and WORKFLOW
+
+clearCNV comprises of two major workflows comprising three major commads:
+
+1) re-assignment
+  a) `clearCNV workflow_reassignment`
+  b) `clearCNV visualize_reassignment`
+
+2) CNV calling
+  a) `clearCNV workflow_cnv_calling`
+
+Some files have to be acquired or created before these commands can be run:
+1) re-assignment:
+  a) meta-file.
+    This file is a tab-separated file and one example can be found [here](tests/testdata/meta.tsv).
+
+
+
 #### NOTE
-If you do sample re-asignment on your own data, followed by CNV-calling, then only one metafile, one coverages file and one bedfile will be used. This means that `--metafile`, `--coverages` and `--bedfile` are given the same file paths in both workflow steps `clearCNV workflow_reassignment` and `clearCNV visualize_reassignment` of clearCNV.
+If you do sample re-assignment on your own data, followed by CNV-calling, then only one metafile, one coverages file and one bedfile will be used. This means that `--metafile`, `--coverages` and `--bedfile` are given the same file paths in both workflow steps `clearCNV workflow_reassignment` and `clearCNV visualize_reassignment` of clearCNV.
 
 ### Running Checks
 
