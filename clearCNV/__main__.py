@@ -99,21 +99,21 @@ def get_parser():
     parser_cnv_calling.add_argument(
         "-C",
         "--cnv_calls",
-        help="Output cnv.calls file formatted in tsv format",
+        help="Output cnv_calls.tsv file formatted in tsv format",
         required=True,
         type=str,
     )
     parser_cnv_calling.add_argument(
         "-r",
         "--ratio_scores",
-        help="Output ratio scores file in tsv format. Best kept together with cnv.calls",
+        help="Output ratio scores file in tsv format. Best kept together with cnv_calls.tsv",
         required=True,
         type=str,
     )
     parser_cnv_calling.add_argument(
         "-z",
         "--z_scores",
-        help="Output z-scores file in tsv format. Best kept together with cnv.calls",
+        help="Output z-scores file in tsv format. Best kept together with cnv_calls.tsv",
         required=True,
         type=str,
     )

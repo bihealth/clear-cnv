@@ -26,7 +26,7 @@ ANALYSIS_DIR    = folder / "analysis"
 COVERAGES       = COV_DIR / "coverages.tsv"
 MATCHSCORES     = RESULTS_DIR / "matchscores.tsv"
 RESULTS_DIR     = folder / "results"
-CNV_CALLS       = RESULTS_DIR / "cnv.calls"
+CNV_CALLS       = RESULTS_DIR / "cnv_calls.tsv"
 RATIO_SCORES    = RESULTS_DIR / "rscores.tsv"
 Z_SCORES        = RESULTS_DIR / "zscores.tsv"
 ANNOT           = RESULTS_DIR / "annotations.bed"
@@ -232,7 +232,7 @@ rule visualize_results:
 
 # rule common_cnv_calls:
 #     input:
-#         RESULTS_DIR+"cnv.calls"
+#         RESULTS_DIR+"cnv_calls.tsv"
 #     output:
 #         COMMON_CNV_CALLS
 #     params:

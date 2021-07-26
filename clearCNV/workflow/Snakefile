@@ -28,7 +28,7 @@ KMER_ALIGN  = config["kmer_align"] # "/fast/work/projects/cubit/18.12/static_dat
 # COVERAGES       = COV_DIR \ pathlib.Path("coverages.tsv")
 # MATCHSCORES     = RESULTS_DIR \ pathlib.Path("matchscores.tsv")
 # RESULTS_DIR     = folder \ pathlib.Path("results")
-# CNV_CALLS       = RESULTS_DIR \ pathlib.Path("cnv.calls")
+# CNV_CALLS       = RESULTS_DIR \ pathlib.Path("cnv_calls.tsv")
 # RATIO_SCORES    = RESULTS_DIR \ pathlib.Path("rscores.tsv")
 # Z_SCORES        = RESULTS_DIR \ pathlib.Path("zscores.tsv")
 # ANNOT           = RESULTS_DIR \ pathlib.Path("annotations.bed")
@@ -42,12 +42,12 @@ ANALYSIS_DIR    = "%sanalysis/"%folder
 COVERAGES       = "%scoverages.tsv"%COV_DIR
 MATCHSCORES     = "%smatchscores.tsv"%RESULTS_DIR
 RESULTS_DIR     = "%sresults/"%folder
-CNV_CALLS       = "%scnv.calls"%RESULTS_DIR
+CNV_CALLS       = "%scnv_calls.tsv"%RESULTS_DIR
 RATIO_SCORES    = "%srscores.tsv"%RESULTS_DIR
 Z_SCORES        = "%szscores.tsv"%RESULTS_DIR
 ANNOT           = "%sannotations.bed"%RESULTS_DIR
 
-#COMMON_CNV_CALLS  = "%scnv.calls.common"%RESULTS_DIR
+#COMMON_CNV_CALLS  = "%scnv_calls.tsv.common"%RESULTS_DIR
 
 # =============================================================================
 #  UTIL
@@ -222,7 +222,7 @@ rule visualize_results:
 
 # rule common_cnv_calls:
 #     input:
-#         RESULTS_DIR+"cnv.calls"
+#         RESULTS_DIR+"cnv_calls.tsv"
 #     output:
 #         COMMON_CNV_CALLS
 #     params:
