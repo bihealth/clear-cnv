@@ -3,7 +3,6 @@ import pathlib
 
 
 def create_config(configpath, args):
-    print("CREATE CONFIG:: ", str(args.plot_regions))
     with open(configpath, "wt") as f:
         print("workdir: '" + args.workdir + "'", file=f)
         print("panelname: '" + args.panelname + "'", file=f)

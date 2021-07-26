@@ -41,7 +41,7 @@ SIZE                 = int(config["size"])
 DEL_CUTOFF           = float(config["del_cutoff"])
 DUP_CUTOFF           = float(config["dup_cutoff"])
 TRANSPROB            = float(config["trans_prob"])
-PLOTREGIONS          = bool(config["plot_regions"])
+PLOTREGIONS          = "--plot_regions" if bool(config["plot_regions"]) else ""
 
 # =============================================================================
 #  UTIL
@@ -201,7 +201,7 @@ rule cnv_calling:
             --del_cutoff {params.del_cutoff} \
             --dup_cutoff {params.dup_cutoff} \
             --trans_prob {params.trans_prob} \
-            --plot_regions {params.plot_regions}"
+            {params.plot_regions}"
 
 
 # =============================================================================

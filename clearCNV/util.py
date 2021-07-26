@@ -110,18 +110,20 @@ def trim(D, axis=0, alpha=0.1):
 
 # within sample
 def normalize(D, axis=1):
-    if axis:
-        return np.asarray(D) / np.median(D, axis=axis)[:, None]
-    else:
-        return np.asarray(D) / np.median(D, axis=axis)[None, :]
+    return np.apply_along_axis(lambda v: v / np.median(v[np.nonzero(v)]), axis, np.asarray(D))
+
 
 
 def normalize_within_exon(D0_):
-    return D0_.div(D0_.median(axis=1), axis=0)
+    c,i = D0_.columns, D0_.index
+    x = np.apply_along_axis(lambda v: v / np.median(v[np.nonzero(v)]), 0, np.asarray(D0_))
+    return pd.DataFrame(x,columns=c, index=i)
 
 
 def normalize_within_sample(D0_):
-    return D0_.div(D0_.median(axis=0), axis=1)
+    c,i = D0_.columns, D0_.index
+    x = np.apply_along_axis(lambda v: v / np.median(v[np.nonzero(v)]), 1, np.asarray(D0_))
+    return pd.DataFrame(x,columns=c, index=i)
 
 
 def normalize_chromosomewise(DA, INDEX):
