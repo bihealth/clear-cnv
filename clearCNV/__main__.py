@@ -563,27 +563,27 @@ def get_parser():
     # =========================================================================
     #  visualize reassignment
     # =========================================================================
-    parser_visualize_reassignment = subparsers.add_parser(
-        "visualize_reassign", description=("Interactive reassignment visualization"),
+    parser_visualize_reassignmentment = subparsers.add_parser(
+        "visualize_reassignment", description=("Interactive reassignment visualization"),
     )
 
-    parser_visualize_reassignment.add_argument(
+    parser_visualize_reassignmentment.add_argument(
         "--host", default="0.0.0.0", help="Host to run server on, defaults to 0.0.0.0"
     )
 
-    parser_visualize_reassignment.add_argument(
+    parser_visualize_reassignmentment.add_argument(
         "--port", type=int, default=8080, help="Port to run server on"
     )
 
-    parser_visualize_reassignment.add_argument(
+    parser_visualize_reassignmentment.add_argument(
         "--debug", default=False, action="store_true", help="Whether or not to enable debugging"
     )
 
-    parser_visualize_reassignment.add_argument(
+    parser_visualize_reassignmentment.add_argument(
         "--cache-dir", help="Optional path to cache directory, avoids repeating startup computation"
     )
 
-    parser_visualize_reassignment.add_argument(
+    parser_visualize_reassignmentment.add_argument(
         "-m",
         "--metafile",
         help="Path to the file containing the meta information. It is a .tsv of the scheme [panel name] [path of bams.txt] [path of targets.bed]. \
@@ -592,7 +592,7 @@ def get_parser():
         type=str,
     )
 
-    parser_visualize_reassignment.add_argument(
+    parser_visualize_reassignmentment.add_argument(
         "-c",
         "--coverages",
         required=True,
@@ -600,7 +600,7 @@ def get_parser():
         help="Matrix in tsv format containing coverage values. Is output of 'workflow_reassignment' step",
     )
 
-    parser_visualize_reassignment.add_argument(
+    parser_visualize_reassignmentment.add_argument(
         "-b",
         "--bedfile",
         required=True,
@@ -608,20 +608,20 @@ def get_parser():
         help="Path to BED file that will contain the union of all given BED files",
     )
 
-    parser_visualize_reassignment.add_argument(
+    parser_visualize_reassignmentment.add_argument(
         "-d",
         "--new_panel_assignments_directory",
         help="Path to directory that will contain the output lists of paths to .bam-files, which were re-assigned to the given panels according to clustering.",
     )
 
-    # parser_visualize_reassignment.add_argument(
+    # parser_visualize_reassignmentment.add_argument(
     #    "-p",
     #    "--panels",
     #    required=True,
     #    type=str,
     #    help="Path to the directory that will contain the final lists of bam-files grouped by panels")
 
-    # parser_visualize_reassignment.add_argument(
+    # parser_visualize_reassignmentment.add_argument(
     #    "-a",
     #    "--batches",
     #    required=True,
@@ -662,7 +662,7 @@ def get_parser():
             ## XXX
             app.run_server(host=args.host, port=args.port, debug=args.debug)
 
-    parser_visualize_reassignment.set_defaults(func=viz_reassignment)
+    parser_visualize_reassignmentment.set_defaults(func=viz_reassignment)
 
     return parser
 

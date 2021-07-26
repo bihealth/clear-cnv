@@ -28,13 +28,13 @@ Also, a cluster config file in .json format can be given with `--cluster_configf
 #### 2. Visualize and adjust the clusterings and final panel assignments
 
 Run the following shell command from `clear-cnv/`:
-```clearCNV visualize_reassign --metafile tests/testdata/meta.tsv --coverages tests/testdata/cov_reassignment.tsv --bedfile tests/testdata/reassignment_union.bed --new_panel_assignments_directory tests/testdata/panel_assignments```
+```clearCNV visualize_reassignment --metafile tests/testdata/meta.tsv --coverages tests/testdata/cov_reassignment.tsv --bedfile tests/testdata/reassignment_union.bed --new_panel_assignments_directory tests/testdata/panel_assignments```
 
 INPUT: files given by `--metafile`, `--coverages` and `--bedfile`.
 OUTPUT: files found in given directory `--new_panel_assignments_directory`.
 
 #### NOTE
-If you do sample re-asignment on your own data, followed by CNV-calling, then only one metafile, one coverages file and one bedfile will be used. This means that `--metafile`, `--coverages` and `--bedfile` are given the same file paths in both workflow steps `clearCNV workflow_reassignment` and `clearCNV visualize_reassign` of clearCNV.
+If you do sample re-asignment on your own data, followed by CNV-calling, then only one metafile, one coverages file and one bedfile will be used. This means that `--metafile`, `--coverages` and `--bedfile` are given the same file paths in both workflow steps `clearCNV workflow_reassignment` and `clearCNV visualize_reassignment` of clearCNV.
 
 ### Running Checks
 
