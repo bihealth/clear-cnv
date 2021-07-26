@@ -51,25 +51,41 @@ This creates the file `tests/testdata/testpanel/results/cnv_calls.tsv` which sho
 
 clearCNV comprises of two major workflows comprising three major commads:
 
+#### workflow
+
 1) re-assignment
-
+    
     a) `clearCNV workflow_reassignment`
-  
+    
     b) `clearCNV visualize_reassignment`
-
+    
 2) CNV calling
-
+    
     a) `clearCNV workflow_cnv_calling`
+
+#### preparations
 
 Some files have to be acquired or created before these commands can be run:
 1) re-assignment:
+    
+    a) For each sequencing panel a .bed file is needed following this [form](tests/testdata/panel1.bed). Such a file should always exist in the case of targeted sequencing.
+    
+    b) For each sequencing panel (or .bed-file containing all target informations) a simple list of the according .bam files is needed. An example can be found [here](tests/testdata/reassignment_p1_bamfiles.txt). Make sure to use absolute paths for this file on custim data.
+    
+    c) meta-file. This file is a tab-separated file and one example can be found [here](tests/testdata/meta.tsv). To avoid any confusion, we recommend using absolute paths here again.
 
-    a) For each sequencing panel a .bed file is needed following this [form](tests/testdata/panel1.bed)
-  
-    b) For each sequencing panel (or .bed-file containing all target informations) a simple list of the according .bam files is needed. An example can be found [here](tests/testdata/reassignment_p1_bamfiles.txt)
-  
-    c) meta-file. This file is a tab-separated file and one example can be found [here](tests/testdata/meta.tsv).
+2) CNV calling:
 
+    a) A reference file. It must be the same that was used to create the alignment files (.bam files).
+    
+    b) `workflow_cnv_calling` does CNV calling for each batch (or sequencing panel associated data set) separately. A text file with all .bam file paths for each batch and panel must be created. [Here](tests/testdata/test_reassignment_p1_bamfiles.txt) is an example showing only one .bam file path. Multiple paths are separated with a newline. This file is usually an output of `clearCNV visualize_reassignment`.
+    
+    c) The .bed-file for the sequencing panel for which this batch is put to CNV calling. An example can be found [here](tests/testdata/panel1.bed). Note that `gene` is optimally replaced with the real name of the exon, gene or target.
+    
+    d) A k-mer alignability file in .bed format. Such files can be downloaded from UCSC (e.g. for Hg19 [here](http://genome.ucsc.edu/cgi-bin/hgFileUi?db=hg19&g=wgEncodeMapability)). A k-mer mappability track can also be created for example using [GenMap](https://github.com/cpockrandt/genmap). In both cases the resulting Wig or BigWig files need to be converted to .bed to be used by clearCNV.
+
+#### notes
+The chromosome name scheme in the reference and .bed-file should be of the forms: ChrX, chrx, X or Chr1, chr1, 1.
 
 
 #### NOTE
