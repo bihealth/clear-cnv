@@ -171,20 +171,20 @@ def get_parser():
         default=0.001,
     )
     parser_cnv_calling.add_argument(
-        '--plot_regions',
-        dest='plot_regions',
+        "--plot_regions",
+        dest="plot_regions",
         help="If set, the CNV calling script plots heatmaps of the CNV called regions with the corresponding sample group taken as background.",
         required=False,
-        action='store_true'
+        action="store_true",
     )
     parser_cnv_calling.set_defaults(plot_regions=False)
-    #parser_cnv_calling.add_argument(
+    # parser_cnv_calling.add_argument(
     #    "--plot_regions",
     #    help="If true, the CNV calling script plots heatmaps of the regions.",
     #    required=False,
     #    type=bool,
     #    default=False,
-    #)
+    # )
     parser_cnv_calling.add_argument(
         "--cores",
         help="Number of cpu cores used in parallel processing. Default: determined automatically.",
@@ -379,7 +379,11 @@ def get_parser():
         type=str,
     )
     parser_workflow_cnv_calling.add_argument(
-        "-d", "--bedfile", help="Path to the BED file that contains all targets of the sequencing panel. It must contain the columns: chr, start, end, gene.", required=True, type=str,
+        "-d",
+        "--bedfile",
+        help="Path to the BED file that contains all targets of the sequencing panel. It must contain the columns: chr, start, end, gene.",
+        required=True,
+        type=str,
     )
     parser_workflow_cnv_calling.add_argument(
         "-k",
@@ -454,11 +458,11 @@ def get_parser():
         default=0.001,
     )
     parser_workflow_cnv_calling.add_argument(
-        '--plot_regions',
-        dest='plot_regions',
+        "--plot_regions",
+        dest="plot_regions",
         help="If set, the CNV calling script plots heatmaps of the CNV called regions with the corresponding sample group taken as background.",
         required=False,
-        action='store_true'
+        action="store_true",
     )
     parser_workflow_cnv_calling.set_defaults(plot_regions=False)
     parser_workflow_cnv_calling.add_argument(

@@ -347,7 +347,7 @@ def cnv_calling(args):
         factor = 0.08
         final_regions = ["-".join(FINAL.loc[i, ["chr", "start", "end"]]) for i in FINAL.index]
         for i, region in enumerate(final_regions):
-            print(f"plotting {i} of %d"%len(final_regions))
+            print(f"plotting {i} of %d" % len(final_regions))
             sample = FINAL["sample"].iloc[i]
             r = util.select_region(region, RR, sample, Matchscores_bools_selected, buffer=2).clip(
                 0, 2

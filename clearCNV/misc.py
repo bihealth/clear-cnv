@@ -72,7 +72,7 @@ def prepare_reassignment(args):
     for b in set([val for l in L for val in l]):
         print(b, file=f)
     f.close()
-    merge_bedfiles(list(META['bedfiles']), args.bedfile)
+    merge_bedfiles(list(META["bedfiles"]), args.bedfile)
 
 
 # =============================================================================

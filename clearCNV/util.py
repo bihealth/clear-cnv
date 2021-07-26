@@ -114,15 +114,15 @@ def normalize(D, axis=1):
 
 
 def normalize_within_exon(D0_):
-    c,i = D0_.columns, D0_.index
+    c, i = D0_.columns, D0_.index
     x = np.apply_along_axis(lambda v: v / np.median(v[np.nonzero(v)]), 1, np.asarray(D0_))
-    return pd.DataFrame(x,columns=c, index=i)
+    return pd.DataFrame(x, columns=c, index=i)
 
 
 def normalize_within_sample(D0_):
-    c,i = D0_.columns, D0_.index
+    c, i = D0_.columns, D0_.index
     x = np.apply_along_axis(lambda v: v / np.median(v[np.nonzero(v)]), 0, np.asarray(D0_))
-    return pd.DataFrame(x,columns=c, index=i)
+    return pd.DataFrame(x, columns=c, index=i)
 
 
 def normalize_chromosomewise(DA, INDEX):
