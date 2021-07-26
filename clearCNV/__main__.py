@@ -11,7 +11,7 @@ from . import matchscores
 from . import cnv_calling
 from . import visualize_scores
 from . import workflow_cnv_calling
-from . import workflow_reassign
+from . import workflow_reassignment
 from . import __version__
 
 #: The executables required for running clear-CNV.
@@ -171,20 +171,20 @@ def get_parser():
         default=0.001,
     )
     parser_cnv_calling.add_argument(
-        "--plot_regions",
-        dest="plot_regions",
+        '--plot_regions',
+        dest='plot_regions',
         help="If set, the CNV calling script plots heatmaps of the CNV called regions with the corresponding sample group taken as background.",
         required=False,
-        action="store_true",
+        action='store_true'
     )
     parser_cnv_calling.set_defaults(plot_regions=False)
-    # parser_cnv_calling.add_argument(
+    #parser_cnv_calling.add_argument(
     #    "--plot_regions",
     #    help="If true, the CNV calling script plots heatmaps of the regions.",
     #    required=False,
     #    type=bool,
     #    default=False,
-    # )
+    #)
     parser_cnv_calling.add_argument(
         "--cores",
         help="Number of cpu cores used in parallel processing. Default: determined automatically.",
@@ -258,7 +258,7 @@ def get_parser():
     parser_merge_bed.set_defaults(func=misc.merge_bedfile)
 
     # =========================================================================
-    #  reassign
+    #  reassignment
     # =========================================================================
 
     # prepare - maybe exclude in future
@@ -379,11 +379,7 @@ def get_parser():
         type=str,
     )
     parser_workflow_cnv_calling.add_argument(
-        "-d",
-        "--bedfile",
-        help="Path to the BED file that contains all targets of the sequencing panel. It must contain the columns: chr, start, end, gene.",
-        required=True,
-        type=str,
+        "-d", "--bedfile", help="Path to the BED file that contains all targets of the sequencing panel. It must contain the columns: chr, start, end, gene.", required=True, type=str,
     )
     parser_workflow_cnv_calling.add_argument(
         "-k",
@@ -458,11 +454,11 @@ def get_parser():
         default=0.001,
     )
     parser_workflow_cnv_calling.add_argument(
-        "--plot_regions",
-        dest="plot_regions",
+        '--plot_regions',
+        dest='plot_regions',
         help="If set, the CNV calling script plots heatmaps of the CNV called regions with the corresponding sample group taken as background.",
         required=False,
-        action="store_true",
+        action='store_true'
     )
     parser_workflow_cnv_calling.set_defaults(plot_regions=False)
     parser_workflow_cnv_calling.add_argument(
@@ -493,19 +489,19 @@ def get_parser():
     # =========================================================================
     #  workflow reassignment
     # =========================================================================
-    parser_workflow_reassign = subparsers.add_parser(
-        "workflow_reassign",
+    parser_workflow_reassignment = subparsers.add_parser(
+        "workflow_reassignment",
         description=(
             "Complete CNV-calling snakemake-workflow to run on data from a single sequencing panel (bed-file)."
         ),
     )
-    parser_workflow_reassign.add_argument(
+    parser_workflow_reassignment.add_argument(
         "-w", "--workdir", help="Path to the snakemake workdir.", required=True, type=str,
     )
-    parser_workflow_reassign.add_argument(
+    parser_workflow_reassignment.add_argument(
         "-r", "--reference", help="Path to the genomic reference.", required=True, type=str,
     )
-    parser_workflow_reassign.add_argument(
+    parser_workflow_reassignment.add_argument(
         "-m",
         "--metafile",
         help="Path to the file containing the meta information. It is a .tsv of the scheme [panel] [bams.txt] [bed.bed]. \
@@ -514,7 +510,7 @@ def get_parser():
         type=str,
     )
 
-    parser_workflow_reassign.add_argument(
+    parser_workflow_reassignment.add_argument(
         "-c",
         "--coverages",
         help="Output file path to coverages matrix (e.g. coverages.tsv).",
@@ -522,7 +518,7 @@ def get_parser():
         type=str,
     )
 
-    parser_workflow_reassign.add_argument(
+    parser_workflow_reassignment.add_argument(
         "-b",
         "--bedfile",
         required=True,
@@ -530,7 +526,7 @@ def get_parser():
         help="Output file path to BED file that will contain the union of all given BED files",
     )
 
-    parser_workflow_reassign.add_argument(
+    parser_workflow_reassignment.add_argument(
         "--cores",
         help="Number of used cores in snakemake workflow. Default is 32.",
         required=False,
@@ -538,7 +534,7 @@ def get_parser():
         default=32,
     )
 
-    parser_workflow_reassign.add_argument(
+    parser_workflow_reassignment.add_argument(
         "--cluster_configfile",
         help="Path to the cluster config file.",
         required=False,
@@ -546,7 +542,7 @@ def get_parser():
         default="",
     )
 
-    parser_workflow_reassign.add_argument(
+    parser_workflow_reassignment.add_argument(
         "--drmaa_mem",
         help="Number of megabytes used with drmaa. Suggested is 16000. If --drmaa_mem and --drmaa_time are given, this workflow will automatically use --drmaa in its snakemake call.",
         required=False,
@@ -554,7 +550,7 @@ def get_parser():
         default=None,
     )
 
-    parser_workflow_reassign.add_argument(
+    parser_workflow_reassignment.add_argument(
         "--drmaa_time",
         help="Maximum number of hh:mm per job. Suggested is 4:00.",
         required=False,
@@ -562,7 +558,7 @@ def get_parser():
         default=None,
     )
 
-    parser_workflow_reassign.set_defaults(func=workflow_reassign.workflow_reassign)
+    parser_workflow_reassignment.set_defaults(func=workflow_reassignment.workflow_reassignment)
 
     # =========================================================================
     #  visualize reassignment
@@ -601,7 +597,7 @@ def get_parser():
         "--coverages",
         required=True,
         type=str,
-        help="Matrix in tsv format containing coverage values. Is output of 'workflow_reassign' step",
+        help="Matrix in tsv format containing coverage values. Is output of 'workflow_reassignment' step",
     )
 
     parser_visualize_reassignment.add_argument(

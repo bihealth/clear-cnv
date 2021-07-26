@@ -13,7 +13,7 @@
 #### 1. Create all files to do reassignment
 
 Go to the directory `clear-cnv/` and execute the shell commad:
-```clearCNV workflow_reassign --workdir tests/testdata/ --reference tests/testdata/test_reassignment_ref.fa --metafile tests/testdata/test_reassign_meta.tsv --coverages tests/testdata/test_reassignment_coverages.tsv --bedfile tests/testdata/test_reassignment_union.bed --cores 2```
+```clearCNV workflow_reassignment --workdir tests/testdata/ --reference tests/testdata/test_reassignment_ref.fa --metafile tests/testdata/test_reassign_meta.tsv --coverages tests/testdata/test_reassignment_coverages.tsv --bedfile tests/testdata/test_reassignment_union.bed --cores 2```
 
 INPUT: working directory given by `--workdir`, the files given by `--reference` and `--metafile`.
 OUTPUT: files created at `--coverages` and `--bedfile`. They are used in the next step.
@@ -34,7 +34,7 @@ INPUT: files given by `--metafile`, `--coverages` and `--bedfile`.
 OUTPUT: files found in given directory `--new_panel_assignments_directory`.
 
 #### NOTE
-If you do sample re-asignment on your own data, followed by CNV-calling, then only one metafile, one coverages file and one bedfile will be used. This means that `--metafile`, `--coverages` and `--bedfile` are given the same file paths in both workflow steps `clearCNV workflow_reassign` and `clearCNV visualize_reassign` of clearCNV.
+If you do sample re-asignment on your own data, followed by CNV-calling, then only one metafile, one coverages file and one bedfile will be used. This means that `--metafile`, `--coverages` and `--bedfile` are given the same file paths in both workflow steps `clearCNV workflow_reassignment` and `clearCNV visualize_reassign` of clearCNV.
 
 ### Running Checks
 
