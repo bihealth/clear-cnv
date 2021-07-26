@@ -52,16 +52,22 @@ This creates the file `tests/testdata/testpanel/results/cnv_calls.tsv` which sho
 clearCNV comprises of two major workflows comprising three major commads:
 
 1) re-assignment
+
   a) `clearCNV workflow_reassignment`
+  
   b) `clearCNV visualize_reassignment`
 
 2) CNV calling
+
   a) `clearCNV workflow_cnv_calling`
 
 Some files have to be acquired or created before these commands can be run:
 1) re-assignment:
+
   a) For each sequencing panel a .bed file is needed following this [form](tests/testdata/panel1.bed)
+  
   b) For each sequencing panel (or .bed-file containing all target informations) a simple list of the according .bam files is needed. An example can be found [here](tests/testdata/reassignment_p1_bamfiles.txt)
+  
   c) meta-file. This file is a tab-separated file and one example can be found [here](tests/testdata/meta.tsv).
 
 
