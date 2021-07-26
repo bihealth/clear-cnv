@@ -85,6 +85,8 @@ Some files have to be acquired or created before these commands can be run:
 #### notes
 The chromosome name scheme in the reference and .bed-file should be of the forms: ChrX, chrX, X or Chr1, chr1, 1.
 
+CNV calling on Chr X or Chr Y: clearCNV automatically determines the copy number of the gonosomes. If your panel targets only a single gene there, it is better to delete according targets from the original .bed file to exclude them. It is necessary to have about double as many samples in your data set to enable meaningful CNV calling on the X or Y chromosomes with roughly equally many women and men in the samples.
+
 
 #### NOTE
 If you do sample re-assignment on your own data, followed by CNV-calling, then only one metafile, one coverages file and one bedfile will be used. This means that `--metafile`, `--coverages` and `--bedfile` are given the same file paths in both workflow steps `clearCNV workflow_reassignment` and `clearCNV visualize_reassignment` of clearCNV.
