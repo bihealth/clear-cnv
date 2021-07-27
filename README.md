@@ -45,6 +45,8 @@ Now execute this shell command:
 
 This creates the file `tests/testdata/testpanel/results/cnv_calls.tsv` which shows one called deletion. if you copy & paste this for your own data, please don't use the `-g 15 -u 3` configuration. We use these in here just to be able to work with a tiny example.
 
+More files for analysis can now be found in `tests/testdata/testpanel/analysis`.
+
 ## HOW TO and WORKFLOW
 
 clearCNV comprises of two major workflows and three major commads:
