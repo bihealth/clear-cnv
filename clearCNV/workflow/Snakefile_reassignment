@@ -1,0 +1,75 @@
+import os.path
+import pathlib
+
+workdir: config["workdir"]
+
+# -----------------------------------------------------------------------------
+#  USER INPUT FILES
+
+META        = config["metafile"]
+REF         = config["reference"]
+
+# -----------------------------------------------------------------------------
+# =============================================================================
+# -----------------------------------------------------------------------------
+#  DO NOT TOUCH
+
+BED         = pathlib.Path(config["bedfile"])
+BAMSTXT     = pathlib.Path(config["bamsfile"])
+COVERAGES   = pathlib.Path(config["coverages"])
+COV_DIR     = pathlib.Path(config["cov_dir"])
+
+#logspath = pathlib.Path(config["workdir"]) / "logs"
+logspath = pathlib.Path("logs")
+# options
+
+# =============================================================================
+#  UTIL
+# =============================================================================
+
+with open(BAMSTXT, "rt") as inputf:
+  paths = [p.strip() for p in inputf.readlines()]
+  BAMS = {
+    pathlib.Path(p).stem: str(pathlib.Path(p).absolute())
+    for p in paths
+  }
+# -----------------------------------------------------------------------------
+
+rule all:
+    input:
+        #rtbeds=expand(str(COV_DIR / "{bam}.rtbed"),bam=BAMS.keys())
+        COVERAGES
+
+# =============================================================================
+#  COVERAGES
+# =============================================================================
+
+rule count_pairs:
+    input:
+        lambda wildcards: BAMS[wildcards.bam],
+        BED
+    output:
+        COV_DIR / "{bam}.rtbed"
+    log: logspath / "coverages/{bam}.log"
+    shell:
+        "clearCNV coverage \
+            -i {input[0]} \
+            -b {input[1]} \
+            -r {output}"
+
+# -----------------------------------------------------------------------------
+
+rule merge_rtbeds:
+    input:
+        rtbeds=expand(str(COV_DIR / "{bam}.rtbed"),bam=BAMS.keys())
+    output:
+        COVERAGES
+    params:
+        exome=BED
+    log: logspath / "merge_coverages.log"
+    shell:
+        "clearCNV merge_coverages \
+            -b {params} \
+            -r {input} \
+            -c {output}"
+

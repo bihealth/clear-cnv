@@ -1,0 +1,7 @@
+workdir: 'tests/testdata/'
+metafile: '/home/memsonmi/DEV/clear-cnv/tests/testdata/test_reassign_meta.tsv'
+coverages: '/home/memsonmi/DEV/clear-cnv/tests/testdata/test_reassignment_coverages.tsv'
+cov_dir: '/home/memsonmi/DEV/clear-cnv/tests/testdata/covs'
+bedfile: '/home/memsonmi/DEV/clear-cnv/tests/testdata/test_reassignment_union.bed'
+bamsfile: '/home/memsonmi/DEV/clear-cnv/tests/testdata/allbams.txt'
+reference: '/home/memsonmi/DEV/clear-cnv/tests/testdata/test_reassignment_ref.fa'
