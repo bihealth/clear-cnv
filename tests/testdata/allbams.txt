@@ -1,2 +1,2 @@
-test_reassign_small_1.bam
 test_reassign_small_0.bam
+test_reassign_small_1.bam
