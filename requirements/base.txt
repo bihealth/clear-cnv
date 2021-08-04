@@ -12,6 +12,8 @@ plotly >=4.5.4
 snakemake >=5.9.1
 fastcluster
 
+regex
+
 attrs
 cattrs
 
@@ -21,3 +23,5 @@ dash-core-components
 dash-bootstrap-components
 flask
 flask-caching
+
+#bedops

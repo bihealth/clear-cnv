@@ -30,6 +30,7 @@ def workflow_reassignment(args):
         / pathlib.Path("workflow")
         / pathlib.Path("config_reassignment.yml")
     )
+    configpath.parent.mkdir(parents=True, exist_ok=True)
     create_config(configpath, args)
     arguments = [
         "snakemake",

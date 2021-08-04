@@ -21,15 +21,14 @@ def create_config(configpath, args):
         print("trans_prob: '" + str(args.trans_prob) + "'", file=f)
         print("plot_regions: '" + str(args.plot_regions) + "'", file=f)
 
-
 def workflow_cnv_calling(args):
     configpath = (
         pathlib.Path(__file__).absolute().parent
         / pathlib.Path("workflow")
         / pathlib.Path("config_cnv_calling.yml")
     )
+    configpath.parent.mkdir(parents=True, exist_ok=True)
     create_config(configpath, args)
-
     arguments = [
         "snakemake",
         "--snakefile",
