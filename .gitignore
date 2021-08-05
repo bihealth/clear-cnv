@@ -335,7 +335,6 @@ run_FCC.sh
 run_rtbedmerge.sh
 log.log
 
-tests/testdata/covs
 tests/testdata/logs
 tests/testdata/.snakemake
 

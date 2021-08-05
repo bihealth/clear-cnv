@@ -57,7 +57,7 @@ def workflow_reassignment(args):
             )
         )
         arguments.append(f"-j {args.drmaa_jobs}")
-
+    print("DEBUG:: \n", ' '.join(arguments))
     # How to create the dir the best way?
     subprocess.check_call(["mkdir", "-p", f"{args.workdir}sge_log"])
     subprocess.check_call(["mkdir", "-p", f"{args.workdir}covs"])
