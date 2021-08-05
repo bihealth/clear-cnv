@@ -51,7 +51,7 @@ def workflow_cnv_calling(args):
         workdir_full_path = str(pathlib.Path(args.workdir).absolute())
         arguments.append(
             str(
-                f"\" --mem={args.drmaa_mem} --time={args.drmaa_time} --output={workdir_full_path}sge_log/%x-%j.log\""
+                f"\" --mem={args.drmaa_mem} --time={args.drmaa_time} --output={workdir_full_path}/sge_log/%x-%j.log\""
             )
         )
         arguments.append(f"--jobs {args.drmaa_jobs}")
