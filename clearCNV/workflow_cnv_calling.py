@@ -50,7 +50,7 @@ def workflow_cnv_calling(args):
         arguments.append("--drmaa")
         arguments.append(
             str(
-                f" --mem={args.drmaa_mem} --time={args.drmaa_time} --output={args.workdir}sge_log/%x-%j.log"
+                f"\" --mem={args.drmaa_mem} --time={args.drmaa_time} --output={args.workdir}sge_log/%x-%j.log\""
             )
         )
     subprocess.check_call(arguments)

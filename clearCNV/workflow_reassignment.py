@@ -52,7 +52,7 @@ def workflow_reassignment(args):
         arguments.append("--drmaa")
         arguments.append(
             str(
-                f" --mem={args.drmaa_mem} --time={args.drmaa_time} --output={args.workdir}sge_log/%x-%j.log"
+                f"\" --mem={args.drmaa_mem} --time={args.drmaa_time} --output={args.workdir}sge_log/%x-%j.log\""
             )
         )
 
