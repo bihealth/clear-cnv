@@ -50,8 +50,9 @@ def cnv_calling(args):
         print("ERROR: NO SAMPLES IN ANALYSIS. There were no samples selected to perform CNV calling. Try to pick a lower value for MINIMUM_GROUP_SIZES or a higher value for SAMPLE_SCORE_FACTOR. Aborting.")
         raise Exception('No samples selected to smaple group. Try to pick a lower value for MINIMUM_GROUP_SIZES or a higher value for SAMPLE_SCORE_FACTOR.')
 
-    for p in [calls_path,z_scores_path,ratio_scores_path,analysis_dir]:
+    for p in [calls_path,z_scores_path,ratio_scores_path]:
         pathlib.Path(p).parent.mkdir(parents=True, exist_ok=True)
+    pathlib.Path(analysis_dir).mkdir(parents=True, exist_ok=True)
 
     # evaluation
     # if len(failed_samples) > 0:
