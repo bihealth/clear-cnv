@@ -45,7 +45,7 @@ def workflow_cnv_calling(args):
     if args.cluster_configfile:
         arguments.append("--cluster-config")
         arguments.append(args.cluster_configfile)
-    if args.drmaa_mem and args.drmaa_time:
+    if args.drmaa_mem and args.drmaa_time and args.drmaa_jobs:
         arguments.append("-p")
         arguments.append("--drmaa")
         arguments.append(
@@ -53,6 +53,7 @@ def workflow_cnv_calling(args):
                 f"\" --mem={args.drmaa_mem} --time={args.drmaa_time} --output={args.workdir}sge_log/%x-%j.log\""
             )
         )
+        arguments.append("--jobs {args.drmaa_jobs}")
     subprocess.check_call(arguments)
 
     # "panelname="+args.panelname,
