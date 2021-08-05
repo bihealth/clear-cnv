@@ -37,7 +37,7 @@ def workflow_reassignment(args):
         str(
             pathlib.Path(__file__).absolute().parent
             / pathlib.Path("workflow")
-            / pathlib.Path("snakefile_reassignment")
+            / pathlib.Path("Snakefile_reassignment")
         ),
         "--configfile",
         str(configpath),
