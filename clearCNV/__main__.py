@@ -484,6 +484,14 @@ def get_parser():
         type=str,
         default=None,
     )
+
+    parser_workflow_cnv_calling.add_argument(
+        "--drmaa_jobs",
+        help="Number of jobs. Default is 50.",
+        required=False,
+        type=int,
+        default=50,
+    )
     parser_workflow_cnv_calling.set_defaults(func=workflow_cnv_calling.workflow_cnv_calling)
 
     # =========================================================================
@@ -557,7 +565,13 @@ def get_parser():
         type=str,
         default=None,
     )
-
+    parser_workflow_reassignment.add_argument(
+        "--drmaa_jobs",
+        help="Number of jobs. Default is 50.",
+        required=False,
+        type=int,
+        default=50,
+    )
     parser_workflow_reassignment.set_defaults(func=workflow_reassignment.workflow_reassignment)
 
     # =========================================================================
