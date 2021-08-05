@@ -14,7 +14,6 @@ def create_config(configpath, args):
         print("bamsfile: '" + str(args.bamsfile) + "'", file=f)
         print("reference: '" + str(args.reference) + "'", file=f)
 
-
 def workflow_reassignment(args):
     args.bamsfile = (pathlib.Path(args.workdir) / "allbams.txt").absolute()
     args.cov_dir = (pathlib.Path(args.workdir) / "covs").absolute()
