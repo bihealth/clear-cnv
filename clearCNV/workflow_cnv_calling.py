@@ -53,7 +53,7 @@ def workflow_cnv_calling(args):
                 f"\" --mem={args.drmaa_mem} --time={args.drmaa_time} --output={args.workdir}sge_log/%x-%j.log\""
             )
         )
-        arguments.append("--jobs {args.drmaa_jobs}")
+        arguments.append(f"--jobs {args.drmaa_jobs}")
     subprocess.check_call(arguments)
 
     # "panelname="+args.panelname,

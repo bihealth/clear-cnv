@@ -50,14 +50,16 @@ def workflow_reassignment(args):
     if args.drmaa_mem and args.drmaa_time and args.drmaa_jobs:
         arguments.append("-p")
         arguments.append("--drmaa")
+        workdir_full_path = pathlib.Path(args.workdir).absolute
         arguments.append(
             str(
-                f"\" --mem={args.drmaa_mem} --time={args.drmaa_time} --output={args.workdir}sge_log/%x-%j.log\""
+                f"\" --mem={args.drmaa_mem} --time={args.drmaa_time} --output={workdir_full_path}sge_log/%x-%j.log\""
             )
         )
-        arguments.append("--jobs {args.drmaa_jobs}")
+        arguments.append(f"-j {args.drmaa_jobs}")
 
     # How to create the dir the best way?
+    print("DEBUG:: FULL SNAKEMAKE CALL STRING::", ' '.join(arguments))
     subprocess.check_call(["mkdir", "-p", f"{args.workdir}sge_log"])
     subprocess.check_call(["mkdir", "-p", f"{args.workdir}covs"])
 
