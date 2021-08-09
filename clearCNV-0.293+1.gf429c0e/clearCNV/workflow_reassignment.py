@@ -53,8 +53,8 @@ def workflow_reassignment(args):
         arguments.append('--drmaa')
         workdir_full_path = str(pathlib.Path(args.workdir).absolute())
 
-        drmaa_string = f' --mem={args.drmaa_mem} --time={args.drmaa_time} --output={workdir_full_path}/sge_log/%x-%j.log '
-        print("DEBUG::", drmaa_string)
+        drmaa_string = f'\" --mem={args.drmaa_mem} --time={args.drmaa_time} --output={workdir_full_path}/sge_log/%x-%j.log \"'
+        print("DEBUG", drmaa_string)
         arguments.append(
             drmaa_string
         )
@@ -64,5 +64,8 @@ def workflow_reassignment(args):
     subprocess.check_call(["mkdir", "-p", f"{args.workdir}sge_log"])
     subprocess.check_call(["mkdir", "-p", f"{args.workdir}covs"])
 
-    subprocess.check_call(arguments)
-
+    # DEBUG
+    subprocess.check_call(arguments,universal_newlines=True, shell=True)
+    #print("DEBUG TEST BASH SNAKEMAKE")
+    #subprocess.check_call(['bash','/fast/work/users/vmay_m/development/clear-cnv/clearCNV/workflow/sm.sh'])
+    # DEBUG
