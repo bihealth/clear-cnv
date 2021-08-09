@@ -54,7 +54,6 @@ def workflow_reassignment(args):
         workdir_full_path = str(pathlib.Path(args.workdir).absolute())
 
         drmaa_string = f' --mem={args.drmaa_mem} --time={args.drmaa_time} --output={workdir_full_path}/sge_log/%x-%j.log '
-        print("DEBUG::", drmaa_string)
         arguments.append(
             drmaa_string
         )
