@@ -47,10 +47,14 @@ def cnv_calling(args):
     Matchscores_selected = Matchscores.loc[selected_samples, selected_samples]
 
     if len(selected_samples) == 0:
-        print("ERROR: NO SAMPLES IN ANALYSIS. There were no samples selected to perform CNV calling. Try to pick a lower value for MINIMUM_GROUP_SIZES or a higher value for SAMPLE_SCORE_FACTOR. Aborting.")
-        raise Exception('No samples selected to smaple group. Try to pick a lower value for MINIMUM_GROUP_SIZES or a higher value for SAMPLE_SCORE_FACTOR.')
+        print(
+            "ERROR: NO SAMPLES IN ANALYSIS. There were no samples selected to perform CNV calling. Try to pick a lower value for MINIMUM_GROUP_SIZES or a higher value for SAMPLE_SCORE_FACTOR. Aborting."
+        )
+        raise Exception(
+            "No samples selected to smaple group. Try to pick a lower value for MINIMUM_GROUP_SIZES or a higher value for SAMPLE_SCORE_FACTOR."
+        )
 
-    for p in [calls_path,z_scores_path,ratio_scores_path]:
+    for p in [calls_path, z_scores_path, ratio_scores_path]:
         pathlib.Path(p).parent.mkdir(parents=True, exist_ok=True)
     pathlib.Path(analysis_dir).mkdir(parents=True, exist_ok=True)
 
@@ -70,7 +74,7 @@ def cnv_calling(args):
     plt.title("Sample group sizes and cutoff")
     x = plt.hist(
         Matchscores_bools.sum().sort_values(),
-        bins=int(len(selected_samples) / 3)+1,
+        bins=int(len(selected_samples) / 3) + 1,
         range=(0, len(selected_samples)),
     )
     plt.vlines(MINIMUM_SAMPLE_GROUP, 0, max(x[0]), color="darkred", label="cutoff")
@@ -124,7 +128,14 @@ def cnv_calling(args):
     for i in range(len(selected_samples)):
         pool.apply_async(
             util.calling_cnv,
-            args=(i, DA[0], Matchscores_bools_selected, DA[1], EXPECTED_CNV_RATE, ZSCALE,),
+            args=(
+                i,
+                DA[0],
+                Matchscores_bools_selected,
+                DA[1],
+                EXPECTED_CNV_RATE,
+                ZSCALE,
+            ),
             callback=collect_result,
         )
     pool.close()
@@ -149,7 +160,14 @@ def cnv_calling(args):
             if sum(Mx.iloc[i]) >= MINIMUM_SAMPLE_GROUP:
                 pool.apply_async(
                     util.calling_cnv,
-                    args=(i, DX[0], Mx, DX[1], EXPECTED_CNV_RATE, ZSCALE,),
+                    args=(
+                        i,
+                        DX[0],
+                        Mx,
+                        DX[1],
+                        EXPECTED_CNV_RATE,
+                        ZSCALE,
+                    ),
                     callback=collect_result,
                 )
         pool.close()
@@ -172,7 +190,14 @@ def cnv_calling(args):
             if sum(My.iloc[i]) >= MINIMUM_SAMPLE_GROUP:
                 pool.apply_async(
                     util.calling_cnv,
-                    args=(i, DY[0], My, DY[1], EXPECTED_CNV_RATE, ZSCALE,),
+                    args=(
+                        i,
+                        DY[0],
+                        My,
+                        DY[1],
+                        EXPECTED_CNV_RATE,
+                        ZSCALE,
+                    ),
                     callback=collect_result,
                 )
         pool.close()

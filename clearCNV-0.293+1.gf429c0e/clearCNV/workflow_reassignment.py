@@ -15,6 +15,7 @@ def create_config(configpath, args):
         print("bamsfile: '" + str(args.bamsfile) + "'", file=f)
         print("reference: '" + str(args.reference) + "'", file=f)
 
+
 def workflow_reassignment(args):
     args.bamsfile = (pathlib.Path(args.workdir) / "allbams.txt").absolute()
     args.cov_dir = (pathlib.Path(args.workdir) / "covs").absolute()
@@ -46,26 +47,24 @@ def workflow_reassignment(args):
         str(args.cores),
     ]
     if args.cluster_configfile:
-        arguments.append('--cluster-config')
+        arguments.append("--cluster-config")
         arguments.append(args.cluster_configfile)
     if args.drmaa_mem and args.drmaa_time and args.drmaa_jobs:
-        arguments.append('-p')
-        arguments.append('--drmaa')
+        arguments.append("-p")
+        arguments.append("--drmaa")
         workdir_full_path = str(pathlib.Path(args.workdir).absolute())
 
-        drmaa_string = f'\" --mem={args.drmaa_mem} --time={args.drmaa_time} --output={workdir_full_path}/sge_log/%x-%j.log \"'
+        drmaa_string = f'" --mem={args.drmaa_mem} --time={args.drmaa_time} --output={workdir_full_path}/sge_log/%x-%j.log "'
         print("DEBUG", drmaa_string)
-        arguments.append(
-            drmaa_string
-        )
-        arguments.append('-j')
+        arguments.append(drmaa_string)
+        arguments.append("-j")
         arguments.append(str(args.drmaa_jobs))
     # How to create the dir the best way?
     subprocess.check_call(["mkdir", "-p", f"{args.workdir}sge_log"])
     subprocess.check_call(["mkdir", "-p", f"{args.workdir}covs"])
 
     # DEBUG
-    subprocess.check_call(arguments,universal_newlines=True, shell=True)
-    #print("DEBUG TEST BASH SNAKEMAKE")
-    #subprocess.check_call(['bash','/fast/work/users/vmay_m/development/clear-cnv/clearCNV/workflow/sm.sh'])
+    subprocess.check_call(arguments, universal_newlines=True, shell=True)
+    # print("DEBUG TEST BASH SNAKEMAKE")
+    # subprocess.check_call(['bash','/fast/work/users/vmay_m/development/clear-cnv/clearCNV/workflow/sm.sh'])
     # DEBUG

@@ -21,6 +21,7 @@ def create_config(configpath, args):
         print("trans_prob: '" + str(args.trans_prob) + "'", file=f)
         print("plot_regions: '" + str(args.plot_regions) + "'", file=f)
 
+
 def workflow_cnv_calling(args):
     configpath = (
         pathlib.Path(__file__).absolute().parent
@@ -51,7 +52,7 @@ def workflow_cnv_calling(args):
         workdir_full_path = str(pathlib.Path(args.workdir).absolute())
         arguments.append(
             str(
-                f"\" --mem={args.drmaa_mem} --time={args.drmaa_time} --output={workdir_full_path}/sge_log/%x-%j.log\""
+                f'" --mem={args.drmaa_mem} --time={args.drmaa_time} --output={workdir_full_path}/sge_log/%x-%j.log"'
             )
         )
         arguments.append(f"--jobs {args.drmaa_jobs}")

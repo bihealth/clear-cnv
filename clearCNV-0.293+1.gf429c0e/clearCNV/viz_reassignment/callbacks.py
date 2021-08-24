@@ -29,7 +29,11 @@ def register_control_to_buffer(app):
     )
     def parameters_to_json(threshold, pca_components, batch_num):
         return json.dumps(
-            {"threshold": threshold, "pca_components": pca_components, "batch_num": batch_num,}
+            {
+                "threshold": threshold,
+                "pca_components": pca_components,
+                "batch_num": batch_num,
+            }
         )
 
 

@@ -193,7 +193,10 @@ def compute_pca(us: settings.reassignSettings):
 def compute_tsne(us: settings.reassignSettings):
     logger.info("Computing tSNE ...")
     data = load_all_data(us)
-    pca = PCA(n_components=us.pca_components, random_state=us.pca_seed,)
+    pca = PCA(
+        n_components=us.pca_components,
+        random_state=us.pca_seed,
+    )
     XT = pca.fit_transform(data.X.dropna(0).T)
 
     X_embedded = TSNE(n_components=2, random_state=us.pca_seed).fit_transform(XT)

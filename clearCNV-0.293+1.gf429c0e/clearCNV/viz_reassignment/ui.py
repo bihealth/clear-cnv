@@ -157,13 +157,17 @@ def render_main_content():
         if type_ == "graph":
             return dbc.Card(
                 dbc.CardBody(
-                    dbc.Spinner([dcc.Graph(id=id_)], color="primary"), className="mt-3 text-center",
+                    dbc.Spinner([dcc.Graph(id=id_)], color="primary"),
+                    className="mt-3 text-center",
                 ),
                 className="border-top-0 rounded-0",
             )
         else:
             return dbc.Card(
-                dbc.CardBody(dbc.Spinner(color="primary", id=id_), className="mt-3 text-center",),
+                dbc.CardBody(
+                    dbc.Spinner(color="primary", id=id_),
+                    className="mt-3 text-center",
+                ),
                 className="border-top-0 rounded-0",
             )
 
@@ -187,7 +191,11 @@ def render_main_content():
         children=[
             dbc.Row(
                 children=[
-                    dbc.Col(children=[controls], id="controls", md=3,),
+                    dbc.Col(
+                        children=[controls],
+                        id="controls",
+                        md=3,
+                    ),
                     dbc.Col(children=[dbc.Tabs(tabs_content)], id="plots", md=9),
                 ]
             )

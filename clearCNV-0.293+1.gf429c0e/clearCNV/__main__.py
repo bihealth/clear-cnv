@@ -171,20 +171,20 @@ def get_parser():
         default=0.001,
     )
     parser_cnv_calling.add_argument(
-        '--plot_regions',
-        dest='plot_regions',
+        "--plot_regions",
+        dest="plot_regions",
         help="If set, the CNV calling script plots heatmaps of the CNV called regions with the corresponding sample group taken as background.",
         required=False,
-        action='store_true'
+        action="store_true",
     )
     parser_cnv_calling.set_defaults(plot_regions=False)
-    #parser_cnv_calling.add_argument(
+    # parser_cnv_calling.add_argument(
     #    "--plot_regions",
     #    help="If true, the CNV calling script plots heatmaps of the regions.",
     #    required=False,
     #    type=bool,
     #    default=False,
-    #)
+    # )
     parser_cnv_calling.add_argument(
         "--cores",
         help="Number of cpu cores used in parallel processing. Default: determined automatically.",
@@ -247,13 +247,22 @@ def get_parser():
     #  merge bed
     # =========================================================================
     parser_merge_bed = subparsers.add_parser(
-        "merge_bed", description=("Merges bed files to non-overlapping intervals."),
+        "merge_bed",
+        description=("Merges bed files to non-overlapping intervals."),
     )
     parser_merge_bed.add_argument(
-        "-i", "--infile", help="Path to the original .bed file.", required=True, type=str,
+        "-i",
+        "--infile",
+        help="Path to the original .bed file.",
+        required=True,
+        type=str,
     )
     parser_merge_bed.add_argument(
-        "-o", "--outfile", help="Output path to the merged .bed file.", required=True, type=str,
+        "-o",
+        "--outfile",
+        help="Output path to the merged .bed file.",
+        required=True,
+        type=str,
     )
     parser_merge_bed.set_defaults(func=misc.merge_bedfile)
 
@@ -302,13 +311,25 @@ def get_parser():
         ),
     )
     parser_rtbeds.add_argument(
-        "-i", "--inbam", help="Path to the .bam file of the sample.", required=True, type=str,
+        "-i",
+        "--inbam",
+        help="Path to the .bam file of the sample.",
+        required=True,
+        type=str,
     )
     parser_rtbeds.add_argument(
-        "-b", "--bedfile", help="Path to the merged .bed file.", required=True, type=str,
+        "-b",
+        "--bedfile",
+        help="Path to the merged .bed file.",
+        required=True,
+        type=str,
     )
     parser_rtbeds.add_argument(
-        "-r", "--rtbed", help="Output file in .rtbed format.", required=True, type=str,
+        "-r",
+        "--rtbed",
+        help="Output file in .rtbed format.",
+        required=True,
+        type=str,
     )
     parser_rtbeds.set_defaults(func=misc.count_pair)
 
@@ -316,16 +337,30 @@ def get_parser():
     # merge rtbeds
 
     parser_merge_rtbeds = subparsers.add_parser(
-        "merge_coverages", description=("Merges all .rtbed files into one table in .tsv format."),
+        "merge_coverages",
+        description=("Merges all .rtbed files into one table in .tsv format."),
     )
     parser_merge_rtbeds.add_argument(
-        "-b", "--bedfile", help="Path to the merged .bed file.", required=True, type=str,
+        "-b",
+        "--bedfile",
+        help="Path to the merged .bed file.",
+        required=True,
+        type=str,
     )
     parser_merge_rtbeds.add_argument(
-        "-r", "--rtbeds", help="Input .rtbed file paths.", required=True, nargs="+", type=str,
+        "-r",
+        "--rtbeds",
+        help="Input .rtbed file paths.",
+        required=True,
+        nargs="+",
+        type=str,
     )
     parser_merge_rtbeds.add_argument(
-        "-c", "--coverages", help="Output table in .tsv format.", required=True, type=str,
+        "-c",
+        "--coverages",
+        help="Output table in .tsv format.",
+        required=True,
+        type=str,
     )
     parser_merge_rtbeds.set_defaults(func=misc.merge_rtbeds)
 
@@ -333,13 +368,22 @@ def get_parser():
     #  annotations
     # =========================================================================
     parser_annotations = subparsers.add_parser(
-        "annotations", description=("Creates annotations file."),
+        "annotations",
+        description=("Creates annotations file."),
     )
     parser_annotations.add_argument(
-        "-r", "--reference", help="Path to the genomic reference.", required=True, type=str,
+        "-r",
+        "--reference",
+        help="Path to the genomic reference.",
+        required=True,
+        type=str,
     )
     parser_annotations.add_argument(
-        "-b", "--bedfile", help="Path to the merged .bed file.", required=True, type=str,
+        "-b",
+        "--bedfile",
+        help="Path to the merged .bed file.",
+        required=True,
+        type=str,
     )
     parser_annotations.add_argument(
         "-k",
@@ -349,7 +393,11 @@ def get_parser():
         type=str,
     )
     parser_annotations.add_argument(
-        "-a", "--annotations", help="Output file in .bed format.", required=True, type=str,
+        "-a",
+        "--annotations",
+        help="Output file in .bed format.",
+        required=True,
+        type=str,
     )
     parser_annotations.set_defaults(func=misc.create_annotations_file)
 
@@ -363,13 +411,25 @@ def get_parser():
         ),
     )
     parser_workflow_cnv_calling.add_argument(
-        "-w", "--workdir", help="Path to the snakemake workdir.", required=True, type=str,
+        "-w",
+        "--workdir",
+        help="Path to the snakemake workdir.",
+        required=True,
+        type=str,
     )
     parser_workflow_cnv_calling.add_argument(
-        "-p", "--panelname", help="name of the panel or dataset.", required=True, type=str,
+        "-p",
+        "--panelname",
+        help="name of the panel or dataset.",
+        required=True,
+        type=str,
     )
     parser_workflow_cnv_calling.add_argument(
-        "-r", "--reference", help="Path to the genomic reference.", required=True, type=str,
+        "-r",
+        "--reference",
+        help="Path to the genomic reference.",
+        required=True,
+        type=str,
     )
     parser_workflow_cnv_calling.add_argument(
         "-b",
@@ -379,7 +439,11 @@ def get_parser():
         type=str,
     )
     parser_workflow_cnv_calling.add_argument(
-        "-d", "--bedfile", help="Path to the BED file that contains all targets of the sequencing panel. It must contain the columns: chr, start, end, gene.", required=True, type=str,
+        "-d",
+        "--bedfile",
+        help="Path to the BED file that contains all targets of the sequencing panel. It must contain the columns: chr, start, end, gene.",
+        required=True,
+        type=str,
     )
     parser_workflow_cnv_calling.add_argument(
         "-k",
@@ -454,11 +518,11 @@ def get_parser():
         default=0.001,
     )
     parser_workflow_cnv_calling.add_argument(
-        '--plot_regions',
-        dest='plot_regions',
+        "--plot_regions",
+        dest="plot_regions",
         help="If set, the CNV calling script plots heatmaps of the CNV called regions with the corresponding sample group taken as background.",
         required=False,
-        action='store_true'
+        action="store_true",
     )
     parser_workflow_cnv_calling.set_defaults(plot_regions=False)
     parser_workflow_cnv_calling.add_argument(
@@ -504,10 +568,18 @@ def get_parser():
         ),
     )
     parser_workflow_reassignment.add_argument(
-        "-w", "--workdir", help="Path to the snakemake workdir.", required=True, type=str,
+        "-w",
+        "--workdir",
+        help="Path to the snakemake workdir.",
+        required=True,
+        type=str,
     )
     parser_workflow_reassignment.add_argument(
-        "-r", "--reference", help="Path to the genomic reference.", required=True, type=str,
+        "-r",
+        "--reference",
+        help="Path to the genomic reference.",
+        required=True,
+        type=str,
     )
     parser_workflow_reassignment.add_argument(
         "-m",
@@ -578,7 +650,8 @@ def get_parser():
     #  visualize reassignment
     # =========================================================================
     parser_visualize_reassignmentment = subparsers.add_parser(
-        "visualize_reassignment", description=("Interactive reassignment visualization"),
+        "visualize_reassignment",
+        description=("Interactive reassignment visualization"),
     )
 
     parser_visualize_reassignmentment.add_argument(
