@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-import regex as re
+import re
 from sklearn.neighbors import KernelDensity
 from sklearn.linear_model import LinearRegression
 import seaborn as sns
