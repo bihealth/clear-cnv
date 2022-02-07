@@ -1,6 +1,6 @@
-import subprocess
+import subprocess, tempfile, shlex
 import pathlib
-
+from logzero import logger
 
 def create_config(configpath, args):
     with open(configpath, "wt") as f:
@@ -23,13 +23,16 @@ def create_config(configpath, args):
 
 
 def workflow_cnv_calling(args):
-    configpath = (
-        pathlib.Path(__file__).absolute().parent
-        / pathlib.Path("workflow")
-        / pathlib.Path("config_cnv_calling.yml")
-    )
-    configpath.parent.mkdir(parents=True, exist_ok=True)
-    create_config(configpath, args)
+    configpath = tempfile.NamedTemporaryFile(suffix=".yml")
+
+
+    # configpath = (
+    #     pathlib.Path(__file__).absolute().parent
+    #     / pathlib.Path("workflow")
+    #     / pathlib.Path("config_cnv_calling.yml")
+    # )
+    # configpath.parent.mkdir(parents=True, exist_ok=True)
+    create_config(configpath.name, args)
     arguments = [
         "snakemake",
         "--snakefile",
@@ -39,9 +42,7 @@ def workflow_cnv_calling(args):
             / pathlib.Path("Snakefile_cnv_calling")
         ),
         "--configfile",
-        str(configpath),
-        "--cores",
-        str(args.cores),
+        str(configpath.name)
     ]
     if args.cluster_configfile:
         arguments.append("--cluster-config")
@@ -49,13 +50,17 @@ def workflow_cnv_calling(args):
     if args.drmaa_mem and args.drmaa_time and args.drmaa_jobs:
         arguments.append("-p")
         arguments.append("--drmaa")
-        workdir_full_path = str(pathlib.Path(args.workdir).absolute())
         arguments.append(
             str(
-                f'" --mem={args.drmaa_mem} --time={args.drmaa_time} --output={workdir_full_path}/sge_log/%x-%j.log"'
+                f'" --mem={args.drmaa_mem} --time={args.drmaa_time} --output={str(args.workdir)}/sge_log/%x-%j.log"'
             )
         )
-        arguments.append(f"--jobs {args.drmaa_jobs}")
+        arguments.append("--jobs")
+        arguments.append(str(args.drmaa_jobs))
+    else:
+        arguments.append("--cores")
+        arguments.append(str(args.cores))
+    logger.info("snakemake arguments: %s"%(' '.join(arguments)))
     subprocess.check_call(arguments)
 
     # "panelname="+args.panelname,

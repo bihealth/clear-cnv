@@ -36,10 +36,10 @@ def get_parser():
         "-p", "--panel", help="Name of the data set (or panel)", required=True, type=str
     )
     parser_matchscores.add_argument(
-        "-c", "--coverages", help="Coverages file in tsv format", required=True, type=str
+        "-c", "--coverages", help="Coverages file in tsv format", required=True, type=os.path.abspath
     )
     parser_matchscores.add_argument(
-        "-m", "--matchscores", help="Output matchscores.tsv file", required=True, type=str
+        "-m", "--matchscores", help="Output matchscores.tsv file", required=True, type=os.path.abspath
     )
     parser_matchscores.add_argument(
         "-x",
@@ -80,42 +80,42 @@ def get_parser():
         "-p", "--panel", help="Name of the data set(or panel)", required=True, type=str
     )
     parser_cnv_calling.add_argument(
-        "-c", "--coverages", help="Coverages file in tsv format", required=True, type=str
+        "-c", "--coverages", help="Coverages file in tsv format", required=True, type=os.path.abspath
     )
     parser_cnv_calling.add_argument(
         "-a",
         "--analysis_directory",
         help="Path to the directory, where analysis files are stored",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_cnv_calling.add_argument(
         "-m",
         "--matchscores",
         help="matchscores.tsv file generated with matchscores.py",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_cnv_calling.add_argument(
         "-C",
         "--cnv_calls",
         help="Output cnv_calls.tsv file formatted in tsv format",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_cnv_calling.add_argument(
         "-r",
         "--ratio_scores",
         help="Output ratio scores file in tsv format. Best kept together with cnv_calls.tsv",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_cnv_calling.add_argument(
         "-z",
         "--z_scores",
         help="Output z-scores file in tsv format. Best kept together with cnv_calls.tsv",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_cnv_calling.add_argument(
         "-x",
@@ -210,28 +210,28 @@ def get_parser():
         "--analysis_directory",
         help="Path to the directory, where analysis files are stored",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_visualize.add_argument(
         "-r",
         "--ratio_scores",
         help="Ratio scores file in tsv format, generated in cnv_calling.py",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_visualize.add_argument(
         "-z",
         "--z_scores",
         help="Z-scores file in tsv format, generated in cnv_calling.py",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_visualize.add_argument(
         "-n",
         "--annotated",
         help="BED-formatted annotatins file generated with clearCNV annotations. E.g. annotations.bed.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_visualize.add_argument(
         "-s",
@@ -255,14 +255,14 @@ def get_parser():
         "--infile",
         help="Path to the original .bed file.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_merge_bed.add_argument(
         "-o",
         "--outfile",
         help="Output path to the merged .bed file.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_merge_bed.set_defaults(func=misc.merge_bedfile)
 
@@ -283,21 +283,21 @@ def get_parser():
         help="Path to the file containing the meta information. It is a .tsv of the scheme -panel bams.txt bed.bed. \
             It aligns each desired panel name with the corresponding .bam files and the .bed file.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_prepare_reassign.add_argument(
         "-b",
         "--bamsfile",
         help="Output .txt file. It will contain the distinct set of all given .bam file paths.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_prepare_reassign.add_argument(
         "-d",
         "--bedfile",
         help="Output .bed file. It will contain the merged union of all given .bed files.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_prepare_reassign.set_defaults(func=misc.prepare_reassignment)
 
@@ -315,21 +315,21 @@ def get_parser():
         "--inbam",
         help="Path to the .bam file of the sample.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_rtbeds.add_argument(
         "-b",
         "--bedfile",
         help="Path to the merged .bed file.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_rtbeds.add_argument(
         "-r",
         "--rtbed",
         help="Output file in .rtbed format.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_rtbeds.set_defaults(func=misc.count_pair)
 
@@ -345,7 +345,7 @@ def get_parser():
         "--bedfile",
         help="Path to the merged .bed file.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_merge_rtbeds.add_argument(
         "-r",
@@ -353,14 +353,14 @@ def get_parser():
         help="Input .rtbed file paths.",
         required=True,
         nargs="+",
-        type=str,
+        type=os.path.abspath,
     )
     parser_merge_rtbeds.add_argument(
         "-c",
         "--coverages",
         help="Output table in .tsv format.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_merge_rtbeds.set_defaults(func=misc.merge_rtbeds)
 
@@ -376,28 +376,28 @@ def get_parser():
         "--reference",
         help="Path to the genomic reference.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_annotations.add_argument(
         "-b",
         "--bedfile",
         help="Path to the merged .bed file.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_annotations.add_argument(
         "-k",
         "--kmer_align",
         help="Path to aligned k-mers (mappability) file in .bed format.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_annotations.add_argument(
         "-a",
         "--annotations",
         help="Output file in .bed format.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_annotations.set_defaults(func=misc.create_annotations_file)
 
@@ -415,7 +415,7 @@ def get_parser():
         "--workdir",
         help="Path to the snakemake workdir.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_workflow_cnv_calling.add_argument(
         "-p",
@@ -429,28 +429,28 @@ def get_parser():
         "--reference",
         help="Path to the genomic reference.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_workflow_cnv_calling.add_argument(
         "-b",
         "--bamsfile",
         help="Path to a .txt file that contains all paths to all used .bam files.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_workflow_cnv_calling.add_argument(
         "-d",
         "--bedfile",
         help="Path to the BED file that contains all targets of the sequencing panel. It must contain the columns: chr, start, end, gene.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_workflow_cnv_calling.add_argument(
         "-k",
         "--kmer_align",
         help="Path to aligned k-mers (mappability) file in .bed format.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_workflow_cnv_calling.add_argument(
         "-c",
@@ -529,7 +529,7 @@ def get_parser():
         "--cluster_configfile",
         help="Path to the cluster config file.",
         required=False,
-        type=str,
+        type=os.path.abspath,
         default="",
     )
 
@@ -572,14 +572,14 @@ def get_parser():
         "--workdir",
         help="Path to the snakemake workdir.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_workflow_reassignment.add_argument(
         "-r",
         "--reference",
         help="Path to the genomic reference.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
     parser_workflow_reassignment.add_argument(
         "-m",
@@ -587,7 +587,7 @@ def get_parser():
         help="Path to the file containing the meta information. It is a .tsv of the scheme [panel] [bams.txt] [bed.bed]. \
             It aligns each desired panel name with the corresponding .bam files and the .bed file.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
 
     parser_workflow_reassignment.add_argument(
@@ -595,14 +595,14 @@ def get_parser():
         "--coverages",
         help="Output file path to coverages matrix (e.g. coverages.tsv).",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
 
     parser_workflow_reassignment.add_argument(
         "-b",
         "--bedfile",
         required=True,
-        type=str,
+        type=os.path.abspath,
         help="Output file path to BED file that will contain the union of all given BED files",
     )
 
@@ -618,7 +618,7 @@ def get_parser():
         "--cluster_configfile",
         help="Path to the cluster config file.",
         required=False,
-        type=str,
+        type=os.path.abspath,
         default="",
     )
 
@@ -676,14 +676,14 @@ def get_parser():
         help="Path to the file containing the meta information. It is a .tsv of the scheme [panel name] [path of bams.txt] [path of targets.bed]. \
             It aligns each desired panel name with the corresponding .bam files and the .bed file.",
         required=True,
-        type=str,
+        type=os.path.abspath,
     )
 
     parser_visualize_reassignmentment.add_argument(
         "-c",
         "--coverages",
         required=True,
-        type=str,
+        type=os.path.abspath,
         help="Matrix in tsv format containing coverage values. Is output of 'workflow_reassignment' step",
     )
 
@@ -691,7 +691,7 @@ def get_parser():
         "-b",
         "--bedfile",
         required=True,
-        type=str,
+        type=os.path.abspath,
         help="Path to BED file that will contain the union of all given BED files",
     )
 

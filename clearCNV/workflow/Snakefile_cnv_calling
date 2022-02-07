@@ -18,7 +18,7 @@ KMER_ALIGN  = config["kmer_align"]
 #  DO NOT TOUCH
 
 
-folder          = pathlib.Path(PANEL)
+folder          = pathlib.Path(config["workdir"]) / PANEL
 BED_MERGED      = folder / "merged.bed"
 COV_DIR         = folder / "cov"
 RESULTS_DIR     = folder / "results"
