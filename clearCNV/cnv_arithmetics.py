@@ -91,26 +91,27 @@ class Target:
 
 
 class CNV:
-    def __init__(self, chr, start, end, gene, abb, score=1.0, size=None):
+    def __init__(self, chr, start, end, gene, abb, score=1.0, size=None, ratio=1.0):
         Target.__init__(self, chr, start, end, gene)
         self.abb = abb
         self.size = size
         self.score = float(score)
+        self.ratio = float(ratio)
 
     def __str__(self):
         if self.size:
             return "\t".join(
                 map(
                     str,
-                    [self.chr, self.start, self.end, self.gene, self.abb, self.score, self.size],
+                    [self.chr, self.start, self.end, self.gene, self.abb, self.score, self.size, self.ratio],
                 )
             )
         return "\t".join(
-            map(str, [self.chr, self.start, self.end, self.gene, self.abb, self.score])
+            map(str, [self.chr, self.start, self.end, self.gene, self.abb, self.score, self.ratio])
         )
 
     def __hash__(self):
-        return hash("\t".join(str(self).split("\t")[:-1]))
+        return hash("\t".join(str(self).split("\t")[:-2]))
 
     def __eq__(self, other):
         if type(other) == type(self):
@@ -153,6 +154,10 @@ class CNV:
             if self.size and other.size
             else 1.0,
             self.size + other.size if self.size and other.size else None,
+            (self.ratio * self.size + other.ratio * other.size) / (self.size + other.size)
+            if self.size and other.size
+            else 1.0,
+            self.size + other.size if self.size and other.size else None
         )
 
     def to_list(self):
@@ -160,10 +165,10 @@ class CNV:
             return list(
                 map(
                     str,
-                    [self.chr, self.start, self.end, self.gene, self.abb, self.score, self.size],
+                    [self.chr, self.start, self.end, self.gene, self.abb, self.score, self.size, self.ratio],
                 )
             )
-        return list(map(str, [self.chr, self.start, self.end, self.gene, self.abb, self.score]))
+        return list(map(str, [self.chr, self.start, self.end, self.gene, self.abb, self.score, self.ratio]))
 
     def get_size(self):
         return self.end - self.start
@@ -226,7 +231,7 @@ class Sample:
 # header = ["sample","chr","start","end","aberration","score","size"]
 def load_cnvs_from_df(df):
     samples = []
-    header = ["sample", "chr", "start", "end", "gene", "aberration", "score", "size"]
+    header = ["sample", "chr", "start", "end", "gene", "aberration", "score", "size", "ratio"]
     df.columns = header
     df.index = range(len(df.index))
     for sample in set(df["sample"]):

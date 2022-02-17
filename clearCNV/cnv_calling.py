@@ -277,6 +277,7 @@ def cnv_calling(args):
             "aberration",
             "size",
             "score",
+            "ratio",
             "sample_score",
         ],
     ).sort_values(by="score", ascending=False)
@@ -296,6 +297,7 @@ def cnv_calling(args):
                         1,
                         RZ.iloc[i, c],
                         float(S[RZ.columns[c]]),
+                        RR.iloc[i, c],
                     ]
                     for i, c in zip(*np.where((RZ < -3.5) & (RR < DEL_CUTOFF)))
                 ],
@@ -308,7 +310,9 @@ def cnv_calling(args):
                     "aberration",
                     "size",
                     "score",
+                    "ratio",
                     "sample_score",
+
                 ],
             ),
             pd.DataFrame(
@@ -320,6 +324,7 @@ def cnv_calling(args):
                         1,
                         RZ.iloc[i, c],
                         float(S[RZ.columns[c]]),
+                        RR.iloc[i, c],
                     ]
                     for i, c in zip(*np.where((RZ > 4.5) & (RR > DUP_CUTOFF)))
                 ],
@@ -332,6 +337,7 @@ def cnv_calling(args):
                     "aberration",
                     "size",
                     "score",
+                    "ratio",
                     "sample_score",
                 ],
             ),
@@ -342,7 +348,7 @@ def cnv_calling(args):
         [
             l.get_hits()
             for l in ca.load_cnvs_from_df(
-                RD[["sample", "chr", "start", "end", "gene", "aberration", "score", "size"]]
+                RD[["sample", "chr", "start", "end", "gene", "aberration", "score", "size", "ratio"]]
             )
         ]
     )
@@ -351,7 +357,7 @@ def cnv_calling(args):
             l.get_hits()
             for l in ca.load_cnvs_from_df(
                 SINGLE_EXONS[
-                    ["sample", "chr", "start", "end", "gene", "aberration", "score", "size"]
+                    ["sample", "chr", "start", "end", "gene", "aberration", "score", "size", "ratio"]
                 ]
             )
         ]
@@ -359,7 +365,7 @@ def cnv_calling(args):
     FS = pd.DataFrame(Matchscores_bools.loc[failed_samples].sum(axis=1), columns=["group_size"])
     FS["median_sample_score"] = Matchscores.loc[failed_samples].median(axis=1)
     X = [
-        [*h.to_list()[:6], h.to_list()[7], h.to_list()[6], *S[h.to_list()[0]]]
+        [*h.to_list(), *S[h.to_list()[0]]]
         for h in ca.hitsA_not_in_hitsB(SINGLE_HITS, BIG_HITS)
     ]
     FINAL = pd.concat([RD, pd.DataFrame(X, columns=RD.columns)])

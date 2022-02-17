@@ -258,7 +258,8 @@ def merge_score_cnvs(hmm_preds, z_scores, r_scores, index, del_cutoff, dup_cutof
                             *index[i - 1].split("_")[2:4],
                             "DUP" if hmm_preds[i - 1] == 2 else "DEL",
                             length - 1,
-                            score_cnv(start, i, z_scores)
+                            score_cnv(start, i, z_scores),
+                            rs
                         )
                     )
                 # cnv -> cnv
