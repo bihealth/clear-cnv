@@ -42,7 +42,6 @@ def workflow_cnv_calling(args):
         "--configfile",
         str(configpath.name)
     ]
-    print("\n XXX", str(args.cluster_configfile))
     if args.cluster_configfile:
         arguments.append("--cluster-config")
         arguments.append(args.cluster_configfile)
