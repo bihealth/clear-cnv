@@ -24,8 +24,6 @@ def create_config(configpath, args):
 
 def workflow_cnv_calling(args):
     configpath = tempfile.NamedTemporaryFile(suffix=".yml")
-
-
     # configpath = (
     #     pathlib.Path(__file__).absolute().parent
     #     / pathlib.Path("workflow")
@@ -44,6 +42,7 @@ def workflow_cnv_calling(args):
         "--configfile",
         str(configpath.name)
     ]
+    print("\n XXX", str(args.cluster_configfile))
     if args.cluster_configfile:
         arguments.append("--cluster-config")
         arguments.append(args.cluster_configfile)
@@ -60,6 +59,8 @@ def workflow_cnv_calling(args):
     else:
         arguments.append("--cores")
         arguments.append(str(args.cores))
+    #arguments.append("--rerun-incomplete")
+    #arguments.append("--unlock")
     logger.info("snakemake arguments: %s"%(' '.join(arguments)))
     subprocess.check_call(arguments)
 

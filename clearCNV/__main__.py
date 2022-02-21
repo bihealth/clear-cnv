@@ -530,7 +530,7 @@ def get_parser():
         help="Path to the cluster config file.",
         required=False,
         type=os.path.abspath,
-        default="",
+        default=None,
     )
 
     parser_workflow_cnv_calling.add_argument(

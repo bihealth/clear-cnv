@@ -278,7 +278,7 @@ def cnv_calling(args):
             "size",
             "score",
             "ratio",
-            "sample_score",
+            "sample_score"
         ],
     ).sort_values(by="score", ascending=False)
 
@@ -310,9 +310,8 @@ def cnv_calling(args):
                     "aberration",
                     "size",
                     "score",
-                    "ratio",
                     "sample_score",
-
+                    "ratio"
                 ],
             ),
             pd.DataFrame(
@@ -337,8 +336,8 @@ def cnv_calling(args):
                     "aberration",
                     "size",
                     "score",
-                    "ratio",
                     "sample_score",
+                    "ratio"
                 ],
             ),
         ]
@@ -364,11 +363,22 @@ def cnv_calling(args):
     )
     FS = pd.DataFrame(Matchscores_bools.loc[failed_samples].sum(axis=1), columns=["group_size"])
     FS["median_sample_score"] = Matchscores.loc[failed_samples].median(axis=1)
-    X = [
-        [*h.to_list(), *S[h.to_list()[0]]]
+    x_cols = ["sample",
+                    "chr",
+                    "start",
+                    "end",
+                    "gene",
+                    "aberration",
+                    "score",
+                    "size",
+                    "ratio",
+                    "sample_score"]
+    X = pd.DataFrame([
+        [*h.to_list(),*S[h.to_list()[0]]]
         for h in ca.hitsA_not_in_hitsB(SINGLE_HITS, BIG_HITS)
-    ]
-    FINAL = pd.concat([RD, pd.DataFrame(X, columns=RD.columns)])
+    ],columns=x_cols)
+
+    FINAL = pd.concat([RD.loc[:,X.columns], X])
     FINAL["score"] = FINAL["score"].astype(float).apply(lambda x: float(abs(x)))
     FINAL = FINAL.sort_values(by="score", ascending=False)
     FINAL.index = list(range(FINAL.shape[0]))
@@ -381,10 +391,10 @@ def cnv_calling(args):
     Matchscores_bools.to_csv(pathlib.Path(analysis_dir) / "samplegroups.tsv", sep="\t")
     FS.to_csv(pathlib.Path(analysis_dir) / "failed_samples.tsv", sep="\t")
 
-    if PLOT_REGIONS:
+    if PLOT_REGIONS and FINAL.shape[0] > 0:
         print("plotting all called CNVs with sample groups...")
         factor = 0.08
-        final_regions = ["-".join(FINAL.loc[i, ["chr", "start", "end"]]) for i in FINAL.index]
+        final_regions = ["-".join(FINAL.astype(str).loc[i, ["chr", "start", "end"]]) for i in FINAL.index]
         for i, region in enumerate(final_regions):
             print(f"plotting {i} of %d" % len(final_regions))
             sample = FINAL["sample"].iloc[i]

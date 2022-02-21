@@ -81,7 +81,7 @@ class Target:
         return self > other or self == other
 
     def to_list(self):
-        return list(map(str, [self.chr, self.start, self.end, self.gene]))
+        return [str(self.chr), int(self.start), int(self.end), str(self.gene)]
 
     def get_size(self):
         return self.end - self.start
@@ -162,13 +162,8 @@ class CNV:
 
     def to_list(self):
         if self.size:
-            return list(
-                map(
-                    str,
-                    [self.chr, self.start, self.end, self.gene, self.abb, self.score, self.size, self.ratio],
-                )
-            )
-        return list(map(str, [self.chr, self.start, self.end, self.gene, self.abb, self.score, self.ratio]))
+            return [str(self.chr), int(self.start), int(self.end), str(self.gene), str(self.abb), float(self.score), int(self.size), float(self.ratio)]
+        return [str(self.chr), int(self.start), int(self.end), str(self.gene), str(self.abb), float(self.score), float(self.ratio)]
 
     def get_size(self):
         return self.end - self.start
