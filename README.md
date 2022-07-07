@@ -21,15 +21,7 @@ or
 
 ```conda create -n clearcnv clearcnv -c conda-forge -c bioconda```
 
-### pip
-
-You can also use pip:
-```pip install clearCNV```
-after which you may need to install
- - bedops
- - bedtools
-
-Alternatively you can clone this repo and install it via pip locally. `cd` into it and `pip install -e .` but it also needs bedops and bedtools.
+Then clone this repo to your favorite location ```git clone git@github.com:bihealth/clear-cnv.git``` and `cd clear-cnv` into it. Now you can run the commands listed below.
 
 ## Quick run checks and examples
 
