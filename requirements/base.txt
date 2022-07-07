@@ -17,7 +17,7 @@ regex
 attrs
 cattrs
 
-dash
+dash =1.21.0
 dash-html-components
 dash-core-components
 dash-bootstrap-components
