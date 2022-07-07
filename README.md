@@ -7,9 +7,34 @@
 
 - Code Formatting: [black](https://github.com/psf/black)
 
+## Installation
+
+### conda
+
+ClearCNV is available on conda: https://anaconda.org/bioconda/clearcnv
+
+I'd recommend to create a conda env:
+
+```mamba create -n clearcnv clearcnv -c conda-forge -c bioconda```
+
+or
+
+```conda create -n clearcnv clearcnv -c conda-forge -c bioconda```
+
+### pip
+
+You can also use pip:
+```pip install clearCNV```
+after which you may need to install
+ - bedops
+ - bedtools
+
+Alternatively you can clone this repo and install it via pip locally. `cd` into it and `pip install -e .` but it also needs bedops and bedtools.
+
 ## Quick run checks and examples
 
-#### 1. Create all files to do reassignment
+### Sample reassignment:
+#### Create all files
 
 Go to the directory `clear-cnv/` and execute the shell commamd:
 ```clearCNV workflow_reassignment --workdir tests/testdata/ --reference tests/testdata/test_reassignment_ref.fa --metafile tests/testdata/test_reassign_meta.tsv --coverages tests/testdata/test_reassignment_coverages.tsv --bedfile tests/testdata/test_reassignment_union.bed --cores 2```
@@ -24,7 +49,8 @@ Optionally, **drmaa** can be used, if the two flags are present:
 where drmaa is given 16 Gb memory per core and and four hours maximum running time.
 Also, a cluster config file in .json format can be given with `--cluster_configfile config.json`
 
-#### 2. Visualize and adjust the clusterings and final panel assignments
+### Visualize sample reassignemnt:
+#### Visualize and adjust the clusterings and final panel assignments
 
 Run the following shell command from `clear-cnv/`:
 ```clearCNV visualize_reassignment --metafile tests/testdata/meta.tsv --coverages tests/testdata/cov_reassignment.tsv --bedfile tests/testdata/reassignment_union.bed --new_panel_assignments_directory tests/testdata/panel_assignments```
@@ -32,13 +58,18 @@ Run the following shell command from `clear-cnv/`:
 INPUT: files given by `--metafile`, `--coverages` and `--bedfile`.
 OUTPUT: files found in given directory `--new_panel_assignments_directory`.
 
-#### 3. Call CNVs
+### CNV calling
+
+#### Match scores
 
 At first, match scores are claculated. Go to the directory `clear-cnv/` and execute the shell command:
 
 ```clearCNV matchscores -p testpanel -c tests/testdata/cov.tsv -m tests/testdata/matchscores.tsv```
 
 This creates a match score matrix which is used in the CNV calling step.
+
+#### CNV calls
+
 Now execute this shell command:
 
 ```clearCNV cnv_calling -p testpanel -c tests/testdata/cov.tsv -a tests/testdata/testpanel/analysis -m tests/testdata/matchscores.tsv -C tests/testdata/testpanel/results/cnv_calls.tsv -r tests/testdata/testpanel/results/rscores.tsv -z tests/testdata/testpanel/results/zscores.tsv -g 15 -u 3```
@@ -87,11 +118,11 @@ Some files have to be acquired or created before these commands can be run:
 #### notes
 The chromosome name scheme in the reference and .bed-file should be of the forms: ChrX, chrX, X or Chr1, chr1, 1.
 
-CNV calling on Chr X or Chr Y: clearCNV automatically determines the copy number of the gonosomes. If your panel targets only a single gene there, it is better to delete according targets from the original .bed file to exclude them. It is necessary to have about double as many samples in your data set to enable meaningful CNV calling on the X or Y chromosomes with roughly equally many women and men in the samples.
+CNV calling on chr X or chr Y: clearCNV automatically determines the copy number of the gonosomes. If your panel targets only a single gene there, it is better to delete according targets from the original .bed file to exclude them. It is necessary to have about double as many samples in your data set to enable meaningful CNV calling on the X or Y chromosomes with roughly equally many women and men in the samples.
 
 
 #### NOTE
-If you do sample re-assignment on your own data, followed by CNV-calling, then only one metafile, one coverages file and one bedfile will be used. This means that `--metafile`, `--coverages` and `--bedfile` are given the same file paths in both workflow steps `clearCNV workflow_reassignment` and `clearCNV visualize_reassignment` of clearCNV.
+If you do sample re-assignment on your own data, followed by CNV-calling, then only one metafile, one coverages file, and one bedfile will be used. This means that `--metafile`, `--coverages` and `--bedfile` are given the same file paths in both workflow steps `clearCNV workflow_reassignment` and `clearCNV visualize_reassignment` of clearCNV.
 
 ### Running Checks
 
