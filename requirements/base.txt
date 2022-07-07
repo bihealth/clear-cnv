@@ -17,10 +17,10 @@ regex
 attrs
 cattrs
 
-dash ==1.21.0
-#dash-html-components
-#dash-core-components
-#dash-bootstrap-components
+dash
+dash-html-components
+dash-core-components
+dash-bootstrap-components
 flask
 flask-caching
 
