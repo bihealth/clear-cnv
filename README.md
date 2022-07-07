@@ -28,11 +28,11 @@ Then clone this repo to your favorite location ```git clone git@github.com:bihea
 ### Sample reassignment:
 #### Create all files
 
-Go to the directory `clear-cnv/` and execute the shell commamd:
+Execute the shell commamd (from within the cloned repo directory):
 ```clearCNV workflow_reassignment --workdir tests/testdata/ --reference tests/testdata/test_reassignment_ref.fa --metafile tests/testdata/test_reassign_meta.tsv --coverages tests/testdata/test_reassignment_coverages.tsv --bedfile tests/testdata/test_reassignment_union.bed --cores 2```
 
-INPUT: working directory given by `--workdir`, the files given by `--reference` and `--metafile`.
-OUTPUT: files created at `--coverages` and `--bedfile`. They are used in the next step.
+ - INPUT: working directory given by `--workdir`, the files given by `--reference` and `--metafile`.
+ - OUTPUT: files created at `--coverages` and `--bedfile`. They are used in the next step.
 
 If you want to create the necessary files for yourown data just edit the meta.tsv file analogously to the example at `clearCNV/tests/testdata/meta.tsv`, where you can add more rows for each targets file (BED-file). It is recommended to use absolute paths in the meta file.
 
@@ -41,14 +41,14 @@ Optionally, **drmaa** can be used, if the two flags are present:
 where drmaa is given 16 Gb memory per core and and four hours maximum running time.
 Also, a cluster config file in .json format can be given with `--cluster_configfile config.json`
 
-### Visualize sample reassignemnt:
+### Visualize sample reassignment:
 #### Visualize and adjust the clusterings and final panel assignments
 
-Run the following shell command from `clear-cnv/`:
+Execute the shell commamd (from within the cloned repo directory):
 ```clearCNV visualize_reassignment --metafile tests/testdata/meta.tsv --coverages tests/testdata/cov_reassignment.tsv --bedfile tests/testdata/reassignment_union.bed --new_panel_assignments_directory tests/testdata/panel_assignments```
 
-INPUT: files given by `--metafile`, `--coverages` and `--bedfile`.
-OUTPUT: files found in given directory `--new_panel_assignments_directory`.
+ - INPUT: files given by `--metafile`, `--coverages` and `--bedfile`.
+ - OUTPUT: files found in given directory `--new_panel_assignments_directory`.
 
 ### CNV calling
 
