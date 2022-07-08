@@ -36,10 +36,18 @@ def get_parser():
         "-p", "--panel", help="Name of the data set (or panel)", required=True, type=str
     )
     parser_matchscores.add_argument(
-        "-c", "--coverages", help="Coverages file in tsv format", required=True, type=os.path.abspath
+        "-c",
+        "--coverages",
+        help="Coverages file in tsv format",
+        required=True,
+        type=os.path.abspath,
     )
     parser_matchscores.add_argument(
-        "-m", "--matchscores", help="Output matchscores.tsv file", required=True, type=os.path.abspath
+        "-m",
+        "--matchscores",
+        help="Output matchscores.tsv file",
+        required=True,
+        type=os.path.abspath,
     )
     parser_matchscores.add_argument(
         "-x",
@@ -80,7 +88,11 @@ def get_parser():
         "-p", "--panel", help="Name of the data set(or panel)", required=True, type=str
     )
     parser_cnv_calling.add_argument(
-        "-c", "--coverages", help="Coverages file in tsv format", required=True, type=os.path.abspath
+        "-c",
+        "--coverages",
+        help="Coverages file in tsv format",
+        required=True,
+        type=os.path.abspath,
     )
     parser_cnv_calling.add_argument(
         "-a",

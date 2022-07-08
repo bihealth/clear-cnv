@@ -2,6 +2,7 @@ import subprocess, tempfile, shlex
 import pathlib
 from logzero import logger
 
+
 def create_config(configpath, args):
     with open(configpath, "wt") as f:
         print("workdir: '" + args.workdir + "'", file=f)
@@ -40,7 +41,7 @@ def workflow_cnv_calling(args):
             / pathlib.Path("Snakefile_cnv_calling")
         ),
         "--configfile",
-        str(configpath.name)
+        str(configpath.name),
     ]
     if args.cluster_configfile:
         arguments.append("--cluster-config")
@@ -58,9 +59,9 @@ def workflow_cnv_calling(args):
     else:
         arguments.append("--cores")
         arguments.append(str(args.cores))
-    #arguments.append("--rerun-incomplete")
-    #arguments.append("--unlock")
-    logger.info("snakemake arguments: %s"%(' '.join(arguments)))
+    # arguments.append("--rerun-incomplete")
+    # arguments.append("--unlock")
+    logger.info("snakemake arguments: %s" % (" ".join(arguments)))
     subprocess.check_call(arguments)
 
     # "panelname="+args.panelname,

@@ -278,7 +278,7 @@ def cnv_calling(args):
             "size",
             "score",
             "ratio",
-            "sample_score"
+            "sample_score",
         ],
     ).sort_values(by="score", ascending=False)
 
@@ -311,7 +311,7 @@ def cnv_calling(args):
                     "size",
                     "score",
                     "sample_score",
-                    "ratio"
+                    "ratio",
                 ],
             ),
             pd.DataFrame(
@@ -337,7 +337,7 @@ def cnv_calling(args):
                     "size",
                     "score",
                     "sample_score",
-                    "ratio"
+                    "ratio",
                 ],
             ),
         ]
@@ -347,7 +347,19 @@ def cnv_calling(args):
         [
             l.get_hits()
             for l in ca.load_cnvs_from_df(
-                RD[["sample", "chr", "start", "end", "gene", "aberration", "score", "size", "ratio"]]
+                RD[
+                    [
+                        "sample",
+                        "chr",
+                        "start",
+                        "end",
+                        "gene",
+                        "aberration",
+                        "score",
+                        "size",
+                        "ratio",
+                    ]
+                ]
             )
         ]
     )
@@ -356,29 +368,41 @@ def cnv_calling(args):
             l.get_hits()
             for l in ca.load_cnvs_from_df(
                 SINGLE_EXONS[
-                    ["sample", "chr", "start", "end", "gene", "aberration", "score", "size", "ratio"]
+                    [
+                        "sample",
+                        "chr",
+                        "start",
+                        "end",
+                        "gene",
+                        "aberration",
+                        "score",
+                        "size",
+                        "ratio",
+                    ]
                 ]
             )
         ]
     )
     FS = pd.DataFrame(Matchscores_bools.loc[failed_samples].sum(axis=1), columns=["group_size"])
     FS["median_sample_score"] = Matchscores.loc[failed_samples].median(axis=1)
-    x_cols = ["sample",
-                    "chr",
-                    "start",
-                    "end",
-                    "gene",
-                    "aberration",
-                    "score",
-                    "size",
-                    "ratio",
-                    "sample_score"]
-    X = pd.DataFrame([
-        [*h.to_list(),*S[h.to_list()[0]]]
-        for h in ca.hitsA_not_in_hitsB(SINGLE_HITS, BIG_HITS)
-    ],columns=x_cols)
+    x_cols = [
+        "sample",
+        "chr",
+        "start",
+        "end",
+        "gene",
+        "aberration",
+        "score",
+        "size",
+        "ratio",
+        "sample_score",
+    ]
+    X = pd.DataFrame(
+        [[*h.to_list(), *S[h.to_list()[0]]] for h in ca.hitsA_not_in_hitsB(SINGLE_HITS, BIG_HITS)],
+        columns=x_cols,
+    )
 
-    FINAL = pd.concat([RD.loc[:,X.columns], X])
+    FINAL = pd.concat([RD.loc[:, X.columns], X])
     FINAL["score"] = FINAL["score"].astype(float).apply(lambda x: float(abs(x)))
     FINAL = FINAL.sort_values(by="score", ascending=False)
     FINAL.index = list(range(FINAL.shape[0]))
@@ -394,7 +418,9 @@ def cnv_calling(args):
     if PLOT_REGIONS and FINAL.shape[0] > 0:
         print("plotting all called CNVs with sample groups...")
         factor = 0.08
-        final_regions = ["-".join(FINAL.astype(str).loc[i, ["chr", "start", "end"]]) for i in FINAL.index]
+        final_regions = [
+            "-".join(FINAL.astype(str).loc[i, ["chr", "start", "end"]]) for i in FINAL.index
+        ]
         for i, region in enumerate(final_regions):
             print(f"plotting {i} of %d" % len(final_regions))
             sample = FINAL["sample"].iloc[i]

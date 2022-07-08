@@ -103,7 +103,16 @@ class CNV:
             return "\t".join(
                 map(
                     str,
-                    [self.chr, self.start, self.end, self.gene, self.abb, self.score, self.size, self.ratio],
+                    [
+                        self.chr,
+                        self.start,
+                        self.end,
+                        self.gene,
+                        self.abb,
+                        self.score,
+                        self.size,
+                        self.ratio,
+                    ],
                 )
             )
         return "\t".join(
@@ -157,13 +166,30 @@ class CNV:
             (self.ratio * self.size + other.ratio * other.size) / (self.size + other.size)
             if self.size and other.size
             else 1.0,
-            self.size + other.size if self.size and other.size else None
+            self.size + other.size if self.size and other.size else None,
         )
 
     def to_list(self):
         if self.size:
-            return [str(self.chr), int(self.start), int(self.end), str(self.gene), str(self.abb), float(self.score), int(self.size), float(self.ratio)]
-        return [str(self.chr), int(self.start), int(self.end), str(self.gene), str(self.abb), float(self.score), float(self.ratio)]
+            return [
+                str(self.chr),
+                int(self.start),
+                int(self.end),
+                str(self.gene),
+                str(self.abb),
+                float(self.score),
+                int(self.size),
+                float(self.ratio),
+            ]
+        return [
+            str(self.chr),
+            int(self.start),
+            int(self.end),
+            str(self.gene),
+            str(self.abb),
+            float(self.score),
+            float(self.ratio),
+        ]
 
     def get_size(self):
         return self.end - self.start
