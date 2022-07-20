@@ -21,7 +21,8 @@ or
 
 ```conda create -n clearcnv clearcnv -c conda-forge -c bioconda```
 
-Then clone this repo to your favorite location ```git clone git@github.com:bihealth/clear-cnv.git``` and `cd clear-cnv` into it. Now you can run the commands listed below.
+
+Then clone this repo to your favorite location ```git clone git@github.com:bihealth/clear-cnv.git``` and `cd clear-cnv` into it. Lastly, activate the environment via ```mamba activate clearcnv``` or ```conda activate clearcnv```. Now you can run the commands listed below.
 
 ## Quick run checks and examples
 
