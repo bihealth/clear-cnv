@@ -94,7 +94,7 @@ Some files have to be acquired or created before these commands can be run:
     
     a) For each sequencing panel a .bed file is needed following this [form](tests/testdata/panel1.bed). Such a file should always exist in the case of targeted sequencing.
     
-    b) For each sequencing panel (or .bed-file containing all target informations) a simple list of the according .bam files is needed. An example can be found [here](tests/testdata/reassignment_p1_bamfiles.txt). Make sure to use absolute paths for this file on custim data.
+    b) For each sequencing panel (or .bed-file containing all target informations) a simple list of the according .bam files is needed. An example can be found [here](tests/testdata/reassignment_p1_bamfiles.txt). Make sure to use absolute paths for this file on custom data.
     
     c) meta-file. This file is a tab-separated file and one example can be found [here](tests/testdata/meta.tsv). To avoid any confusion, we recommend using absolute paths here again.
 
