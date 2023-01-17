@@ -27,8 +27,8 @@ Then clone this repo to your favorite location ```git clone git@github.com:bihea
 ## Quickstart
 #### Case one
 You have one gene panel (e.g. called '/path/to/genepanel.bed') and a collection of aligned short reads (sample_xy0.bam, sample_xy1.bam, ..) and you want to call CNVs.
-* write a 'meta-file' like [this one](tests/testdata/meta.tsv).
-  * Copy all full paths of your bam files to a txt-file '/path/to/bams.txt'.
+* Write a 'meta-file' like [this one](tests/testdata/meta.tsv).
+  * Copy all full paths of your bam files to a txt-file e.g. '/path/to/bams.txt'.
   * Your '/path/to/meta.tsv' file would look like this: `genepanel\t/path/to/bams.txt\t/path/to/genepanel.bed`
 * Use `clearCNV workflow_cnv_calling`. Type `clearCNV workflow_cnv_calling --help` to see how.
 * Check the QC files to see if everything went well.
@@ -36,9 +36,9 @@ You have one gene panel (e.g. called '/path/to/genepanel.bed') and a collection 
 
 #### Case two
 You have several panels and you're not really sure if the bam files are assigned correctly to each panel. You want the panels and batches separated and to call CNVs on each of them.
-* write a 'meta-file' like [this one](tests/testdata/meta.tsv).
-  * Copy all full paths of your bam files that you think belong to panel 1 to a txt-file '/path/to/p1_bamfiles.txt'.
-  * Copy all full paths of your bam files that you think belong to panel 2 to a txt-file '/path/to/p2_bamfiles.txt'. Do that for all panels. 
+* Write a 'meta-file' like [this one](tests/testdata/meta.tsv).
+  * Copy all full paths of your bam files that you think belong to panel 1 to a txt-file e.g. '/path/to/p1_bamfiles.txt'.
+  * Copy all full paths of your bam files that you think belong to panel 2 to a txt-file e.g. '/path/to/p2_bamfiles.txt'. Do that for all panels. 
   * Your '/path/to/meta.tsv' file would look like this: `genepanel\t/path/to/bams.txt\t/path/to/genepanel.bed`
   * Run `clearCNV workflow_reassignment`. Type `clearCNV workflow_reassignment --help` to see how.
   * Run `clearCNV visualize_reassignment`. Type `clearCNV visualize_reassignment --help` to see how. You'll need to open the URL with your browser.
