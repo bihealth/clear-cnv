@@ -98,7 +98,7 @@ clearCNV comprises of two major workflows and three major commads:
 
 #### workflow
 
-1) re-assignment
+1) re-assignment (not necessary for CNV calling)
     
     a) `clearCNV workflow_reassignment`
     
@@ -113,15 +113,15 @@ clearCNV comprises of two major workflows and three major commads:
 Some files have to be acquired or created before these commands can be run:
 1) re-assignment:
     
-    a) For each sequencing panel a .bed file is needed following this [form](tests/testdata/panel1.bed). Such a file should always exist in the case of targeted sequencing.
+    a) For each sequencing panel a .bed file is needed following this [form](tests/testdata/panel1.bed).
     
-    b) For each sequencing panel (or .bed-file containing all target informations) a simple list of the according .bam files is needed. An example can be found [here](tests/testdata/reassignment_p1_bamfiles.txt). Make sure to use absolute paths for this file on custom data.
+    b) For each sequencing panel (or .bed-file containing all target informations) a simple list of the according .bam files is needed. An example can be found [here](tests/testdata/reassignment_p1_bamfiles.txt). Make sure to use absolute paths for this file.
     
     c) meta-file. This file is a tab-separated file and one example can be found [here](tests/testdata/meta.tsv). To avoid any confusion, we recommend using absolute paths here again.
 
 2) CNV calling:
 
-    a) A reference file. It must be the same that was used to create the alignment files (.bam files).
+    a) A genome reference file. It must be the same that was used to create the read alignment files (.bam files).
     
     b) `workflow_cnv_calling` does CNV calling for each batch (or sequencing panel associated data set) separately. A text file with all .bam file paths for each batch and panel must be created. [Here](tests/testdata/test_reassignment_p1_bamfiles.txt) is an example showing only one .bam file path. Multiple paths are separated with a newline. This file is usually an output of `clearCNV visualize_reassignment`.
     
@@ -129,14 +129,12 @@ Some files have to be acquired or created before these commands can be run:
     
     d) A k-mer alignability file in .bed format. Such files can be downloaded from UCSC (e.g. for Hg19 [here](http://genome.ucsc.edu/cgi-bin/hgFileUi?db=hg19&g=wgEncodeMapability)). A k-mer mappability track can also be created for example using [GenMap](https://github.com/cpockrandt/genmap). In both cases the resulting Wig or BigWig files need to be converted to .bed to be used by clearCNV.
 
-#### notes
+#### NOTES
 The chromosome name scheme in the reference and .bed-file should be of the forms: ChrX, chrX, X or Chr1, chr1, 1.
 
-CNV calling on chr X or chr Y: clearCNV automatically determines the copy number of the gonosomes. If your panel targets only a single gene there, it is better to delete according targets from the original .bed file to exclude them. It is necessary to have about double as many samples in your data set to enable meaningful CNV calling on the X or Y chromosomes with roughly equally many women and men in the samples.
+CNV calling on chr X or chr Y: clearCNV automatically determines the copy number of the gonosomes. If your panel targets only a single gene per chromosome, then it is better to delete according targets from the original .bed file to exclude them. It is necessary to have about double as many samples in your data set to enable meaningful CNV calling on the X or Y chromosomes with roughly equally many women and men in the samples.
 
-
-#### NOTE
-If you do sample re-assignment on your own data, followed by CNV-calling, then only one metafile, one coverages file, and one bedfile will be used. This means that `--metafile`, `--coverages` and `--bedfile` are given the same file paths in both workflow steps `clearCNV workflow_reassignment` and `clearCNV visualize_reassignment` of clearCNV.
+If you do sample re-assignment on your own data, followed by CNV-calling, then only one metafile, one coverages file, and one bedfile will be used. This means that `--metafile`, `--coverages` and `--bedfile` are given the same file paths in both workflow steps `clearCNV workflow_reassignment` and `clearCNV visualize_reassignment` of clearCNV. The coverages file can not be re-used for the CNV calling steps.
 
 ### Running Checks
 
