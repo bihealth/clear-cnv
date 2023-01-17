@@ -32,7 +32,7 @@ You have one gene panel (e.g. called '/path/to/genepanel.bed') and a collection 
   * Your '/path/to/meta.tsv' file would look like this: `genepanel\t/path/to/bams.txt\t/path/to/genepanel.bed`
 * Use `clearCNV workflow_cnv_calling`. Type `clearCNV workflow_cnv_calling --help` to see how.
 * Check the QC files to see if everything went well.
-
+* Read more: https://github.com/bihealth/clear-cnv/blob/master/README.md#how-to-and-workflow
 
 #### Case two
 You have several panels and you're not really sure if the bam files are assigned correctly to each panel. You want the panels and batches separated and to call CNVs on each of them.
@@ -43,6 +43,7 @@ You have several panels and you're not really sure if the bam files are assigned
   * Run `clearCNV workflow_reassignment`. Type `clearCNV workflow_reassignment --help` to see how.
   * Run `clearCNV visualize_reassignment`. Type `clearCNV visualize_reassignment --help` to see how. You'll need to open the URL with your browser.
   * After you ran each step in your browser, there will be a folder that contains all newly assigned batches. In each panel/batch you'll find a txt file that contains patchs to .bam files. These are your batches! Proceed with the `clearCNV workflow_cnv_calling` step for each batch. Type `clearCNV workflow_cnv_calling --help` to see how.
+  * Read more: https://github.com/bihealth/clear-cnv/blob/master/README.md#how-to-and-workflow
 
 ## Quick run checks and examples
 
