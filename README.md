@@ -24,7 +24,7 @@ or
 
 Then clone this repo to your favorite location ```git clone git@github.com:bihealth/clear-cnv.git``` and `cd clear-cnv` into it. Lastly, activate the environment via ```mamba activate clearcnv``` or ```conda activate clearcnv```. Now you can run the commands listed below.
 
-## for the impatient
+## Quickstart
 #### Case one
 You have one gene panel (e.g. called '/path/to/genepanel.bed') and a collection of aligned short reads (sample_xy0.bam, sample_xy1.bam, ..) and you want to call CNVs.
 * write a 'meta-file' like [this one](tests/testdata/meta.tsv).
