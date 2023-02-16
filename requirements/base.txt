@@ -23,7 +23,7 @@ dash-core-components
 dash-bootstrap-components
 flask
 flask-caching
-werkzeug ==2.0.0
+werkzeug ==2.2.3
 
 #bedops
 #drmaa
